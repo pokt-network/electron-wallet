@@ -1,10 +1,13 @@
 import React from 'react';
 import './App.scss';
 
-function App() {
+interface AppProps {
+  version: string;
+}
+function App({ version }: AppProps) {
   return (
     <div>
-      <h1 className={'text-center'}>Wallet</h1>
+      <h1 className={'text-center'}>Wallet v{version}</h1>
     </div>
   );
 }

@@ -8,7 +8,9 @@
     "start": "react-scripts start",
     "start-app": "electron .",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test-front": "react-scripts test",
+    "test-back": "mocha ./test-back/tests.js",
+    "test-all": "npm run test-front && npm run test-back",
     "eject": "react-scripts eject"
   },
   "dependencies": {
@@ -22,10 +24,14 @@
     "electron": "^15.3.0",
     "electron-context-menu": "^3.1.1",
     "electron-is-dev": "^2.0.0",
+    "fs-extra": "^10.0.0",
+    "lodash": "^4.17.21",
+    "mocha": "^9.1.3",
     "node-sass": "^5.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
+    "should": "^13.2.3",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1"
   },
