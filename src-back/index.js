@@ -2,8 +2,11 @@ const { app, BrowserWindow, ipcMain, screen } = require('electron');
 const electronContextMenu = require('electron-context-menu');
 const isDev = require('electron-is-dev');
 const path = require('path');
+const serve = require('electron-serve');
 const { getPackageJson } = require('./util');
 const API = require('./modules/api');
+
+const serveDir = !isDev ? serve({directory: path.resolve(__dirname, '../build')}) : null;
 
 // Add a default system context menu on right click anywhere in the application
 electronContextMenu();
@@ -30,8 +33,13 @@ const init = async function() {
   appWindow.once('ready-to-show', () => {
     appWindow.show();
   });
-  await appWindow.loadURL('http://localhost:3000');
-  if(isDev) appWindow.toggleDevTools();
+  if(isDev) {
+    await appWindow.loadURL('http://localhost:3000');
+    appWindow.toggleDevTools();
+  } else {
+    serveDir(appWindow)
+      .catch(console.error);
+  }
 };
 
 app.on('window-all-closed', () => {

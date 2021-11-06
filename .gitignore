@@ -64,6 +64,7 @@ typings/
 
 # production
 /build
+/build-native
 
 # misc
 .DS_Store
@@ -72,3 +73,4 @@ typings/
 .env.test.local
 .env.production.local
 .idea
+/temp
