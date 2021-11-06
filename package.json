@@ -8,6 +8,10 @@
     "start": "react-scripts start",
     "start-app": "electron .",
     "build": "react-scripts build",
+    "build-native-linux": "npm run native-build-prep && electron-builder --dir --linux --publish never",
+    "pack-native-linux": "npm run native-build-prep && electron-builder --linux --publish never",
+    "build-native-mac": "npm run native-build-prep && electron-builder --dir --mac --publish never",
+    "pack-native-mac": "npm run native-build-prep && electron-builder --mac --publish never",
     "build-native-win": "npm run native-build-prep && electron-builder --dir --win --publish never",
     "pack-native-win": "npm run native-build-prep && electron-builder --win --publish never",
     "native-build-prep": "node ./native-build-scripts/clear-build-dir.js && npm run build && node ./native-build-scripts/copy-files.js && cd temp && npm install --production && cd ..",
@@ -82,30 +86,6 @@
       "output": "build-native"
     },
     "extends": null,
-    "win": {
-      "artifactName": "pocket-wallet-${version}-${os}-${arch}.${ext}",
-      "verifyUpdateCodeSignature": false,
-      "target": [
-        {
-          "target": "zip",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "icon": "./public/favicon.ico",
-      "publish": {
-        "provider": "github",
-        "releaseType": "draft"
-      }
-    },
-    "mac": {},
     "linux": {
       "target": [
         {
@@ -126,8 +106,44 @@
       "description": "Official lite wallet of Pocket Foundation.",
       "category": "Utility",
       "desktop": {
-        "Name": "Pocket Wallet"
+        "Name": "Pocket Wallet",
+        "StartupWMClass": "pocket-wallet"
       },
+      "publish": {
+        "provider": "github",
+        "releaseType": "draft"
+      }
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.utilities",
+      "icon": "./public/favicon.icns",
+      "publish": {
+        "provider": "github",
+        "releaseType": "draft"
+      }
+    },
+    "win": {
+      "artifactName": "pocket-wallet-${version}-${os}-${arch}.${ext}",
+      "verifyUpdateCodeSignature": false,
+      "target": [
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "./public/favicon.ico",
       "publish": {
         "provider": "github",
         "releaseType": "draft"
