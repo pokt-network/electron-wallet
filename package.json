@@ -1,13 +1,14 @@
 {
-  "name": "dl-wallet",
+  "name": "pocket-wallet",
   "version": "0.1.0",
-  "description": "dl-wallet",
+  "description": "Official lite wallet of Pocket Foundation.",
   "main": "./src-back/index.js",
   "private": true,
   "scripts": {
     "start": "react-scripts start",
     "start-app": "electron .",
     "build": "react-scripts build",
+    "build-native": "npm run build && node ./native-build-scripts/copy-files.js && cd temp && npm install --production && cd .. && electron-builder --dir --publish never",
     "test-front": "react-scripts test",
     "test-back": "mocha ./test-back/tests.js",
     "test-all": "npm run test-front && npm run test-back",
@@ -21,9 +22,10 @@
     "@types/node": "^12.0.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
-    "electron": "^15.3.0",
     "electron-context-menu": "^3.1.1",
     "electron-is-dev": "^2.0.0",
+    "electron-serve": "^1.1.0",
+    "electron-updater": "^4.3.9",
     "fs-extra": "^10.0.0",
     "lodash": "^4.17.21",
     "mocha": "^9.1.3",
@@ -31,9 +33,14 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
+    "rmrf-promise": "^1.1.0",
     "should": "^13.2.3",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1"
+  },
+  "devDependencies": {
+    "electron": "15.3.0",
+    "electron-builder": "^22.13.1"
   },
   "eslintConfig": {
     "extends": [
@@ -61,5 +68,45 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/pokt-foundation/dl-wallet/issues"
+  },
+  "build": {
+    "electronVersion": "15.3.0",
+    "appId": "network.pokt.pocket-wallet",
+    "productName": "Pocket Wallet",
+    "artifactName": "pocket-wallet-${version}-${os}.${ext}",
+    "copyright": "Copyright © 2021 by Pocket Foundation",
+    "directories": {
+      "app": "temp",
+      "output": "build-native"
+    },
+    "win": {},
+    "mac": {},
+    "linux": {
+      "target": [
+        {
+          "target": "appImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "tar.gz",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "./public/images/linux/",
+      "synopsis": "Official lite wallet of Pocket Foundation.",
+      "description": "Official lite wallet of Pocket Foundation.",
+      "category": "Utility",
+      "desktop": {
+        "Name": "Pocket Wallet"
+      },
+      "publish": {
+        "provider": "github",
+        "releaseType": "draft"
+      }
+    }
   }
 }
