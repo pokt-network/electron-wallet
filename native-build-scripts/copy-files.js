@@ -13,6 +13,8 @@ const {ensureDir} = require("fs-extra");
     'src-back',
   ];
 
+  console.log('Clearing temp directory');
+
   const tempDir = path.resolve(__dirname, '../temp');
 
   await rmrf(tempDir);
@@ -21,6 +23,9 @@ const {ensureDir} = require("fs-extra");
   for(const file of filesToCopy) {
     const filePath = path.resolve(__dirname, '..', file);
     const destination = path.join(tempDir, file);
+
+    console.log(`Copying ${filePath} > ${destination}`);
+
     if(file === 'package.json') {
       const packageJson = await fs.readJSON(filePath);
       await fs.writeJSON(destination, omit(packageJson, ['build']), {spaces: 2});
