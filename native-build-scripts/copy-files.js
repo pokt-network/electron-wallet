@@ -13,7 +13,7 @@ const {ensureDir} = require("fs-extra");
     'src-back',
   ];
 
-  console.log('Clearing temp directory');
+  console.log('Clearing temp directory\n');
 
   const tempDir = path.resolve(__dirname, '../temp');
 
@@ -33,6 +33,8 @@ const {ensureDir} = require("fs-extra");
       await fs.copy(filePath, destination);
     }
   }
+
+  console.log('');
 
 })();
 
