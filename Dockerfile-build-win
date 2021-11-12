@@ -1,0 +1,17 @@
+FROM electronuserland/builder:wine
+
+# Create app directory
+RUN mkdir -p /pocket-wallet/build-native
+
+WORKDIR /pocket-wallet/
+VOLUME /pocket-wallet/build-native
+
+# Install app dependencies
+COPY package.json /pocket-wallet/
+RUN npm install
+
+# Bundle app source
+COPY . /pocket-wallet/
+
+ENTRYPOINT ["npm"]
+CMD ["run", "pack-native-win"]
