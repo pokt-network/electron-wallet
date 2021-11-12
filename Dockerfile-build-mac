@@ -1,0 +1,30 @@
+FROM ubuntu:20.04
+
+ARG PLATFORM="mac"
+
+# Update packages & install native dependencies
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+     curl gnupg build-essential ca-certificates
+
+ # Install node js
+RUN apt-get update \
+  && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
+  && apt-get install -y --no-install-recommends \
+      nodejs
+
+# Create app directory
+RUN mkdir -p /pocket-wallet/build-native
+
+WORKDIR /pocket-wallet/
+VOLUME /pocket-wallet/build-native
+
+# Install app dependencies
+COPY package.json /pocket-wallet/
+RUN npm install
+
+# Bundle app source
+COPY . /pocket-wallet/
+
+ENTRYPOINT ["npm"]
+CMD ["run", "build-native-mac"]
