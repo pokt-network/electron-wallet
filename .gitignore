@@ -74,3 +74,4 @@ typings/
 .env.production.local
 .idea
 /temp
+package-lock.json
