@@ -23,5 +23,5 @@ Set environment variable `CI` to `true` and run `yarn run test-all`
 2. `docker run --rm -ti -v [path to local output directory]:/pocket-wallet/build-native pocket-wallet-build-mac`
 
 ## Linux builds via docker
-1. `docker build -t pocket-wallet-build-linux -f Dockerfile-build-mac .`
+1. `docker build -t pocket-wallet-build-linux -f Dockerfile-build-linux .`
 2. `docker run --rm -ti -v [path to local output directory]:/pocket-wallet/build-native pocket-wallet-build-linux`
