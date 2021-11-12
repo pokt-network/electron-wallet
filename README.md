@@ -13,3 +13,15 @@
 
 ## Run Tests
 Set environment variable `CI` to `true` and run `yarn run test-all`
+
+## Windows builds via docker
+1. `docker build -t pocket-wallet-build-win -f Dockerfile-build-win .`
+2. `docker run --rm -ti -v [path to local output directory]:/pocket-wallet/build-native pocket-wallet-build-win`
+
+## macOS builds via docker
+1. `docker build -t pocket-wallet-build-mac -f Dockerfile-build-mac .`
+2. `docker run --rm -ti -v [path to local output directory]:/pocket-wallet/build-native pocket-wallet-build-mac`
+
+## Linux builds via docker
+1. `docker build -t pocket-wallet-build-linux -f Dockerfile-build-mac .`
+2. `docker run --rm -ti -v [path to local output directory]:/pocket-wallet/build-native pocket-wallet-build-linux`
