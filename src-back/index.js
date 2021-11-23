@@ -3,7 +3,7 @@ const electronContextMenu = require('electron-context-menu');
 const isDev = require('electron-is-dev');
 const path = require('path');
 const serve = require('electron-serve');
-const { getPackageJson } = require('./util');
+const { getPackageJson, createLogger} = require('./util');
 const API = require('./modules/api');
 
 const serveDir = !isDev ? serve({directory: path.resolve(__dirname, '../build')}) : null;
@@ -17,7 +17,8 @@ const init = async function() {
   const defaultHeight = 900;
 
   const packageJson = await getPackageJson();
-  const api = new API(ipcMain, packageJson);
+  const logger = createLogger('', true);
+  const api = new API(ipcMain, packageJson, logger);
 
   const appWindow = new BrowserWindow({
     backgroundColor: '#262A34',
