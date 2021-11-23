@@ -8,6 +8,7 @@ class API {
 
   keys = {
     // General listeners
+    GET_ENDPOINT: 'GET_ENDPOINT',
     GET_VERSION: 'GET_VERSION',
     LOG_INFO: 'LOG_INFO',
     LOG_ERROR: 'LOG_ERROR',
@@ -15,18 +16,23 @@ class API {
 
   /**
    * Constructs an API instance
-   * @param {electron.ipcMain} ipcMain:
+   * @param {Electron.IpcMain} ipcMain:
    * @param {{version: string}} packageJson
    * @param {Logger} logger
    */
   constructor(ipcMain, packageJson, logger) {
     this._ipcMain = ipcMain;
     this._packageJson = packageJson;
-    this.logger = logger;
+    this._logger = logger;
     ipcMain
+      .on(this.keys.GET_ENDPOINT, this.getEndpoint)
       .on(this.keys.GET_VERSION, this.getVersion.bind(this))
-      .on(this.keys.LOG_INFO, this.logInfo)
-      .on(this.keys.LOG_ERROR, this.logError)
+      .on(this.keys.LOG_INFO, this.logInfo.bind(this))
+      .on(this.keys.LOG_ERROR, this.logError.bind(this))
+  }
+
+  getEndpoint(e) {
+    e.returnValue = process.env.ENDPOINT || '';
   }
 
   /**
@@ -37,13 +43,13 @@ class API {
     e.returnValue = this._packageJson.version;
   }
 
-  logInfo(message) {
+  logInfo(e, message) {
     if(message) {
       this._logger.info(message);
     }
   }
 
-  logError(message) {
+  logError(e, message) {
     if(message) {
       this._logger.error(message);
     }

@@ -4,6 +4,7 @@ class API {
 
   keys = {
     // General listeners
+    GET_ENDPOINT: 'GET_ENDPOINT',
     GET_VERSION: 'GET_VERSION',
     LOG_INFO: 'LOG_INFO',
     LOG_ERROR: 'LOG_ERROR',
@@ -11,6 +12,10 @@ class API {
 
   constructor(ipcRenderer: any) {
     this._ipcRenderer = ipcRenderer;
+  }
+
+  getEndpoint(): string {
+    return this._ipcRenderer.sendSync(this.keys.GET_ENDPOINT);
   }
 
   /**

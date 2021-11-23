@@ -5,6 +5,7 @@ const path = require('path');
 const serve = require('electron-serve');
 const { getPackageJson, createLogger} = require('./util');
 const API = require('./modules/api');
+const { LOG_FILENAME } = require('./constants');
 
 const serveDir = !isDev ? serve({directory: path.resolve(__dirname, '../build')}) : null;
 
@@ -12,12 +13,17 @@ const serveDir = !isDev ? serve({directory: path.resolve(__dirname, '../build')}
 electronContextMenu();
 
 const init = async function() {
+
+  // ToDo add content security policy
+
   const { height, width } = screen.getPrimaryDisplay().workAreaSize;
   const defaultWidth = 1440;
   const defaultHeight = 900;
 
+  const appDataDir = app.getPath('userData');
+
   const packageJson = await getPackageJson();
-  const logger = createLogger('', true);
+  const logger = createLogger(path.join(appDataDir, LOG_FILENAME), true);
   const api = new API(ipcMain, packageJson, logger);
 
   const appWindow = new BrowserWindow({
@@ -39,7 +45,9 @@ const init = async function() {
     appWindow.toggleDevTools();
   } else {
     serveDir(appWindow)
-      .catch(console.error);
+      .catch(err => {
+        logger.error(`'serveDir error: ${err.message} \n ${err.stack}`);
+      });
   }
 };
 

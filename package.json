@@ -36,6 +36,7 @@
     "redux": "^4.1.2",
     "rmrf-promise": "^1.1.0",
     "rxjs": "^7.4.0",
+    "sweetalert": "^2.1.2",
     "uuid": "^8.3.2",
     "web-vitals": "^1.0.1",
     "winston": "^3.3.3"
@@ -50,6 +51,7 @@
     "@types/node": "^12.0.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "@types/sweetalert": "^2.0.4",
     "@types/uuid": "^8.3.3",
     "electron": "15.3.0",
     "electron-builder": "^22.13.1",
