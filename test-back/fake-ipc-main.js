@@ -1,6 +1,8 @@
 class FakeIPCMain {
 
-  on() {}
+  on() {
+    return this;
+  }
 
 }
 
