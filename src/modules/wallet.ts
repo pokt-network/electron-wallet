@@ -54,7 +54,7 @@ export class Wallet {
     if(err instanceof RpcError) {
       this.logError(`wallet.${method}() failed with error code ${err.code} and message "${err.message}"`);
     } else {
-      this.logError(`wallet.${method}() failed with message "${err.message}"` + '\n' + err.stack);
+      this.logError(`wallet.${method}() failed with message "${err.message}" \n ${err.stack}`);
     }
   }
 

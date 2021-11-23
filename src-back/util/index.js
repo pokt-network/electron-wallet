@@ -18,21 +18,21 @@ module.exports.getPackageJson = () => {
  * @returns {Logger}
  */
 module.exports.createLogger = (logFilePath = '', logToConsole = false) => {
-  const transports = [];
+  const transportsArr = [];
   if(logFilePath)
-    transports.push(new transports.File({
+    transportsArr.push(new transports.File({
       filename: logFilePath,
-      maxsize: 2 * 1024000, // 2MB
+      maxsize: 4 * 1024000, // 4MB
       maxFiles: 1,
       tailable: true,
     }));
   if(logToConsole)
-    transports.push(new transports.Console());
+    transportsArr.push(new transports.Console());
   return createLogger({
     format: format.combine(
       format.timestamp(),
       format.simple()
     ),
-    transports,
+    transports: transportsArr,
   });
 };

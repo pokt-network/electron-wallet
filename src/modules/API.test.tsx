@@ -28,6 +28,12 @@ describe('API class tests', () => {
     api = new API(fakeIPCRenderer);
   });
 
+  test('API.getEndpoint() should get the RPC endpoint', () => {
+    const endpoint = 'https://some-node.provider.com';
+    fakeIPCRenderer.syncReturnValues[api.keys.GET_ENDPOINT] = endpoint;
+    expect(api.getEndpoint()).toEqual(endpoint);
+  });
+
   test('API.getVersion() should get the version from package.json', () => {
     const version = '1.2.3';
     fakeIPCRenderer.syncReturnValues[api.keys.GET_VERSION] = version;
