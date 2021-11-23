@@ -1,3 +1,8 @@
+export const actions = {
+  SET_WALLETS: 'SET_WALLETS',
+  SET_WINDOW_SIZE: 'SET_WINDOW_SIZE',
+};
+
 export const accountTypes = {
   NODE: 'NODE',
   APP: 'NODE',
