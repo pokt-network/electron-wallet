@@ -6,7 +6,7 @@ const packageJson = {
   version: '1.2.3',
 };
 
-describe('API', function() {
+describe('API class tests', function() {
 
   let api;
 
@@ -15,17 +15,48 @@ describe('API', function() {
     api = new API(fakeIPCMain, packageJson);
   });
 
-  it('should be a constructor', function() {
-    API.should.be.a.Function();
-    api.should.be.an.instanceOf(API);
-  });
-
-  describe('getVersion', function() {
+  describe('getVersion()', function() {
     it('should set e.returnValue to the version', function() {
       const e = {};
       api.getVersion(e);
       e.returnValue.should.equal(packageJson.version);
     })
+  });
+
+  describe('getEndpoint()', function() {
+    it('should set e.returnValue to the endpoint', function() {
+      const e = {};
+      api.getEndpoint(e);
+      e.returnValue.should.be.a.String();
+    })
+  });
+
+  describe('logInfo()', function() {
+    it('should save a message to the log', function() {
+      let logged = '';
+      api._logger = {
+        info(infoMessage) {
+          logged = infoMessage;
+        }
+      };
+      const message = 'some message';
+      api.logInfo(null, message);
+      logged.should.equal(message);
+    });
+  });
+
+  describe('logError()', function() {
+    it('should save an error message to the log', function() {
+      let logged = '';
+      api._logger = {
+        error(errorMessage) {
+          logged = errorMessage;
+        }
+      };
+      const message = 'some error';
+      api.logError(null, message);
+      logged.should.equal(message);
+    });
   });
 
 });

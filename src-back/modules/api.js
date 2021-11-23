@@ -31,16 +31,16 @@ class API {
       .on(this.keys.LOG_ERROR, this.logError.bind(this))
   }
 
-  getEndpoint(e) {
-    e.returnValue = process.env.ENDPOINT || '';
-  }
-
   /**
    *  Gets the application version from package.json
    *  @returns void
    */
   getVersion(e) {
     e.returnValue = this._packageJson.version;
+  }
+
+  getEndpoint(e) {
+    e.returnValue = process.env.ENDPOINT || '';
   }
 
   logInfo(e, message) {
