@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.scss';
 import App from './App';
 import API from './modules/API';
 import { WalletController } from './modules/wallet-controller';
@@ -12,6 +11,9 @@ import { combineReducers, createStore } from 'redux';
 import appReducer from './reducers/app-reducer';
 import * as appActions from './actions/app-actions';
 import { Provider } from 'react-redux';
+import { GlobalStyle } from './styles/global';
+import { ThemeProvider } from 'styled-components';
+import { WalletTheme } from './styles/theme';
 
 // @ts-ignore
 const api = new API(window.ipcRenderer);
@@ -82,9 +84,12 @@ const api = new API(window.ipcRenderer);
 
     ReactDOM.render(
       <React.StrictMode>
-        <Provider store={store}>
-          <App version={version} walletController={walletController} />
-        </Provider>
+        <ThemeProvider theme={new WalletTheme()}>
+          <GlobalStyle />
+          <Provider store={store}>
+            <App version={version} walletController={walletController} />
+          </Provider>
+        </ThemeProvider>
       </React.StrictMode>,
       document.getElementById('root')
     );
