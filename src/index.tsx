@@ -11,9 +11,8 @@ import { combineReducers, createStore } from 'redux';
 import appReducer from './reducers/app-reducer';
 import * as appActions from './actions/app-actions';
 import { Provider } from 'react-redux';
-import { GlobalStyle } from './styles/global';
-import { ThemeProvider } from 'styled-components';
-import { WalletTheme } from './styles/theme';
+import { Main } from '@pokt-foundation/ui';
+import './index.scss';
 
 // @ts-ignore
 const api = new API(window.ipcRenderer);
@@ -84,12 +83,11 @@ const api = new API(window.ipcRenderer);
 
     ReactDOM.render(
       <React.StrictMode>
-        <ThemeProvider theme={new WalletTheme()}>
-          <GlobalStyle />
+        <Main theme={'dark'}>
           <Provider store={store}>
             <App version={version} walletController={walletController} />
           </Provider>
-        </ThemeProvider>
+        </Main>
       </React.StrictMode>,
       document.getElementById('root')
     );
