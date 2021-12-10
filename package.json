@@ -21,6 +21,7 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "@pokt-foundation/ui": "^0.3.1",
     "@pokt-network/pocket-js": "^0.7.0-rc",
     "electron-context-menu": "^3.1.1",
     "electron-is-dev": "^2.0.0",
