@@ -21,8 +21,10 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "@fontsource/manrope": "^4.5.1",
     "@pokt-foundation/ui": "^0.3.1",
     "@pokt-network/pocket-js": "^0.7.0-rc",
+    "@reduxjs/toolkit": "^1.6.2",
     "electron-context-menu": "^3.1.1",
     "electron-is-dev": "^2.0.0",
     "electron-serve": "^1.1.0",
@@ -31,6 +33,7 @@
     "fs-extra": "^10.0.0",
     "lodash": "^4.17.21",
     "mathjs": "^10.0.0",
+    "pbkdf2": "^3.1.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.6",
@@ -51,6 +54,7 @@
     "@types/jest": "^26.0.15",
     "@types/lodash": "^4.14.177",
     "@types/node": "^12.0.0",
+    "@types/pbkdf2": "^3.1.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/styled-components": "^5.1.16",
