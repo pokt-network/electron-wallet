@@ -1,35 +1,40 @@
-import { actions } from '../constants';
 import { Wallet } from '../modules/wallet';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { activeViews } from '../constants';
 
-interface AppReducerData {
-  wallets: Wallet[],
-  windowWidth: number,
-  windowHeight: number,
+export interface AppState {
+  activeView: string;
+  locale: string
+  wallets: Wallet[]
+  windowWidth: number
+  windowHeight: number
 }
 
-const getInitialState = (): AppReducerData => ({
+const getInitialState = (): AppState => ({
+  activeView: activeViews.START,
+  locale: 'en-US',
   wallets: [],
   windowWidth: window.innerWidth,
   windowHeight: window.innerHeight,
 });
 
-const appReducer = (state = getInitialState(), data: {type: string, payload: any}): AppReducerData => {
-  const { type, payload } = data;
-  switch(type) {
-    case actions.SET_WALLETS:
-      return {
-        ...state,
-        wallets: payload.wallets
-      };
-    case actions.SET_WINDOW_SIZE:
-      return {
-        ...state,
-        windowWidth: payload.innerWidth,
-        windowHeight: payload.innerHeight,
-      };
-    default:
-      return state;
+export const appSlice = createSlice({
+  name: 'appState',
+  initialState: getInitialState(),
+  reducers: {
+    setWindowSize: (state, action: PayloadAction<{innerWidth: number, innerHeight: number}>) => {
+      state.windowHeight = action.payload.innerHeight;
+      state.windowWidth = action.payload.innerWidth;
+    },
+    setLocale: (state, action: PayloadAction<{locale: string}>) => {
+      state.locale = action.payload.locale;
+    },
+    setActiveView: (state, action: PayloadAction<{activeView: string}>) => {
+      state.activeView = action.payload.activeView;
+    }
   }
-};
+});
 
-export default appReducer;
+export const { setWindowSize, setLocale, setActiveView } = appSlice.actions;
+
+export default appSlice.reducer;

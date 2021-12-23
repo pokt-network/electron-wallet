@@ -41,8 +41,8 @@ const init = async function() {
     appWindow.show();
   });
   if(isDev) {
-    await appWindow.loadURL('http://localhost:3000');
     appWindow.toggleDevTools();
+    await appWindow.loadURL('http://localhost:3000');
   } else {
     serveDir(appWindow)
       .catch(err => {

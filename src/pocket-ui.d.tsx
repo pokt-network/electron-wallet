@@ -25,4 +25,10 @@ declare module '@pokt-foundation/ui' {
   const DEFAULT_FONT_FAMILY: string;
   const MONOSPACE_FONT_FAMILY: string;
 
+  const useTheme: () => any;
+
+  export class Button extends React.Component<any, any> {}
+  export class Field extends React.Component<any, any> {}
+  export class TextInput extends React.Component<any, any> {}
+
 }
