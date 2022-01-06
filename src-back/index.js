@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, screen, shell } = require('electron');
 const electronContextMenu = require('electron-context-menu');
 const isDev = require('electron-is-dev');
 const path = require('path');
@@ -24,7 +24,7 @@ const init = async function() {
 
   const packageJson = await getPackageJson();
   const logger = createLogger(path.join(appDataDir, LOG_FILENAME), true);
-  const api = new API(ipcMain, packageJson, logger);
+  const api = new API(ipcMain, packageJson, logger, shell);
 
   const appWindow = new BrowserWindow({
     backgroundColor: '#262A34',

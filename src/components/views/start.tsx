@@ -8,12 +8,15 @@ import { ButtonPrimary, TextButton } from '../ui/button';
 import { localizeContext } from '../../hooks/localize-hook';
 import { useDispatch } from 'react-redux';
 import { setActiveView } from '../../reducers/app-reducer';
-import { activeViews } from '../../constants';
+import { activeViews, links } from '../../constants';
 import { MasterPassword, masterPasswordIsSet } from '../../modules/master-password';
 import { TextInput } from '@pokt-foundation/ui';
 import { masterPasswordContext } from '../../hooks/master-password-hook';
+import { APIContext } from '../../hooks/api-hook';
 
 export const Start = () => {
+
+  const api = useContext(APIContext);
 
   const dispatch = useDispatch();
   const localize = useContext(localizeContext);
@@ -77,7 +80,7 @@ export const Start = () => {
   };
 
   const onHelpClick = () => {
-    console.log('onHelpClick');
+    api.openExternal(links.HELP);
   };
   const onImportClick = () => {
     console.log('onImportClick');
@@ -111,7 +114,7 @@ export const Start = () => {
           <p style={styles.description as React.CSSProperties}><BodyText1>{localize.text('This is an open-source interface for easy management of your POKT accounts.', 'start')}</BodyText1></p>
           <form onSubmit={onSubmit}>
             {passwordSet ?
-              <TextInput style={styles.input} wide={true} required={true} value={password} onChange={onPasswordChange} placeholder={localize.text('Wallet Password', 'start')} />
+              <TextInput type={'password'} style={styles.input} wide={true} required={true} value={password} autofocus={true} onChange={onPasswordChange} placeholder={localize.text('Wallet Password', 'start')} />
               :
               null
             }

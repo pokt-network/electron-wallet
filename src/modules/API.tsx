@@ -6,6 +6,7 @@ class API {
     // General listeners
     GET_ENDPOINT: 'GET_ENDPOINT',
     GET_VERSION: 'GET_VERSION',
+    OPEN_EXTERNAL: 'OPEN_EXTERNAL',
     LOG_INFO: 'LOG_INFO',
     LOG_ERROR: 'LOG_ERROR',
   };
@@ -24,6 +25,10 @@ class API {
   getVersion(): string {
     // @ts-ignore
     return this._ipcRenderer.sendSync(this.keys.GET_VERSION);
+  }
+
+  openExternal(url: string): void {
+    this._ipcRenderer.send(this.keys.OPEN_EXTERNAL, url);
   }
 
   logInfo(message: string): void {
