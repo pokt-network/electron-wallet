@@ -92,7 +92,7 @@ export const CreatePassword = () => {
           <p><BodyText1>{localize.text('Create a password to lock your Wallet. You will need this to unlock your accounts, perform transactions, and export your keys.', 'create-password')}</BodyText1></p>
           <p><BodyText1 style={styles.warningParagraph}>{localize.text('We can NOT help you recover this password so please back it up securely.', 'create-password')}</BodyText1></p>
           <form style={styles.form} onSubmit={onSubmit}>
-            <TextInput type={'password'} style={styles.input} wide={true} value={password} onChange={onPasswordChange} required={true} placeholder={localize.text('Password', 'universal')} />
+            <TextInput type={'password'} style={styles.input} wide={true} value={password} onChange={onPasswordChange} required={true} autofocus={true} placeholder={localize.text('Password', 'universal')} />
             <TextInput type={'password'} style={styles.input} wide={true} value={passwordRepeat} onChange={onPasswordRepeatChange} required={true} placeholder={localize.text('Confirm Password', 'universal')} />
             <ButtonPrimary size={'md'} type={'submit'}>{localize.text('Create', 'universal')}</ButtonPrimary>
           </form>

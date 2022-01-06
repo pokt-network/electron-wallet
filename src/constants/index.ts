@@ -34,3 +34,8 @@ export const localStorageKeys = {
   MASTER_PASSWORD_HASHED: 'MASTER_PASSWORD_HASHED',
   MASTER_PASSWORD_SALT: 'MASTER_PASSWORD_SALT',
 };
+
+export const links = {
+  BUY_POCKET: 'https://www.pokt.network/',
+  HELP: 'https://www.pokt.network/',
+};
