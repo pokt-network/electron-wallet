@@ -119,7 +119,11 @@ export const Start = () => {
               null
             }
             <FlexRow justifyContent={'center'}>
-              <ButtonPrimary type={'submit'} style={styles.startButton}>{localize.text('Start', 'start')}</ButtonPrimary>
+              {passwordSet ?
+                <ButtonPrimary type={'submit'} style={styles.startButton}>{localize.text('Unlock', 'start')}</ButtonPrimary>
+                :
+                <ButtonPrimary type={'submit'} style={styles.startButton}>{localize.text('Start', 'start')}</ButtonPrimary>
+              }
             </FlexRow>
           </form>
           <FlexRow style={styles.bottomRow} justifyContent={'center'} alignItems={'center'}>

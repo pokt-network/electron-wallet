@@ -10,22 +10,43 @@ import { KeyUtils } from './modules/key-utils';
 import { RPCController } from './modules/rpc-controller';
 import { Localize } from './modules/localize';
 import { localizeContext } from './hooks/localize-hook';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { CreatePassword } from './components/views/create-password';
 import { masterPasswordContext } from './hooks/master-password-hook';
 import { MasterPasswordUtils, masterPasswordIsSet } from './modules/master-password';
-import { activeViews } from './constants';
+import { activeViews, localStorageKeys } from './constants';
 import { WalletOverview } from './components/views/wallet-overview';
+import { setWallets } from './reducers/app-reducer';
+import { WalletControllerContext } from './hooks/wallet-hook';
+import { WalletDetail } from './components/views/wallet-detail';
+import { WalletData } from './modules/wallet';
+import { Pricing } from './modules/pricing';
+import { PricingContext } from './hooks/pricing-hook';
 
 const App = () => {
 
+  const dispatch = useDispatch();
   const { activeView, locale } = useSelector(({ appState }: RootState) => appState);
   const [ localize, setLocalize ] = useState(new Localize(locale, {}));
   const [ masterPassword, setMasterPassword ] = useState<MasterPasswordUtils|null>(null);
+  const [ walletController, setWalletController ] = useState<WalletController|null>(null);
+  const [ pricingData, setPricingData ] = useState({});
 
   useEffect(() => {
     setLocalize(new Localize(locale, {}));
   }, [locale]);
+
+  useEffect(() => {
+    const updatePricingData = () => {
+      Pricing.getPricingData()
+        .then(pricingData => {
+          setPricingData(pricingData);
+        })
+        .catch(console.error);
+    }
+    setInterval(updatePricingData, 60000);
+    updatePricingData();
+  }, []);
 
   const api = useContext(APIContext);
 
@@ -68,43 +89,103 @@ const App = () => {
         });
         walletController.events.walletCreated.subscribe(wallet => {
           // ToDo add to database
+          const walletsFromStorage: WalletData[] = JSON.parse(localStorage.getItem(localStorageKeys.WALLETS) || '[]');
+          localStorage.setItem(localStorageKeys.WALLETS, JSON.stringify([
+            ...walletsFromStorage,
+            wallet.toObject(),
+          ]));
           api.logInfo(`Wallet created with address ${wallet.address} and public key ${wallet.publicKey}`);
         });
         walletController.events.walletDeleted.subscribe(publicKey => {
           // ToDo delete to from database
+          const walletsFromStorage: WalletData[] = JSON.parse(localStorage.getItem(localStorageKeys.WALLETS) || '[]');
+          localStorage.setItem(localStorageKeys.WALLETS, JSON.stringify(walletsFromStorage.filter(w => w.publicKey === publicKey)));
           api.logInfo(`Wallet deleted with public key ${publicKey}`);
         });
         walletController.events.walletUpdated.subscribe(wallet => {
           // ToDo update in database
+          const walletsFromStorage: WalletData[] = JSON.parse(localStorage.getItem(localStorageKeys.WALLETS) || '[]');
+          const idx = walletsFromStorage.findIndex(w => w.address === wallet.address);
+          localStorage.setItem(localStorageKeys.WALLETS, JSON.stringify([
+            ...walletsFromStorage.slice(0, idx),
+            wallet.toObject(),
+            ...walletsFromStorage.slice(idx + 1),
+          ]));
           api.logInfo(`Wallet updated with address ${wallet.address} and public key ${wallet.publicKey}`);
         });
         walletController.events.walletsChanged.subscribe(wallets => {
-          // store.dispatch(appActions.setWallets(wallets));
+          console.log('walletsChanged', wallets);
+          dispatch(setWallets({wallets}));
         });
+
+        // ToDo get from DB
+        const walletsFromStorage: WalletData[] = JSON.parse(localStorage.getItem(localStorageKeys.WALLETS) || '[]');
+        walletsFromStorage.forEach(w => {
+          walletController.addWallet(w)
+        });
+
+        const updateAllBalances = async () => {
+          const wallets = walletController.getWallets();
+          for(const w of wallets) {
+            try {
+              await w.updateBalance();
+            } catch(err) {
+              // nothing to do, already logged
+            }
+          }
+        };
+        setInterval(updateAllBalances, 10000);
+        updateAllBalances()
+          .catch();
+        const updateAllTransactions = async () => {
+          const wallets = walletController.getWallets();
+          for(const w of wallets) {
+            try {
+              await w.updateTransactions();
+            } catch(err) {
+              // nothing to do, already logged
+            }
+          }
+        };
+        setInterval(updateAllTransactions, 30000);
+        updateAllTransactions()
+          .catch();
+
+        setWalletController(walletController);
+
       } catch({ message = '', stack = '' }) {
         api.logError(message + '\n' + stack);
       }
     })();
   }, [api]);
 
-  console.log('masterPassword', masterPassword);
-
   return (
     <localizeContext.Provider value={localize}>
       <masterPasswordContext.Provider value={{masterPassword, setMasterPassword}}>
-        <AppContainer>
-          {activeView === activeViews.START ?
-            <Start />
-            :
-            activeView === activeViews.CREATE_PASSWORD ?
-              <CreatePassword />
-              :
-              activeView === activeViews.WALLET_OVERVIEW ?
-                <WalletOverview />
-                :
-                null
-          }
-        </AppContainer>
+        {walletController ?
+          <WalletControllerContext.Provider value={walletController}>
+            <PricingContext.Provider value={new Pricing(pricingData)}>
+              <AppContainer>
+                {activeView === activeViews.START ?
+                  <Start />
+                  :
+                  activeView === activeViews.CREATE_PASSWORD ?
+                    <CreatePassword />
+                    :
+                    activeView === activeViews.WALLET_OVERVIEW ?
+                      <WalletOverview />
+                      :
+                      activeView === activeViews.WALLET_DETAIL ?
+                        <WalletDetail />
+                        :
+                        null
+                }
+              </AppContainer>
+            </PricingContext.Provider>
+          </WalletControllerContext.Provider>
+          :
+          null
+        }
       </masterPasswordContext.Provider>
     </localizeContext.Provider>
   );

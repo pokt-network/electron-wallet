@@ -34,6 +34,7 @@ const init = async function() {
     minHeight: 720,
     show: false,
     webPreferences: {
+      webSecurity: false,
       preload: path.resolve(__dirname, '../public/api.js'),
     }
   });

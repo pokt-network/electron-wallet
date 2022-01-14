@@ -8,6 +8,8 @@ export interface AppState {
   wallets: Wallet[]
   windowWidth: number
   windowHeight: number
+  showCreateModal: boolean,
+  selectedWallet: string,
 }
 
 const getInitialState = (): AppState => ({
@@ -16,6 +18,8 @@ const getInitialState = (): AppState => ({
   wallets: [],
   windowWidth: window.innerWidth,
   windowHeight: window.innerHeight,
+  showCreateModal: false,
+  selectedWallet: '',
 });
 
 export const appSlice = createSlice({
@@ -31,10 +35,22 @@ export const appSlice = createSlice({
     },
     setActiveView: (state, action: PayloadAction<{activeView: string}>) => {
       state.activeView = action.payload.activeView;
-    }
+      if(action.payload.activeView === activeViews.WALLET_OVERVIEW)
+        state.selectedWallet = '';
+    },
+    setShowCreateModal: (state, action: PayloadAction<{show: boolean}>) => {
+      state.showCreateModal = action.payload.show;
+    },
+    setWallets: (state, action: PayloadAction<{wallets: Wallet[]}>) => {
+      state.wallets = action.payload.wallets;
+    },
+    setSelectedWallet: (state, action: PayloadAction<{address: string}>) => {
+      state.selectedWallet = action.payload.address;
+      state.activeView = activeViews.WALLET_DETAIL;
+    },
   }
 });
 
-export const { setWindowSize, setLocale, setActiveView } = appSlice.actions;
+export const { setWindowSize, setLocale, setActiveView, setShowCreateModal, setWallets, setSelectedWallet } = appSlice.actions;
 
 export default appSlice.reducer;
