@@ -1,4 +1,4 @@
-name: 02 - package_builds CI
+name: 02 - package_linux
 
 on:
   push:

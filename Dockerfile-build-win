@@ -3,15 +3,17 @@ FROM electronuserland/builder:wine
 # Create app directory
 RUN mkdir -p /pocket-wallet/build-native
 
+RUN npm install -g yarn
+
 WORKDIR /pocket-wallet/
 VOLUME /pocket-wallet/build-native
 
 # Install app dependencies
 COPY package.json /pocket-wallet/
-RUN npm install
+RUN yarn
 
 # Bundle app source
 COPY . /pocket-wallet/
 
-ENTRYPOINT ["npm"]
+ENTRYPOINT ["yarn"]
 CMD ["run", "pack-native-win"]
