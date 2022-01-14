@@ -75,3 +75,4 @@ typings/
 .idea
 /temp
 package-lock.json
+/output
