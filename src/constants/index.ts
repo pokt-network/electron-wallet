@@ -2,6 +2,7 @@ export const activeViews = {
   START: 'START',
   CREATE_PASSWORD: 'CREATE_PASSWORD',
   WALLET_OVERVIEW: 'WALLET_OVERVIEW',
+  WALLET_DETAIL: 'WALLET_DETAIL',
 };
 
 export const actions = {
@@ -33,6 +34,7 @@ export const PRIMARY_TEXT_INVERTED = '#fafafa';
 export const localStorageKeys = {
   MASTER_PASSWORD_HASHED: 'MASTER_PASSWORD_HASHED',
   MASTER_PASSWORD_SALT: 'MASTER_PASSWORD_SALT',
+  WALLETS: 'WALLETS',
 };
 
 export const links = {

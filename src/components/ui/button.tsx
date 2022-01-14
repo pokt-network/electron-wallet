@@ -181,7 +181,7 @@ export const ButtonSecondary = ({ children, disabled = false, size = 'lg', style
   );
 };
 
-const StyledTextButton = styled.button`
+const StyledTextButton = styled.button<{hoverBackground?: string}>`
   background: transparent;
   outline: none;
   box-shadow: none;
@@ -190,15 +190,16 @@ const StyledTextButton = styled.button`
   margin: 0 0 0 0;
   cursor: pointer;
   &:hover, &:active, &:focus {
-    text-decoration: underline;
+    text-decoration: ${props => props.hoverBackground ? 'none' : 'underline'};
+    ${props => props.hoverBackground ? `background-color:${props.hoverBackground}` : ''}
   }
 `;
-export const TextButton = ({ children, style = {}, onClick }: {children: any, style?: object, onClick: () => void}) => {
+export const TextButton = ({ children, hoverBackground, style = {}, onClick }: {children: any, style?: object, hoverBackground?: string, onClick: () => void}) => {
   const onButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     onClick();
   };
   return (
-    <StyledTextButton style={style} onClick={onButtonClick}>{children}</StyledTextButton>
+    <StyledTextButton style={style} hoverBackground={hoverBackground} onClick={onButtonClick}>{children}</StyledTextButton>
   );
 };

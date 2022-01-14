@@ -2,6 +2,7 @@ import { Wallet, WalletData } from './wallet';
 import { KeyUtils } from './key-utils';
 import { Subject } from 'rxjs';
 import { RPCController } from './rpc-controller';
+import { makePassword } from '../util';
 
 export class WalletController {
 
@@ -37,7 +38,7 @@ export class WalletController {
     this.events.walletsChanged.next([...this._wallets]);
   }
 
-  async createWallet(name: string, password: string): Promise<string> {
+  async createWallet(name: string, password = makePassword()): Promise<string> {
     const account = await this._keyUtils.createAcount(password);
     if(!account)
       return '';
@@ -59,6 +60,10 @@ export class WalletController {
     this.events.walletDeleted.next(publicKey);
     this.events.walletsChanged.next([...this._wallets]);
     return true;
+  }
+
+  getWallets(): Wallet[] {
+    return [...this._wallets];
   }
 
 }

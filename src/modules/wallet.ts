@@ -1,5 +1,5 @@
 import { Subject } from 'rxjs';
-import { RpcError } from '@pokt-network/pocket-js';
+import { RpcError, Transaction } from '@pokt-network/pocket-js';
 import { accountStatus, accountTypes } from '../constants';
 import { bignumber } from 'mathjs';
 import { RPCController } from './rpc-controller';
@@ -32,6 +32,7 @@ export class Wallet {
   accountType = accountTypes.NODE;
   status = accountStatus.NOT_STAKED;
   jailed = false;
+  transactions: Transaction[] = [];
 
   constructor(data: WalletData, rpcController: RPCController) {
     this._rpcController = rpcController;
@@ -84,6 +85,23 @@ export class Wallet {
         this.balance = bignumber(balance.toString());
         this.events.change.next(this);
       }
+      return true;
+    } catch(err) {
+      // @ts-ignore
+      this.logRPCError('updateBalance', err);
+    }
+    return false;
+  }
+
+  async updateTransactions(): Promise<boolean> {
+    try {
+      const sentTransactions = await this._rpcController.getAccountTransactions(this.address, false, false);
+      const receivedTransactions = await this._rpcController.getAccountTransactions(this.address, true, false);
+      this.transactions = [
+        ...sentTransactions.transactions,
+        ...receivedTransactions.transactions,
+      ];
+      this.events.change.next(this);
       return true;
     } catch(err) {
       // @ts-ignore
