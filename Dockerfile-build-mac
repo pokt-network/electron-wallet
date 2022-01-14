@@ -13,6 +13,8 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends \
       nodejs
 
+RUN npm install -g yarn
+
 # Create app directory
 RUN mkdir -p /pocket-wallet/build-native
 
@@ -21,10 +23,10 @@ VOLUME /pocket-wallet/build-native
 
 # Install app dependencies
 COPY package.json /pocket-wallet/
-RUN npm install
+RUN yarn
 
 # Bundle app source
 COPY . /pocket-wallet/
 
-ENTRYPOINT ["npm"]
+ENTRYPOINT ["yarn"]
 CMD ["run", "build-native-mac"]
