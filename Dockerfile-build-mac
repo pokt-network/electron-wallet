@@ -5,7 +5,7 @@ ARG PLATFORM="mac"
 # Update packages & install native dependencies
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-     curl gnupg build-essential ca-certificates
+     curl gnupg build-essential ca-certificates git
 
  # Install node js
 RUN apt-get update \
