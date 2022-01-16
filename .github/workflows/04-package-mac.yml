@@ -37,5 +37,5 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: pocket-wallet-mac-packager:latest
-          options: -e GITHUB_SHA=${{ github.sha }} -e S3_BUCKET=pocket-wallet-pub -e BUILDS_TOPIC_ARN=arn:aws:sns:us-east-2:059424750518:PocketWallet -e AWS_REGION=us-east-2 -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} -e NODE_OPTIONS="--max-old-space-size=4096"
+          options: -e GITHUB_SHA=${{ github.sha }} -e GITHUB_EVENT_NAME=${{ github.eventName }} -e GITHUB_REF=${{ github.ref }} -e AWS_REGION=${{ secrets.AWS_REGION }} -e S3_BUCKET=${{ secrets.S3_BUCKET }} -e SNS_TOPIC=${{ secrets.SNS_TOPIC }} -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} -e NODE_OPTIONS="--max-old-space-size=4096"
           run: yarn run build-upload-mac
