@@ -54,12 +54,9 @@ const logUpdate = require('log-update');
 
     const sns = new s3.AWS.SNS();
 
-    // let s3Key = `${version}/${name}`;
-    // let endpoint = `https://${S3_BUCKET}/${s3Key}`;
-
     const sha = GITHUB_SHA.slice(0, 7);
     const s3Key = `${version}/${sha}/${name}`;
-    const endpoint = `https://${S3_BUCKET}/${s3Key}`;
+    const endpoint = `https://${S3_BUCKET}.s3.amazonaws.com/${s3Key}`;
     const titleVersion = `${version}#${sha}`;
 
     const client = s3.createClient();
@@ -95,7 +92,7 @@ const logUpdate = require('log-update');
     const event = GITHUB_EVENT_NAME === 'pull' ? `Pull Request from ${branchName}` : `Push to ${branchName}`;
 
     await new Promise(resolve => {
-      const osStr = platform === 'linux' ? 'Linux' : platform === 'mac' ? 'macOS' : platform === 'Windows';
+      const osStr = platform === 'linux' ? 'Linux' : platform === 'mac' ? 'macOS' : 'Windows';
       const message = `New Pocket Wallet ${osStr} build available! Build triggered by ${event}.\n\n${endpoint}\n`;
       sns.publish({
         TopicArn: SNS_TOPIC,
