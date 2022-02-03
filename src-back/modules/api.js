@@ -50,7 +50,7 @@ class API {
   }
 
   getEndpoint(e) {
-    e.returnValue = process.env.ENDPOINT || '';
+    e.returnValue = process.env.POCKET_WALLET_RPC_ENDPOINT || 'https://node1.testnet.pokt.network';
   }
 
   logInfo(e, message) {
