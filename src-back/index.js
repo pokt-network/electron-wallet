@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, screen, shell } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, screen, shell } = require('electron');
 const electronContextMenu = require('electron-context-menu');
 const isDev = require('electron-is-dev');
 const path = require('path');
@@ -6,6 +6,7 @@ const serve = require('electron-serve');
 const { getPackageJson, createLogger} = require('./util');
 const API = require('./modules/api');
 const { LOG_FILENAME } = require('./constants');
+const fs = require('fs-extra');
 
 const serveDir = !isDev ? serve({directory: path.resolve(__dirname, '../build')}) : null;
 
@@ -24,7 +25,14 @@ const init = async function() {
 
   const packageJson = await getPackageJson();
   const logger = createLogger(path.join(appDataDir, LOG_FILENAME), true);
-  const api = new API(ipcMain, packageJson, logger, shell);
+  const api = new API(
+    ipcMain,
+    packageJson,
+    logger,
+    shell,
+    dialog,
+    fs,
+  );
 
   const appWindow = new BrowserWindow({
     backgroundColor: '#262A34',

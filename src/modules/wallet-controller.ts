@@ -52,6 +52,38 @@ export class WalletController {
     return walletData.publicKey;
   }
 
+  async importWalletFromPPK(name: string, ppkJson: string, ppkPassword: string, password = makePassword()): Promise<string> {
+    const account = await this._keyUtils.importAccountFromPPK(password, ppkJson, ppkPassword);
+    if(!account)
+      return '';
+    const walletData = {
+      name,
+      publicKey: account.publicKey.toString('hex'),
+      privateKeyEncrypted: account.encryptedPrivateKeyHex,
+      address: account.addressHex,
+    };
+    if(this._wallets.some(w => w.address === walletData.address))
+      return '';
+    this.addWallet(walletData, true);
+    return walletData.publicKey;
+  }
+
+  async importWalletFromRawPrivateKey(name: string, rawPrivateKey: string, password = makePassword()): Promise<string> {
+    const account = await this._keyUtils.importAccountFromRawPrivateKey(password, rawPrivateKey);
+    if(!account)
+      return '';
+    const walletData = {
+      name: name || account.addressHex.slice(0, 11),
+      publicKey: account.publicKey.toString('hex'),
+      privateKeyEncrypted: account.encryptedPrivateKeyHex,
+      address: account.addressHex,
+    };
+    if(this._wallets.some(w => w.address === walletData.address))
+      return '';
+    this.addWallet(walletData, true);
+    return walletData.publicKey;
+  }
+
   deleteWallet(publicKey: string): boolean {
     const idx = this._wallets.findIndex(w => w.publicKey === publicKey);
     if(idx < 0)

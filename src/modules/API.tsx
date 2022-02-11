@@ -1,3 +1,10 @@
+interface FileDialogOptions {
+  title?: string
+  buttonLabel?: string
+  filters?: {name: string, extensions: string[]}[]
+  properties?: string[]
+}
+
 class API {
 
   _ipcRenderer: any;
@@ -7,6 +14,8 @@ class API {
     GET_ENDPOINT: 'GET_ENDPOINT',
     GET_VERSION: 'GET_VERSION',
     OPEN_EXTERNAL: 'OPEN_EXTERNAL',
+    OPEN_FILE_DIALOG: 'OPEN_FILE_DIALOG',
+    OPEN_FILE: 'OPEN_FILE',
     LOG_INFO: 'LOG_INFO',
     LOG_ERROR: 'LOG_ERROR',
   };
@@ -25,6 +34,14 @@ class API {
   getVersion(): string {
     // @ts-ignore
     return this._ipcRenderer.sendSync(this.keys.GET_VERSION);
+  }
+
+  async openFileDialog(options: FileDialogOptions): Promise<{canceled: boolean, filePaths: string[]}> {
+    return this._ipcRenderer.invoke(this.keys.OPEN_FILE_DIALOG, options);
+  }
+
+  async openFile(filePath: string): Promise<string> {
+    return this._ipcRenderer.invoke(this.keys.OPEN_FILE, filePath);
   }
 
   openExternal(url: string): void {

@@ -8,6 +8,7 @@ import { FlexRow } from './flex';
 import { useDispatch } from 'react-redux';
 import { setShowCreateModal } from '../../reducers/app-reducer';
 import { WalletControllerContext } from '../../hooks/wallet-hook';
+import { masterPasswordContext } from "../../hooks/master-password-hook";
 
 interface ModalCreateWalletProps {}
 
@@ -16,6 +17,7 @@ export const ModalCreateWallet = ({}: ModalCreateWalletProps) => {
   const dispatch = useDispatch();
   const localize = useContext(localizeContext);
   const walletController = useContext(WalletControllerContext);
+  const { masterPassword } = useContext(masterPasswordContext);
 
   const [ name, setName ] = useState('');
 
@@ -42,7 +44,8 @@ export const ModalCreateWallet = ({}: ModalCreateWalletProps) => {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Submit!');
-    walletController?.createWallet(name);
+    const password = masterPassword?.get();
+    walletController?.createWallet(name, password);
     dispatch(setShowCreateModal({show: false}));
   };
 

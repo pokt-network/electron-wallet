@@ -22,6 +22,7 @@ import { WalletDetail } from './components/views/wallet-detail';
 import { WalletData } from './modules/wallet';
 import { Pricing } from './modules/pricing';
 import { PricingContext } from './hooks/pricing-hook';
+import { ImportAccount } from "./components/views/import-account";
 
 const App = () => {
 
@@ -178,7 +179,10 @@ const App = () => {
                       activeView === activeViews.WALLET_DETAIL ?
                         <WalletDetail />
                         :
-                        null
+                        activeView === activeViews.IMPORT_ACCOUNT ?
+                          <ImportAccount />
+                          :
+                          null
                 }
               </AppContainer>
             </PricingContext.Provider>

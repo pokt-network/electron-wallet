@@ -13,6 +13,7 @@ export const masterPasswordIsSet = (ls = localStorage) => {
 export interface MasterPasswordUtils {
   set: () => void
   verify: () => boolean
+  get: () => string
 }
 
 export function MasterPassword(password: string, ls = localStorage): MasterPasswordUtils {
@@ -35,5 +36,8 @@ export function MasterPassword(password: string, ls = localStorage): MasterPassw
         throw new Error('Password has not been set yet');
       return hashed === newHashed;
     },
+    get() {
+      return password;
+    }
   };
 }

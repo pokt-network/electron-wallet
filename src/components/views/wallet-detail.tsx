@@ -22,6 +22,7 @@ import ellipse from '../../images/icons/ellipse.svg';
 import { Switcher } from '../ui/switcher';
 import { TransactionTable } from '../ui/transactions-table';
 import { TextInput } from '@pokt-foundation/ui';
+import { AppHeader } from "../ui/app-header";
 
 export const WalletDetail = () => {
 
@@ -64,7 +65,6 @@ export const WalletDetail = () => {
     card: {
       marginTop: 35,
       marginBottom: 32,
-      borderRadius: 10,
       paddingLeft: 32,
       paddingRight: 32,
       paddingTop: 24,
@@ -122,12 +122,7 @@ export const WalletDetail = () => {
     <FlexRow style={styles.container as React.CSSProperties}>
       <Sidebar />
       <MainContainer>
-        <MainHeader>
-          <MainHeaderTitle>{showSend ? localize.text('Send from {{name}}', 'walletDetail', {name: wallet?.name}) : wallet?.name}</MainHeaderTitle>
-          <TextButton onClick={() => api.openExternal(links.BUY_POCKET)}>
-            <Header5>{localize.text('Buy POKT', 'universal')}</Header5>
-          </TextButton>
-        </MainHeader>
+        <AppHeader title={showSend ? localize.text('Send from {{name}}', 'walletDetail', {name: wallet?.name}) : (wallet?.name || '')} />
         <MainBody>
           <FlexRow style={{visibility: 'hidden'} as React.CSSProperties} justifyContent={'flex-start'}>
             <BodyText2>{localize.text('Wallet Balance', 'walletOverview')}</BodyText2>
@@ -143,7 +138,7 @@ export const WalletDetail = () => {
           </FlexRow>
           {!showSend ?
             <div>
-              <Card style={styles.card}>
+              <Card round={true} style={styles.card}>
                 <FlexRow justifyContent={'space-between'}>
                   <FlexColumn style={styles.cardItem}>
                     <BodyText3>{localize.text('Account Type', 'walletOverview')}</BodyText3>
