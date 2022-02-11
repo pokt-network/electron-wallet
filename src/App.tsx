@@ -77,13 +77,13 @@ const App = () => {
         }
 
         const dispatcher = new URL(endpoint);
-        const configuration = new Configuration(5, 1000, 0, 40000);
+        const configuration = new Configuration(5, 1000, 0, 40000, undefined, undefined, undefined, undefined, undefined, undefined, false);
         const pocket = new Pocket([dispatcher], new HttpRpcProvider(dispatcher), configuration);
 
         const keyUtils = new KeyUtils(pocket);
         const rpcController = new RPCController(pocket);
 
-        const walletController = new WalletController(keyUtils, rpcController);
+        const walletController = new WalletController(keyUtils, rpcController, pocket);
 
         walletController.events.error.subscribe(errStr => {
           api.logError(errStr);

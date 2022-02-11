@@ -3,6 +3,8 @@ import { KeyUtils } from './key-utils';
 import { Subject } from 'rxjs';
 import { RPCController } from './rpc-controller';
 import { makePassword } from '../util';
+import { CoinDenom, Pocket } from "@pokt-network/pocket-js";
+import { isError } from "lodash";
 
 export class WalletController {
 
@@ -14,13 +16,15 @@ export class WalletController {
     walletDeleted: new Subject<string>(),
   };
 
+  _pocket: Pocket;
   _keyUtils: KeyUtils;
   _rpcController: RPCController;
   _wallets: Wallet[] = [];
 
-  constructor(keyUtils: KeyUtils, rpcController: RPCController) {
+  constructor(keyUtils: KeyUtils, rpcController: RPCController, pocket: Pocket) {
     this._keyUtils = keyUtils;
     this._rpcController = rpcController;
+    this._pocket = pocket;
   }
 
   addWallet(walletData: WalletData, newWallet = false): void {
@@ -109,6 +113,22 @@ export class WalletController {
 
   getWallets(): Wallet[] {
     return [...this._wallets];
+  }
+
+  async sendTransaction(fromAddress: string, amount: string, toAddress: string, memo: string, password: string): Promise<string> {
+    const wallet = this._wallets.find(w => w.address === fromAddress);
+    if(!wallet)
+      return '';
+    const privateKey = await this.getRawPrivateKeyFromWallet(wallet.publicKey, password);
+    const transactionSender = await this._pocket.withPrivateKey(privateKey);
+    if(isError(transactionSender))
+      return '';
+    const rawTxResponse = await transactionSender
+      .send(fromAddress, toAddress, (Number(amount) * 1000000).toString(10))
+      .submit('testnet', '10000', CoinDenom.Upokt);
+    if(isError(rawTxResponse))
+      return '';
+    return rawTxResponse.hash;
   }
 
 }
