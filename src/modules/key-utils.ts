@@ -74,4 +74,25 @@ export class KeyUtils {
     return res;
   }
 
+  async getPPK(password: string, address: string): Promise<string> {
+    const res = await this._pocket.keybase.exportPPKfromAccount(address, password, '', password);
+    if(isError(res)) {
+      this.events.error.next('KeyUtils.getPPK() ' + res.message + '\n' + res.stack);
+      return '';
+    }
+    return res;
+  }
+
+  async getRawPrivateKeyFromPPK(password: string, ppk: string): Promise<string> {
+    const res = await this.importAccountFromPPK(password, ppk, password);
+    if(!res)
+      return '';
+    const unlocked = await this._pocket.keybase.getUnlockedAccount(res.addressHex, password);
+    if(isError(unlocked)) {
+      this.events.error.next('KeyUtils.getRawPrivateKeyFromPPK() ' + unlocked.message + '\n' + unlocked.stack);
+      return ''
+    }
+    return unlocked.privateKey.toString('hex');
+  }
+
 }

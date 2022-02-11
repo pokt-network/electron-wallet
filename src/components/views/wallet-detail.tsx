@@ -8,9 +8,9 @@ import { localizeContext } from '../../hooks/localize-hook';
 import { ButtonPrimary, ButtonSecondary, TextButton } from '../ui/button';
 import { Header1, Header5 } from '../ui/header';
 import { APIContext } from '../../hooks/api-hook';
-import { links } from '../../constants';
+import { activeViews, links } from '../../constants';
 import { WalletControllerContext } from '../../hooks/wallet-hook';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import pocketLogo from '../../images/pocket-logo.svg';
 import * as math from 'mathjs';
@@ -21,20 +21,28 @@ import { Card } from '../ui/card';
 import ellipse from '../../images/icons/ellipse.svg';
 import { Switcher } from '../ui/switcher';
 import { TransactionTable } from '../ui/transactions-table';
-import { TextInput } from '@pokt-foundation/ui';
+import { TextInput, useTheme } from '@pokt-foundation/ui';
 import { AppHeader } from "../ui/app-header";
+import { setActiveView, setShowPrivateKeyModal } from "../../reducers/app-reducer";
+import { masterPasswordContext } from "../../hooks/master-password-hook";
+import { ModalPrivateKey } from "../ui/modal-private-key";
 
 export const WalletDetail = () => {
 
+  const [ privateKey, setPrivateKey ] = useState('');
   const [ showSend, setShowSend ] = useState(false);
   const [ switcherIdx, setSwitcherIdx ] = useState(0);
   const api = useContext(APIContext);
   const localize = useContext(localizeContext);
   const walletController = useContext(WalletControllerContext);
   const pricing = useContext(PricingContext);
+  const theme = useTheme();
+  const dispatch = useDispatch();
+  const { masterPassword } = useContext(masterPasswordContext);
   const {
     wallets,
     selectedWallet,
+    showPrivateKeyModal,
   } = useSelector(({ appState }: RootState) => appState);
 
   useEffect(() => {
@@ -106,6 +114,13 @@ export const WalletDetail = () => {
     sendInput: {
       width: 600,
     },
+    removeButton: {
+      marginTop: 30,
+      color: theme.accent,
+    },
+    removeButtonText: {
+      color: theme.accent,
+    }
   };
   const balance = math.divide(math.bignumber(wallet?.balance || 0), math.bignumber(1000000)) as BigNumber;
   const convertedBalance = pricing.convert(balance, 'USD');
@@ -116,6 +131,50 @@ export const WalletDetail = () => {
   const onSendSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Submit!');
+  };
+  const onSaveKeyFileClick = () => {
+    if(wallet) {
+      const { name } = wallet;
+      const preppedName = name
+        .replace(/\s/g, '_')
+        .replace(/\W/g, '');
+      api.openFileSaveDialog({
+        title: 'Save Key File',
+        defaultPath: preppedName + '.json',
+        filters: [
+          {name: 'JSON', extensions: ['json']},
+        ],
+        properties: []
+      })
+        .then(({ canceled, filePath }) => {
+          if(!canceled && filePath) {
+            console.log('filePath', filePath);
+            api.saveFile(filePath, wallet.ppk)
+              .then(success => {
+                console.log('success', success);
+              })
+              .catch(console.error);
+          }
+        })
+        .catch(console.error);
+    }
+  };
+  const onRevealPrivateKeyClick = () => {
+    if(wallet && walletController && masterPassword) {
+      walletController.getRawPrivateKeyFromWallet(wallet.publicKey, masterPassword.get())
+        .then(keyStr => {
+          setPrivateKey(keyStr);
+          dispatch(setShowPrivateKeyModal({show: true}))
+        })
+        .catch(console.error);
+    }
+  };
+  const onRemoveWallet = () => {
+    if(wallet && walletController) {
+      const success = walletController.deleteWallet(wallet.publicKey);
+      if(success)
+        dispatch(setActiveView({activeView: activeViews.WALLET_OVERVIEW}));
+    }
   };
 
   return (
@@ -175,13 +234,16 @@ export const WalletDetail = () => {
                   <Header5 style={styles.infoHeader}>{localize.text('Address', 'universal')}</Header5>
                   <FlexRow justifyContent={'flex-start'}>
                     <TextInput style={styles.input} type={'text'} value={wallet?.address} readOnly={true} />
-                    <ButtonSecondary style={styles.infoButton} onClick={()=>{}}>{localize.text('Download Key File', 'walletDetail')}</ButtonSecondary>
+                    <ButtonSecondary style={styles.infoButton} onClick={onSaveKeyFileClick}>{localize.text('Download Key File', 'walletDetail')}</ButtonSecondary>
                   </FlexRow>
                   <Header5 style={{...styles.infoHeader, ...styles.publicKeyHeader}}>{localize.text('Public Key', 'universal')}</Header5>
                   <FlexRow justifyContent={'flex-start'}>
                     <TextInput style={styles.input} type={'text'} value={wallet?.publicKey} readOnly={true} />
-                    <ButtonSecondary style={styles.infoButton} onClick={()=>{}}>{localize.text('Reveal Private Key', 'walletDetail')}</ButtonSecondary>
+                    <ButtonSecondary style={styles.infoButton} onClick={onRevealPrivateKeyClick}>{localize.text('Reveal Private Key', 'walletDetail')}</ButtonSecondary>
                   </FlexRow>
+                  <TextButton style={styles.removeButton} onClick={onRemoveWallet}>
+                    <BodyText2 style={styles.removeButtonText}>{localize.text('Remove this account', 'walletDetail')}</BodyText2>
+                  </TextButton>
                 </div>
                 :
                 null
@@ -194,6 +256,11 @@ export const WalletDetail = () => {
               <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Send to Address', 'walletSend')} wide={true} required={true} />
               <ButtonPrimary type={'submit'} style={{marginTop: 32}}>{localize.text('Send', 'univeral')}</ButtonPrimary>
             </form>
+          }
+          {showPrivateKeyModal ?
+            <ModalPrivateKey privateKey={privateKey} />
+            :
+            null
           }
         </MainBody>
       </MainContainer>

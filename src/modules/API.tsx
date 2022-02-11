@@ -1,5 +1,6 @@
 interface FileDialogOptions {
   title?: string
+  defaultPath?: string
   buttonLabel?: string
   filters?: {name: string, extensions: string[]}[]
   properties?: string[]
@@ -16,6 +17,8 @@ class API {
     OPEN_EXTERNAL: 'OPEN_EXTERNAL',
     OPEN_FILE_DIALOG: 'OPEN_FILE_DIALOG',
     OPEN_FILE: 'OPEN_FILE',
+    OPEN_FILE_SAVE_DIALOG: 'OPEN_FILE_SAVE_DIALOG',
+    SAVE_FILE: 'SAVE_FILE',
     LOG_INFO: 'LOG_INFO',
     LOG_ERROR: 'LOG_ERROR',
   };
@@ -42,6 +45,14 @@ class API {
 
   async openFile(filePath: string): Promise<string> {
     return this._ipcRenderer.invoke(this.keys.OPEN_FILE, filePath);
+  }
+
+  async openFileSaveDialog(options: FileDialogOptions): Promise<{canceled: boolean, filePath: string}> {
+    return this._ipcRenderer.invoke(this.keys.OPEN_FILE_SAVE_DIALOG, options);
+  }
+
+  async saveFile(filePath: string, content: string): Promise<boolean> {
+    return this._ipcRenderer.invoke(this.keys.SAVE_FILE, {filePath, content});
   }
 
   openExternal(url: string): void {
