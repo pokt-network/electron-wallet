@@ -3,6 +3,7 @@ export const activeViews = {
   CREATE_PASSWORD: 'CREATE_PASSWORD',
   WALLET_OVERVIEW: 'WALLET_OVERVIEW',
   WALLET_DETAIL: 'WALLET_DETAIL',
+  IMPORT_ACCOUNT: 'IMPORT_ACCOUNT',
 };
 
 export const actions = {

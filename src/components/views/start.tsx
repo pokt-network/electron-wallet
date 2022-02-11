@@ -35,7 +35,6 @@ export const Start = () => {
     card: {
       width: 763,
       maxWidth: '90%',
-      borderRadius: 10,
       paddingTop: 105,
       paddingBottom: 0,
     },
@@ -108,7 +107,7 @@ export const Start = () => {
   return (
     <FlexColumn style={styles.column as React.CSSProperties} justifyContent={'center'} alignItems={'center'}>
       <div style={styles.topSpacer} />
-      <Card style={styles.card}>
+      <Card round={true} style={styles.card}>
         <FlexColumn alignItems={'center'}>
           <img style={styles.textLogo} src={walletTextLogo} alt={localize.text('Wallet text logo', 'start')} />
           <p style={styles.description as React.CSSProperties}><BodyText1>{localize.text('This is an open-source interface for easy management of your POKT accounts.', 'start')}</BodyText1></p>

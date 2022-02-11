@@ -8,8 +8,8 @@ import { localizeContext } from '../../hooks/localize-hook';
 import { ButtonPrimary, ButtonSecondary, TextButton } from '../ui/button';
 import { Header1, Header4, Header5 } from '../ui/header';
 import { APIContext } from '../../hooks/api-hook';
-import { links } from '../../constants';
-import { useSelector } from 'react-redux';
+import { activeViews, links } from '../../constants';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { BodyText1, BodyText2, BodyText3 } from '../ui/text';
 import pocketLogo from '../../images/pocket-logo.svg';
@@ -20,9 +20,12 @@ import { Card } from '../ui/card';
 import ellipse from '../../images/icons/ellipse.svg';
 import { TransactionTable } from '../ui/transactions-table';
 import { PricingContext } from '../../hooks/pricing-hook';
+import { AppHeader } from "../ui/app-header";
+import { setActiveView } from "../../reducers/app-reducer";
 
 export const WalletOverview = () => {
 
+  const dispatch = useDispatch();
   const api = useContext(APIContext);
   const localize = useContext(localizeContext);
   const pricing = useContext(PricingContext);
@@ -50,7 +53,6 @@ export const WalletOverview = () => {
     },
     card: {
       marginTop: 35,
-      borderRadius: 10,
       paddingLeft: 32,
       paddingRight: 32,
       paddingTop: 24,
@@ -75,16 +77,15 @@ export const WalletOverview = () => {
   totalBalance = math.divide(totalBalance, math.bignumber(1000000)) as BigNumber;
   const convertedBalance = pricing.convert(totalBalance, 'USD');
 
+  const onImportAccountClick = () => {
+    dispatch(setActiveView({activeView: activeViews.IMPORT_ACCOUNT}));
+  };
+
   return (
     <FlexRow style={styles.container as React.CSSProperties}>
       <Sidebar />
       <MainContainer>
-        <MainHeader>
-          <MainHeaderTitle>{localize.text('Wallet Overview', 'wallet-overview')}</MainHeaderTitle>
-          <TextButton onClick={() => api.openExternal(links.BUY_POCKET)}>
-            <Header5>{localize.text('Buy POKT', 'create-password')}</Header5>
-          </TextButton>
-        </MainHeader>
+        <AppHeader title={localize.text('Wallet Overview', 'wallet-overview')} />
         <MainBody>
           <FlexRow justifyContent={'flex-start'}>
             <BodyText2>{localize.text('Wallet Total Balance', 'walletOverview')}</BodyText2>
@@ -96,7 +97,7 @@ export const WalletOverview = () => {
           <FlexRow style={styles.convertedBalanceContainer} justifyContent={'flex-start'}>
             <BodyText1>{`$${localize.number(Number(convertedBalance), {useGrouping: true})} USD`}</BodyText1>
           </FlexRow>
-          <Card style={styles.card}>
+          <Card round={true} style={styles.card}>
             <FlexRow justifyContent={'space-between'}>
               <FlexColumn style={styles.cardItem}>
                 <BodyText3>{localize.text('Total Accounts', 'walletOverview')}</BodyText3>
@@ -124,7 +125,7 @@ export const WalletOverview = () => {
                 </FlexRow>
               </FlexColumn>
               <FlexColumn justifyContent={'center'}>
-                <ButtonSecondary>{localize.text('Import Account', 'walletOverview')}</ButtonSecondary>
+                <ButtonSecondary onClick={onImportAccountClick}>{localize.text('Import Account', 'walletOverview')}</ButtonSecondary>
               </FlexColumn>
             </FlexRow>
           </Card>

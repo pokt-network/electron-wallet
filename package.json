@@ -5,9 +5,9 @@
   "main": "./src-back/index.js",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts --max_old_space_size=8192 start",
     "start-app": "electron .",
-    "build": "react-scripts build",
+    "build": "react-scripts --max_old_space_size=8192 build",
     "build-native-linux": "npm run native-build-prep && electron-builder --dir --x64 --linux appImage --publish never",
     "pack-native-linux": "npm run native-build-prep && electron-builder --linux --publish never",
     "build-native-mac": "npm run native-build-prep && electron-builder --dir --x64 --mac zip --publish never",
