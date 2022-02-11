@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Sidebar } from '../ui/sidebar';
-import { MainHeader, MainHeaderTitle } from '../ui/main-header';
 import { FlexColumn, FlexRow } from '../ui/flex';
 import { MainContainer } from '../ui/main-container';
 import { MainBody } from '../ui/main-body';
@@ -8,7 +7,7 @@ import { localizeContext } from '../../hooks/localize-hook';
 import { ButtonPrimary, ButtonSecondary, TextButton } from '../ui/button';
 import { Header1, Header5 } from '../ui/header';
 import { APIContext } from '../../hooks/api-hook';
-import { activeViews, links } from '../../constants';
+import { activeViews } from '../../constants';
 import { WalletControllerContext } from '../../hooks/wallet-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -18,7 +17,6 @@ import { BigNumber } from 'mathjs';
 import { PricingContext } from '../../hooks/pricing-hook';
 import { BodyText1, BodyText2, BodyText3 } from '../ui/text';
 import { Card } from '../ui/card';
-import ellipse from '../../images/icons/ellipse.svg';
 import { Switcher } from '../ui/switcher';
 import { TransactionTable } from '../ui/transactions-table';
 import { TextInput, useTheme } from '@pokt-foundation/ui';
@@ -29,6 +27,9 @@ import { ModalPrivateKey } from "../ui/modal-private-key";
 
 export const WalletDetail = () => {
 
+  const [ sendAmount, setSendAmount ] = useState('');
+  const [ sendAddress, setSendAddress ] = useState('');
+  const [ sendMemo, setSendMemo ] = useState('');
   const [ privateKey, setPrivateKey ] = useState('');
   const [ showSend, setShowSend ] = useState(false);
   const [ switcherIdx, setSwitcherIdx ] = useState(0);
@@ -48,6 +49,9 @@ export const WalletDetail = () => {
   useEffect(() => {
     setSwitcherIdx(0);
     setShowSend(false);
+    setSendAmount('');
+    setSendAddress('');
+    setSendMemo('');
   }, [selectedWallet]);
 
   const wallet = wallets.find(w => w.address === selectedWallet);
@@ -120,7 +124,11 @@ export const WalletDetail = () => {
     },
     removeButtonText: {
       color: theme.accent,
-    }
+    },
+    sendFeeContainer: {
+      marginTop: 22,
+      marginBottom: 22,
+    },
   };
   const balance = math.divide(math.bignumber(wallet?.balance || 0), math.bignumber(1000000)) as BigNumber;
   const convertedBalance = pricing.convert(balance, 'USD');
@@ -130,7 +138,26 @@ export const WalletDetail = () => {
   };
   const onSendSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Submit!');
+    const amount = Number(sendAmount);
+    const password = masterPassword?.get();
+    if(amount > 0 && wallet && walletController && password) {
+      console.log('Submit!', amount, sendAddress, sendMemo);
+      walletController.sendTransaction(
+        wallet.address,
+        sendAmount,
+        sendAddress,
+        sendMemo,
+        password,
+      )
+        .then(tx => {
+          console.log('tx', tx);
+          setShowSend(false);
+          setSendAmount('');
+          setSendAddress('');
+          setSendMemo('');
+        })
+        .catch(console.error);
+    }
   };
   const onSaveKeyFileClick = () => {
     if(wallet) {
@@ -175,6 +202,18 @@ export const WalletDetail = () => {
       if(success)
         dispatch(setActiveView({activeView: activeViews.WALLET_OVERVIEW}));
     }
+  };
+  const onSendAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setSendAmount(e.target.value.trim().replace(/[^\d,.]/g, ''));
+  };
+  const onSendAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setSendAddress(e.target.value.trim());
+  };
+  const onSendMemoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setSendMemo(e.target.value);
   };
 
   return (
@@ -252,8 +291,12 @@ export const WalletDetail = () => {
             </div>
             :
             <form style={styles.sendContainer} onSubmit={onSendSubmit}>
-              <TextInput style={styles.sendInput} type={'text'} placeholder={localize.text('Amount', 'walletSend')} wide={true} autofocus={true} required={true} />
-              <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Send to Address', 'walletSend')} wide={true} required={true} />
+              <TextInput style={styles.sendInput} type={'text'} placeholder={localize.text('Amount in POKT', 'walletSend')} wide={true} value={sendAmount} onChange={onSendAmountChange} autofocus={true} required={true} />
+              <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Send to Address', 'walletSend')} wide={true} value={sendAddress} onChange={onSendAddressChange} required={true} />
+              <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Add a Tx memo', 'walletSend')} wide={true} value={sendMemo} onChange={onSendMemoChange} required={false} />
+              <div style={styles.sendFeeContainer}>
+                <BodyText1>{localize.text('Transaction Fee 0.01 POKT', 'walletSend')}</BodyText1>
+              </div>
               <ButtonPrimary type={'submit'} style={{marginTop: 32}}>{localize.text('Send', 'univeral')}</ButtonPrimary>
             </form>
           }

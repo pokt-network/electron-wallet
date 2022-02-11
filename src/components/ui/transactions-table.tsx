@@ -52,7 +52,7 @@ export const TransactionTable = ({ wallets }: TransactionsTableProps) => {
           const preppedAmount = math.divide(math.bignumber(amount), math.bignumber(1000000)).toString();
           return (
             <FlexRow key={height + txHash} style={styles.row as React.CSSProperties} justifyContent={'flex-start'}>
-              <FlexColumn style={styles.column}>
+              <FlexColumn style={{...styles.column, width: 130, minWidth: 130}}>
                 <BodyText3>{type}</BodyText3>
                 <BodyText1><strong>{`${localize.number(Number(preppedAmount), {useGrouping: true})} POKT`}</strong></BodyText1>
               </FlexColumn>
@@ -64,10 +64,10 @@ export const TransactionTable = ({ wallets }: TransactionsTableProps) => {
                 <BodyText3>{localize.text('TX Hash', 'transactionsTable')}</BodyText3>
                 <BodyText1 style={styles.accentText}><strong>{splitHash(txHash)}</strong></BodyText1>
               </FlexColumn>
-              <FlexColumn style={styles.column} justifyContent={'center'}>
+              <FlexColumn style={{...styles.column, width: 100, minWidth: 100}} justifyContent={'center'}>
                 <BodyText1>Jan 14, 2022</BodyText1>
               </FlexColumn>
-              <FlexColumn style={styles.column} justifyContent={'center'}>
+              <FlexColumn style={{...styles.column, width: 40, minWidth: 40}} justifyContent={'center'}>
                 <TextButton onClick={() => {}}><img alt={localize.text('Open transaction icon', 'transactionsTable')} src={chevronRight} /></TextButton>
               </FlexColumn>
             </FlexRow>
