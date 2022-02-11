@@ -11,6 +11,7 @@ export interface AppState {
   showCreateModal: boolean,
   showPrivateKeyModal: boolean,
   selectedWallet: string,
+  selectedTransaction: string,
 }
 
 const getInitialState = (): AppState => ({
@@ -22,6 +23,7 @@ const getInitialState = (): AppState => ({
   showCreateModal: false,
   showPrivateKeyModal: false,
   selectedWallet: '',
+  selectedTransaction: '',
 });
 
 export const appSlice = createSlice({
@@ -53,9 +55,12 @@ export const appSlice = createSlice({
       state.selectedWallet = action.payload.address;
       state.activeView = activeViews.WALLET_DETAIL;
     },
+    setSelectedTransaction: (state, action: PayloadAction<{selectedTransaction: string}>) => {
+      state.selectedTransaction = action.payload.selectedTransaction;
+    }
   }
 });
 
-export const { setWindowSize, setLocale, setActiveView, setShowCreateModal, setShowPrivateKeyModal, setWallets, setSelectedWallet } = appSlice.actions;
+export const { setWindowSize, setLocale, setActiveView, setShowCreateModal, setShowPrivateKeyModal, setWallets, setSelectedWallet, setSelectedTransaction } = appSlice.actions;
 
 export default appSlice.reducer;
