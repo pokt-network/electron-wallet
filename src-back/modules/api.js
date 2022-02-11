@@ -16,6 +16,8 @@ class API {
     OPEN_EXTERNAL: 'OPEN_EXTERNAL',
     OPEN_FILE_DIALOG: 'OPEN_FILE_DIALOG',
     OPEN_FILE: 'OPEN_FILE',
+    OPEN_FILE_SAVE_DIALOG: 'OPEN_FILE_SAVE_DIALOG',
+    SAVE_FILE: 'SAVE_FILE',
     LOG_INFO: 'LOG_INFO',
     LOG_ERROR: 'LOG_ERROR',
   };
@@ -46,6 +48,10 @@ class API {
       .handle(this.keys.OPEN_FILE_DIALOG, this.openFileDialog.bind(this));
     ipcMain
       .handle(this.keys.OPEN_FILE, this.openFile.bind(this));
+    ipcMain
+      .handle(this.keys.OPEN_FILE_SAVE_DIALOG, this.openFileSaveDialog.bind(this));
+    ipcMain
+      .handle(this.keys.SAVE_FILE, this.saveFile.bind(this));
   }
 
   /**
@@ -76,6 +82,20 @@ class API {
       this._logger.error(`api.openFile() error for ${filePath}. ` + err.message);
       return '';
     }
+  }
+
+  openFileSaveDialog(e, options) {
+    return this._dialog.showSaveDialog(options);
+  }
+
+  async saveFile(e, {filePath, content}) {
+    try {
+      await this._fs.writeFile(filePath, content, 'utf8');
+    } catch(err) {
+      this._logger.error(`api.saveFile() error for ${filePath}. ` + err.message);
+      return false;
+    }
+    return true;
   }
 
   logInfo(e, message) {

@@ -8,6 +8,7 @@ export interface WalletData {
   name: string;
   publicKey: string;
   privateKeyEncrypted: string;
+  ppk: string;
   address: string;
   balance?: string;
   accountType?: string;
@@ -27,6 +28,7 @@ export class Wallet {
   name: string;
   publicKey: string;
   privateKeyEncrypted: string;
+  ppk: string;
   address: string;
   balance = bignumber(0);
   accountType = accountTypes.NODE;
@@ -39,6 +41,7 @@ export class Wallet {
     this.name = data.name;
     this.publicKey = data.publicKey;
     this.privateKeyEncrypted = data.privateKeyEncrypted;
+    this.ppk = data.ppk;
     this.address = data.address;
     if(typeof data.balance === 'string')
       this.balance = bignumber(data.balance);
@@ -64,6 +67,7 @@ export class Wallet {
       name: this.name,
       publicKey: this.publicKey,
       privateKeyEncrypted: this.privateKeyEncrypted,
+      ppk: this.ppk,
       address: this.address,
       balance: this.balance.toString(),
       accountType: this.accountType,

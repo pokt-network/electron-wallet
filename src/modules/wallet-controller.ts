@@ -42,10 +42,12 @@ export class WalletController {
     const account = await this._keyUtils.createAcount(password);
     if(!account)
       return '';
+    const ppk = await this._keyUtils.getPPK(password, account.addressHex);
     const walletData = {
       name,
       publicKey: account.publicKey.toString('hex'),
       privateKeyEncrypted: account.encryptedPrivateKeyHex,
+      ppk,
       address: account.addressHex,
     };
     this.addWallet(walletData, true);
@@ -56,10 +58,12 @@ export class WalletController {
     const account = await this._keyUtils.importAccountFromPPK(password, ppkJson, ppkPassword);
     if(!account)
       return '';
+    const ppk = await this._keyUtils.getPPK(password, account.addressHex);
     const walletData = {
       name,
       publicKey: account.publicKey.toString('hex'),
       privateKeyEncrypted: account.encryptedPrivateKeyHex,
+      ppk,
       address: account.addressHex,
     };
     if(this._wallets.some(w => w.address === walletData.address))
@@ -72,16 +76,25 @@ export class WalletController {
     const account = await this._keyUtils.importAccountFromRawPrivateKey(password, rawPrivateKey);
     if(!account)
       return '';
+    const ppk = await this._keyUtils.getPPK(password, account.addressHex);
     const walletData = {
       name: name || account.addressHex.slice(0, 11),
       publicKey: account.publicKey.toString('hex'),
       privateKeyEncrypted: account.encryptedPrivateKeyHex,
+      ppk,
       address: account.addressHex,
     };
     if(this._wallets.some(w => w.address === walletData.address))
       return '';
     this.addWallet(walletData, true);
     return walletData.publicKey;
+  }
+
+  async getRawPrivateKeyFromWallet(publicKey: string, password: string): Promise<string> {
+    const wallet = this._wallets.find(w => w.publicKey === publicKey);
+    if(!wallet)
+      return '';
+    return this._keyUtils.getRawPrivateKeyFromPPK(password, wallet.ppk);
   }
 
   deleteWallet(publicKey: string): boolean {
