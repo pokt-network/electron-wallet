@@ -3,7 +3,7 @@ import { KeyUtils } from './key-utils';
 import { Subject } from 'rxjs';
 import { RPCController } from './rpc-controller';
 import { makePassword } from '../util';
-import { CoinDenom, Pocket } from "@pokt-network/pocket-js";
+import { CoinDenom, Pocket, Transaction } from "@pokt-network/pocket-js";
 import { isError } from "lodash";
 
 export class WalletController {
@@ -129,6 +129,10 @@ export class WalletController {
     if(isError(rawTxResponse))
       return '';
     return rawTxResponse.hash;
+  }
+
+  async getTransaction(tx: string): Promise<Transaction> {
+    return await this._rpcController.getTransaction(tx);
   }
 
 }

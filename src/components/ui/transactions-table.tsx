@@ -9,12 +9,16 @@ import { BigNumber } from 'mathjs';
 import { splitAddress, splitHash } from '../../util';
 import { TextButton } from './button';
 import chevronRight from '../../images/icons/chevron-right.svg';
+import { useDispatch } from "react-redux";
+import { setActiveView, setSelectedTransaction } from "../../reducers/app-reducer";
+import { activeViews } from "../../constants";
 
 interface TransactionsTableProps {
   wallets: Wallet[]
 }
 export const TransactionTable = ({ wallets }: TransactionsTableProps) => {
 
+  const dispatch = useDispatch();
   const theme = useTheme();
   const localize = useContext(localizeContext);
 
@@ -43,6 +47,11 @@ export const TransactionTable = ({ wallets }: TransactionsTableProps) => {
     },
   };
 
+  const onOpenTransactionClick = (tx: string) => {
+    dispatch(setSelectedTransaction({selectedTransaction: tx}));
+    dispatch(setActiveView({activeView: activeViews.TRANSACTION_SUMMARY}));
+  };
+
   return (
     <div>
       {transactions
@@ -68,7 +77,7 @@ export const TransactionTable = ({ wallets }: TransactionsTableProps) => {
                 <BodyText1>Jan 14, 2022</BodyText1>
               </FlexColumn>
               <FlexColumn style={{...styles.column, width: 40, minWidth: 40}} justifyContent={'center'}>
-                <TextButton onClick={() => {}}><img alt={localize.text('Open transaction icon', 'transactionsTable')} src={chevronRight} /></TextButton>
+                <TextButton onClick={() => onOpenTransactionClick(txHash)}><img alt={localize.text('Open transaction icon', 'transactionsTable')} src={chevronRight} /></TextButton>
               </FlexColumn>
             </FlexRow>
           );
