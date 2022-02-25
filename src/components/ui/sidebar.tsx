@@ -110,7 +110,7 @@ export const Sidebar = () => {
     dispatch(setActiveView({activeView: activeViews.IMPORT_ACCOUNT}));
   };
   const onWatchAccountClick = () => {
-    console.log('on watch accounts click');
+    dispatch(setActiveView({activeView: activeViews.WATCH_ACCOUNT}));
   };
   const onHardwareWalletClick = () => {
     console.log('hardward wallet click');
