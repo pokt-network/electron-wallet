@@ -83,6 +83,15 @@ export class KeyUtils {
     return res;
   }
 
+  async getPPKFromRawKey(privateKey: string, password: string): Promise<string> {
+    const res = await this._pocket.keybase.exportPPK(privateKey, password, '');
+    if(isError(res)) {
+      this.events.error.next('KeyUtils.getPPKFromRawKey() ' + res.message + '\n' + res.stack);
+      return '';
+    }
+    return res;
+  }
+
   async getRawPrivateKeyFromPPK(password: string, ppk: string): Promise<string> {
     const res = await this.importAccountFromPPK(password, ppk, password);
     if(!res)
