@@ -24,6 +24,7 @@ import { Pricing } from './modules/pricing';
 import { PricingContext } from './hooks/pricing-hook';
 import { ImportAccount } from "./components/views/import-account";
 import { TransactionSummary } from "./components/views/transaction-summary";
+import { WatchAccount } from "./components/views/watch-account";
 
 const App = () => {
 
@@ -183,10 +184,13 @@ const App = () => {
                         activeView === activeViews.IMPORT_ACCOUNT ?
                           <ImportAccount />
                           :
-                          activeView === activeViews.TRANSACTION_SUMMARY ?
-                            <TransactionSummary />
+                          activeView === activeViews.WATCH_ACCOUNT ?
+                            <WatchAccount />
                             :
-                            null
+                            activeView === activeViews.TRANSACTION_SUMMARY ?
+                              <TransactionSummary />
+                              :
+                              null
                 }
               </AppContainer>
             </PricingContext.Provider>
