@@ -26,6 +26,7 @@ import { masterPasswordContext } from "../../hooks/master-password-hook";
 import { ModalPrivateKey } from "../ui/modal-private-key";
 import { ModalUnlockWallet } from "../ui/modal-unlock-wallet";
 import { ModalExportKeyFile } from "../ui/modal-export-key-file";
+import { ModalUnjail } from "../ui/modal-unjail";
 
 export const WalletDetail = () => {
 
@@ -38,6 +39,8 @@ export const WalletDetail = () => {
   const [ showUnlockForKeyFileModal, setShowUnlockForKeyFileModal ] = useState(false);
   const [ showUnlockForPrivateKeyModal, setShowUnlockForPrivateKeyModal ] = useState(false);
   const [ showSaveKeyFileModal, setShowSaveKeyFileModal ] = useState(false);
+  const [ showUnjailModal, setShowUnjailModal ] = useState(false);
+  const [ showStakeModal, setShowStakeModal ] = useState(false);
   const api = useContext(APIContext);
   const localize = useContext(localizeContext);
   const walletController = useContext(WalletControllerContext);
@@ -264,6 +267,15 @@ export const WalletDetail = () => {
         .catch(console.error);
     }
   };
+  const onUnjailClick = () => {
+    setShowUnjailModal(true);
+  };
+  const onUnjailModalClose = () => {
+    setShowUnjailModal(false);
+  };
+  const onUnjailModalSubmit = () => {
+    setShowUnjailModal(false);
+  };
 
   return (
     <FlexRow style={styles.container as React.CSSProperties}>
@@ -312,7 +324,7 @@ export const WalletDetail = () => {
                     </FlexRow>
                   </FlexColumn>
                   <FlexColumn justifyContent={'center'}>
-                    <ButtonSecondary>{localize.text('Unjail', 'walletOverview')}</ButtonSecondary>
+                    <ButtonSecondary onClick={onUnjailClick}>{localize.text('Unjail', 'walletOverview')}</ButtonSecondary>
                   </FlexColumn>
                 </FlexRow>
               </Card>
@@ -368,6 +380,11 @@ export const WalletDetail = () => {
       }
       {showSaveKeyFileModal ?
         <ModalExportKeyFile onClose={onSaveKeyFileModalClose} onSubmit={onSaveKeyFileModalSubmit} />
+        :
+        null
+      }
+      {showUnjailModal ?
+        <ModalUnjail onClose={onUnjailModalClose} onSubmit={onUnjailModalSubmit} />
         :
         null
       }
