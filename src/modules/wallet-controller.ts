@@ -135,4 +135,8 @@ export class WalletController {
     return await this._rpcController.getTransaction(tx);
   }
 
+  async getPPKFromRawKey(privateKey: string, password: string): Promise<string> {
+    return await this._keyUtils.getPPKFromRawKey(privateKey, password);
+  }
+
 }

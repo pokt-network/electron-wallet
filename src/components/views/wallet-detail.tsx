@@ -24,6 +24,8 @@ import { AppHeader } from "../ui/app-header";
 import { setActiveView, setShowPrivateKeyModal } from "../../reducers/app-reducer";
 import { masterPasswordContext } from "../../hooks/master-password-hook";
 import { ModalPrivateKey } from "../ui/modal-private-key";
+import { ModalUnlockWallet } from "../ui/modal-unlock-wallet";
+import { ModalExportKeyFile } from "../ui/modal-export-key-file";
 
 export const WalletDetail = () => {
 
@@ -33,6 +35,9 @@ export const WalletDetail = () => {
   const [ privateKey, setPrivateKey ] = useState('');
   const [ showSend, setShowSend ] = useState(false);
   const [ switcherIdx, setSwitcherIdx ] = useState(0);
+  const [ showUnlockForKeyFileModal, setShowUnlockForKeyFileModal ] = useState(false);
+  const [ showUnlockForPrivateKeyModal, setShowUnlockForPrivateKeyModal ] = useState(false);
+  const [ showSaveKeyFileModal, setShowSaveKeyFileModal ] = useState(false);
   const api = useContext(APIContext);
   const localize = useContext(localizeContext);
   const walletController = useContext(WalletControllerContext);
@@ -45,6 +50,11 @@ export const WalletDetail = () => {
     selectedWallet,
     showPrivateKeyModal,
   } = useSelector(({ appState }: RootState) => appState);
+
+  useEffect(() => {
+    if(!showPrivateKeyModal)
+      setPrivateKey('');
+  }, [showPrivateKeyModal]);
 
   useEffect(() => {
     setSwitcherIdx(0);
@@ -160,41 +170,10 @@ export const WalletDetail = () => {
     }
   };
   const onSaveKeyFileClick = () => {
-    if(wallet) {
-      const { name } = wallet;
-      const preppedName = name
-        .replace(/\s/g, '_')
-        .replace(/\W/g, '');
-      api.openFileSaveDialog({
-        title: 'Save Key File',
-        defaultPath: preppedName + '.json',
-        filters: [
-          {name: 'JSON', extensions: ['json']},
-        ],
-        properties: []
-      })
-        .then(({ canceled, filePath }) => {
-          if(!canceled && filePath) {
-            console.log('filePath', filePath);
-            api.saveFile(filePath, wallet.ppk)
-              .then(success => {
-                console.log('success', success);
-              })
-              .catch(console.error);
-          }
-        })
-        .catch(console.error);
-    }
+    setShowUnlockForKeyFileModal(true);
   };
   const onRevealPrivateKeyClick = () => {
-    if(wallet && walletController && masterPassword) {
-      walletController.getRawPrivateKeyFromWallet(wallet.publicKey, masterPassword.get())
-        .then(keyStr => {
-          setPrivateKey(keyStr);
-          dispatch(setShowPrivateKeyModal({show: true}))
-        })
-        .catch(console.error);
-    }
+    setShowUnlockForPrivateKeyModal(true);
   };
   const onRemoveWallet = () => {
     if(wallet && walletController) {
@@ -214,6 +193,76 @@ export const WalletDetail = () => {
   const onSendMemoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setSendMemo(e.target.value);
+  };
+  const onUnlockForKeyFileClose = () => {
+    setShowUnlockForKeyFileModal(false);
+  };
+  const onUnlockForKeyFileSubmit = (password: string) => {
+    setShowUnlockForKeyFileModal(false);
+    if(wallet && walletController) {
+      walletController.getRawPrivateKeyFromWallet(wallet.publicKey, password)
+        .then(keyStr => {
+          if(keyStr) {
+            setPrivateKey(keyStr);
+            setShowSaveKeyFileModal(true);
+          }
+        })
+        .catch(console.error);
+    }
+  };
+  const onUnlockForPrivateKeyModalClose = () => {
+    setShowUnlockForPrivateKeyModal(false);
+  };
+  const onUnlockForPrivateKeyModalSubmit = (password: string) => {
+    setShowUnlockForPrivateKeyModal(false);
+    if(wallet && walletController) {
+      walletController.getRawPrivateKeyFromWallet(wallet.publicKey, password)
+        .then(keyStr => {
+          if(keyStr) {
+            setPrivateKey(keyStr);
+            dispatch(setShowPrivateKeyModal({show: true}));
+          }
+        })
+        .catch(console.error);
+    }
+  };
+  const onSaveKeyFileModalClose = () => {
+    setShowSaveKeyFileModal(false);
+    setPrivateKey('');
+  };
+  const onSaveKeyFileModalSubmit = (password: string) => {
+    if(wallet && walletController) {
+      console.log(password, privateKey);
+      walletController.getPPKFromRawKey(privateKey, password)
+        .then(ppk => {
+          if(ppk) {
+            const { name } = wallet;
+            const preppedName = name
+              .replace(/\s/g, '_')
+              .replace(/\W/g, '');
+            api.openFileSaveDialog({
+              title: 'Save Key File',
+              defaultPath: preppedName + '.json',
+              filters: [
+                {name: 'JSON', extensions: ['json']},
+              ],
+              properties: []
+            })
+              .then(({ canceled, filePath }) => {
+                if(!canceled && filePath) {
+                  api.saveFile(filePath, ppk)
+                    .then(success => {
+                      setShowSaveKeyFileModal(false);
+                      setPrivateKey('');
+                    })
+                    .catch(console.error);
+                }
+              })
+              .catch(console.error);
+          }
+        })
+        .catch(console.error);
+    }
   };
 
   return (
@@ -307,6 +356,21 @@ export const WalletDetail = () => {
           }
         </MainBody>
       </MainContainer>
+      {showUnlockForKeyFileModal ?
+        <ModalUnlockWallet onClose={onUnlockForKeyFileClose} onSubmit={onUnlockForKeyFileSubmit} />
+        :
+        null
+      }
+      {showUnlockForPrivateKeyModal ?
+        <ModalUnlockWallet onClose={onUnlockForPrivateKeyModalClose} onSubmit={onUnlockForPrivateKeyModalSubmit} />
+        :
+        null
+      }
+      {showSaveKeyFileModal ?
+        <ModalExportKeyFile onClose={onSaveKeyFileModalClose} onSubmit={onSaveKeyFileModalSubmit} />
+        :
+        null
+      }
     </FlexRow>
   );
 }
