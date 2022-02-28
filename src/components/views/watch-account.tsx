@@ -9,24 +9,20 @@ import { Header4 } from '../ui/header';
 import { TextInput, useTheme } from "@pokt-foundation/ui";
 import { BodyText1 } from "../ui/text";
 import { ButtonPrimary } from "../ui/button";
-// import { APIContext } from "../../hooks/api-hook";
-// import { WalletControllerContext } from "../../hooks/wallet-hook";
-// import { useDispatch } from "react-redux";
-// import { setActiveView, setSelectedWallet } from "../../reducers/app-reducer";
-// import { activeViews } from "../../constants";
-// import { masterPasswordContext } from "../../hooks/master-password-hook";
+import { WalletControllerContext } from "../../hooks/wallet-hook";
+import { setActiveView, setSelectedWallet } from "../../reducers/app-reducer";
+import { activeViews } from "../../constants";
+import { useDispatch } from "react-redux";
 
 export const WatchAccount = () => {
 
   const [ accountName, setAccountName ] = useState('');
   const [ address, setAddress ] = useState('');
 
-  // const dispatch = useDispatch();
-  // const api = useContext(APIContext);
+  const dispatch = useDispatch();
   const localize = useContext(localizeContext);
   const theme = useTheme();
-  // const walletController = useContext(WalletControllerContext);
-  // const { masterPassword } = useContext(masterPasswordContext);
+  const walletController = useContext(WalletControllerContext);
 
   const styles = {
     container: {
@@ -70,22 +66,25 @@ export const WatchAccount = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Submit!', accountName, address);
-    // const password = masterPassword?.get();
-    // if(walletController && password)
-    //   walletController.importWalletFromRawPrivateKey('', privateKey, password)
-    //     .then(res => {
-    //       if(res) {
-    //         setTimeout(() => {
-    //           const wallets = walletController.getWallets();
-    //           const wallet = wallets.find(w => w.publicKey === res);
-    //           if(wallet) {
-    //             dispatch(setSelectedWallet({address: wallet.address}))
-    //             dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
-    //           }
-    //         }, 500);
-    //       }
-    //     })
-    //     .catch(console.error);
+    const preppedName = accountName.trim();
+    const preppedAddress = address.trim();
+    if(!preppedName || !preppedAddress)
+      return;
+    if(walletController) {
+      walletController
+        .importWatchAccount(preppedName, preppedAddress)
+        .then(() => {
+          setTimeout(() => {
+            const wallets = walletController.getWallets();
+            const wallet = wallets.find(w => w.address === preppedAddress);
+            if(wallet) {
+              dispatch(setSelectedWallet({address: wallet.address}))
+              dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
+            }
+          }, 500);
+        })
+        .catch(console.error);
+    }
   };
 
   const onAccountNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {

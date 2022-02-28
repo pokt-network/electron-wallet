@@ -91,7 +91,6 @@ const App = () => {
           api.logError(errStr);
         });
         walletController.events.walletCreated.subscribe(wallet => {
-          // ToDo add to database
           const walletsFromStorage: WalletData[] = JSON.parse(localStorage.getItem(localStorageKeys.WALLETS) || '[]');
           localStorage.setItem(localStorageKeys.WALLETS, JSON.stringify([
             ...walletsFromStorage,
@@ -99,16 +98,16 @@ const App = () => {
           ]));
           api.logInfo(`Wallet created with address ${wallet.address} and public key ${wallet.publicKey}`);
         });
-        walletController.events.walletDeleted.subscribe(publicKey => {
-          // ToDo delete to from database
+        walletController.events.walletDeleted.subscribe(address => {
           const walletsFromStorage: WalletData[] = JSON.parse(localStorage.getItem(localStorageKeys.WALLETS) || '[]');
-          localStorage.setItem(localStorageKeys.WALLETS, JSON.stringify(walletsFromStorage.filter(w => w.publicKey !== publicKey)));
-          api.logInfo(`Wallet deleted with public key ${publicKey}`);
+          localStorage.setItem(localStorageKeys.WALLETS, JSON.stringify(walletsFromStorage.filter(w => w.address !== address)));
+          api.logInfo(`Wallet deleted with address ${address}`);
         });
         walletController.events.walletUpdated.subscribe(wallet => {
-          // ToDo update in database
           const walletsFromStorage: WalletData[] = JSON.parse(localStorage.getItem(localStorageKeys.WALLETS) || '[]');
           const idx = walletsFromStorage.findIndex(w => w.address === wallet.address);
+          if(idx < 0)
+            return;
           localStorage.setItem(localStorageKeys.WALLETS, JSON.stringify([
             ...walletsFromStorage.slice(0, idx),
             wallet.toObject(),
