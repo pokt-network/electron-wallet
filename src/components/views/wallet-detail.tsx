@@ -339,7 +339,7 @@ export const WalletDetail = () => {
                     </FlexRow>
                   </FlexColumn>
                   <FlexColumn justifyContent={'center'}>
-                    <ButtonSecondary onClick={onUnjailClick}>{localize.text('Unjail', 'walletOverview')}</ButtonSecondary>
+                    <ButtonSecondary onClick={onUnjailClick} disabled={!wallet?.jailed}>{localize.text('Unjail', 'walletOverview')}</ButtonSecondary>
                   </FlexColumn>
                 </FlexRow>
               </Card>
