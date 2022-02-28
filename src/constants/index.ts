@@ -14,13 +14,14 @@ export const actions = {
 };
 
 export const accountTypes = {
+  WALLET: 'WALLET',
   NODE: 'NODE',
   APP: 'NODE',
 };
 
 export const accountStatus = {
   NOT_STAKED: 'NOT_STAKED',
-  STAKING: 'STAKING',
+  UNSTAKING: 'UNSTAKING',
   STAKED: 'STAKED',
 };
 

@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs';
-import { RpcError, Transaction } from '@pokt-network/pocket-js';
+import { Application, Node, RpcError, StakingStatus, Transaction } from '@pokt-network/pocket-js';
 import { accountStatus, accountTypes } from '../constants';
-import { bignumber } from 'mathjs';
+import { BigNumber, bignumber } from 'mathjs';
 import { RPCController } from './rpc-controller';
 
 export interface WalletData {
@@ -13,7 +13,9 @@ export interface WalletData {
   balance?: string;
   accountType?: string;
   status?: string;
+  stakedAmount?: string;
   jailed?: boolean;
+  watchOnly?: boolean;
 }
 
 export class Wallet {
@@ -31,10 +33,16 @@ export class Wallet {
   ppk: string;
   address: string;
   balance = bignumber(0);
-  accountType = accountTypes.NODE;
+  accountType = accountTypes.WALLET;
   status = accountStatus.NOT_STAKED;
+  stakedAmount = bignumber(0);
   jailed = false;
   transactions: Transaction[] = [];
+  watchOnly = false;
+
+  static statusNumToStatus(statusNum: StakingStatus): string {
+    return statusNum === 2 ? accountStatus.STAKED : statusNum === 1 ? accountStatus.UNSTAKING : accountStatus.NOT_STAKED;
+  }
 
   constructor(data: WalletData, rpcController: RPCController) {
     this._rpcController = rpcController;
@@ -47,6 +55,8 @@ export class Wallet {
       this.balance = bignumber(data.balance);
     this.accountType = data.accountType || this.accountType;
     this.status = data.status || this.status;
+    if(typeof data.stakedAmount === 'string')
+      this.stakedAmount = bignumber(data.stakedAmount);
     this.jailed = data.jailed || this.jailed;
   }
 
@@ -62,6 +72,25 @@ export class Wallet {
     }
   }
 
+  private async getAppInfo(): Promise<Application|null> {
+    try {
+      return await this._rpcController.getApp(this.address);
+    } catch(err) {
+      // do nothing with error, it just means that it isn't an app
+      return null;
+    }
+  }
+
+  private async getNodeInfo(): Promise<Node|null> {
+    try {
+      return await this._rpcController.getNode(this.address);
+    } catch(err) {
+      // do nothing with error, it just means that it isn't a node
+      return null;
+    }
+  }
+
+
   toObject(): WalletData {
     return {
       name: this.name,
@@ -71,6 +100,7 @@ export class Wallet {
       address: this.address,
       balance: this.balance.toString(),
       accountType: this.accountType,
+      stakedAmount: this.stakedAmount.toString(),
       status: this.status,
       jailed: this.jailed,
     };
@@ -109,9 +139,70 @@ export class Wallet {
       return true;
     } catch(err) {
       // @ts-ignore
-      this.logRPCError('updateBalance', err);
+      this.logRPCError('updateTransactions', err);
+      return false;
     }
-    return false;
+  }
+
+  async updateAccountInfo(): Promise<boolean> {
+    try {
+      let accountType: string|null = null;
+      let appInfo: Application|null = null;
+      let nodeInfo: Node|null = null;
+      let jailed: boolean;
+      let status: string;
+      let stakedAmount: BigNumber;
+      if([accountTypes.WALLET, accountTypes.APP].includes(this.accountType)) {
+        appInfo = await this.getAppInfo();
+        if(appInfo) {
+          accountType = accountTypes.APP;
+        } else {
+          nodeInfo = await this.getNodeInfo();
+          if(nodeInfo)
+            accountType = accountTypes.NODE;
+        }
+      } else if(this.accountType === accountTypes.NODE) {
+        nodeInfo = await this.getNodeInfo();
+        if(nodeInfo) {
+          accountType = accountTypes.NODE;
+        } else {
+          appInfo = await this.getAppInfo();
+          if(appInfo)
+            accountType = accountTypes.APP;
+        }
+      }
+      if(appInfo && accountType === accountTypes.APP) {
+        jailed = appInfo.jailed;
+        status = Wallet.statusNumToStatus(appInfo.status);
+        stakedAmount = bignumber(appInfo.stakedTokens.toString(10));
+      } else if(nodeInfo && accountType === accountTypes.NODE) {
+        jailed = nodeInfo.jailed;
+        status = Wallet.statusNumToStatus(nodeInfo.status);
+        stakedAmount = bignumber(nodeInfo.stakedTokens.toString(10));
+      } else {
+        accountType = accountTypes.WALLET;
+        jailed = false;
+        status = accountStatus.NOT_STAKED;
+        stakedAmount = bignumber(0);
+      }
+      if(
+        accountType !== this.accountType
+        || jailed !== this.jailed
+        || status !== this.status
+        || stakedAmount.toString() !== this.stakedAmount.toString()
+      ) {
+        this.accountType = accountType;
+        this.jailed = jailed;
+        this.status = status;
+        this.stakedAmount = stakedAmount;
+        this.events.change.next(this);
+      }
+      return true;
+    } catch(err) {
+      // @ts-ignore
+      this.logRPCError('updateAccountInfo', err);
+      return false;
+    }
   }
 
 }
