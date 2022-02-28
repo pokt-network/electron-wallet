@@ -102,7 +102,7 @@ const App = () => {
         walletController.events.walletDeleted.subscribe(publicKey => {
           // ToDo delete to from database
           const walletsFromStorage: WalletData[] = JSON.parse(localStorage.getItem(localStorageKeys.WALLETS) || '[]');
-          localStorage.setItem(localStorageKeys.WALLETS, JSON.stringify(walletsFromStorage.filter(w => w.publicKey === publicKey)));
+          localStorage.setItem(localStorageKeys.WALLETS, JSON.stringify(walletsFromStorage.filter(w => w.publicKey !== publicKey)));
           api.logInfo(`Wallet deleted with public key ${publicKey}`);
         });
         walletController.events.walletUpdated.subscribe(wallet => {
