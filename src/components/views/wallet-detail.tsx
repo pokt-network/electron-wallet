@@ -149,6 +149,17 @@ export const WalletDetail = () => {
       marginTop: 22,
       marginBottom: 22,
     },
+    watchOnlyCard: {
+      marginRight: 32,
+    },
+    watchOnlyFlexRow: {
+      paddingTop: 16,
+      paddingBottom: 16,
+      width: 219,
+    },
+    watchOnlyText: {
+      fontSize: 16,
+    }
   };
   const balance = math.divide(math.bignumber(wallet?.balance || 0), math.bignumber(1000000)) as BigNumber;
   const convertedBalance = pricing.convert(balance, 'USD');
@@ -206,7 +217,7 @@ export const WalletDetail = () => {
   const onUnlockForKeyFileSubmit = (password: string) => {
     setShowUnlockForKeyFileModal(false);
     if(wallet && walletController) {
-      walletController.getRawPrivateKeyFromWallet(wallet.publicKey, password)
+      walletController.getRawPrivateKeyFromWallet(wallet.address, password)
         .then(keyStr => {
           if(keyStr) {
             setPrivateKey(keyStr);
@@ -222,7 +233,7 @@ export const WalletDetail = () => {
   const onUnlockForPrivateKeyModalSubmit = (password: string) => {
     setShowUnlockForPrivateKeyModal(false);
     if(wallet && walletController) {
-      walletController.getRawPrivateKeyFromWallet(wallet.publicKey, password)
+      walletController.getRawPrivateKeyFromWallet(wallet.address, password)
         .then(keyStr => {
           if(keyStr) {
             setPrivateKey(keyStr);
@@ -286,13 +297,15 @@ export const WalletDetail = () => {
     setShowRemoveModal(false);
     if(wallet && walletController) {
       setShowRemoveModal(true);
-      const success = walletController.deleteWallet(wallet.publicKey);
+      const success = walletController.deleteWallet(wallet.address);
       if (success)
         dispatch(setActiveView({activeView: activeViews.WALLET_OVERVIEW}));
     }
   };
 
   let stakedAmount = wallet ? wallet.stakedAmount.toString() : '0';
+
+  const watchOnly = wallet?.watchOnly || false;
 
   return (
     <FlexRow style={styles.container as React.CSSProperties}>
@@ -307,7 +320,16 @@ export const WalletDetail = () => {
             <img alt={localize.text('Pocket logo', 'universal')} src={pocketLogo} />
             <Header1 style={styles.totalBalanceHeader}>{`${localize.number(Number(balance), {useGrouping: true})} POKT`}</Header1>
             <div style={styles.spacer} />
-            {showSend ? null : <ButtonPrimary style={styles.sendButton} onClick={() => setShowSend(true)}>{localize.text('Send', 'universal')}</ButtonPrimary>}
+            {(showSend || watchOnly) ? null : <ButtonPrimary style={styles.sendButton} onClick={() => setShowSend(true)}>{localize.text('Send', 'universal')}</ButtonPrimary>}
+            {watchOnly ?
+              <Card round={true} style={styles.watchOnlyCard}>
+                <FlexRow style={styles.watchOnlyFlexRow} justifyContent={'center'}>
+                  <Header5 style={styles.watchOnlyText}>{localize.text('Watch Only', 'walletDetail')}</Header5>
+                </FlexRow>
+              </Card>
+              :
+              null
+            }
           </FlexRow>
           <FlexRow style={styles.convertedBalanceContainer} justifyContent={'flex-start'}>
             <BodyText1>{`$${localize.number(Number(convertedBalance), {useGrouping: true})} USD`}</BodyText1>
@@ -342,13 +364,13 @@ export const WalletDetail = () => {
                       <BodyText1><strong>{stakedAmount}</strong></BodyText1>
                     </FlexRow>
                   </FlexColumn>
-                  <FlexColumn style={styles.cardItem}>
+                  <FlexColumn style={{...styles.cardItem, visibility: watchOnly ? 'hidden' : 'visible'}}>
                     <BodyText3>{localize.text('Jail Status', 'walletOverview')}</BodyText3>
                     <FlexRow justifyContent={'flex-start'}>
                       <BodyText1><strong>{wallet?.jailed ? localize.text('Jailed', 'walletDetail') : localize.text('Not Jailed', 'walletDetail')}</strong></BodyText1>
                     </FlexRow>
                   </FlexColumn>
-                  <FlexColumn justifyContent={'center'}>
+                  <FlexColumn justifyContent={'center'} style={{visibility: watchOnly ? 'hidden' : 'visible'}}>
                     <ButtonSecondary onClick={onUnjailClick} disabled={!wallet?.jailed}>{localize.text('Unjail', 'walletOverview')}</ButtonSecondary>
                   </FlexColumn>
                 </FlexRow>
@@ -359,16 +381,32 @@ export const WalletDetail = () => {
                   <Header5 style={styles.infoHeader}>{localize.text('Address', 'universal')}</Header5>
                   <FlexRow justifyContent={'flex-start'}>
                     <TextInput style={styles.input} type={'text'} value={wallet?.address} readOnly={true} />
-                    <ButtonSecondary style={styles.infoButton} onClick={onSaveKeyFileClick}>{localize.text('Download Key File', 'walletDetail')}</ButtonSecondary>
+                    {watchOnly ?
+                      <ButtonSecondary style={styles.infoButton}
+                                       onClick={onRemoveWallet}>{localize.text('Remove this Account', 'walletDetail')}</ButtonSecondary>
+                      :
+                      <ButtonSecondary style={styles.infoButton}
+                                       onClick={onSaveKeyFileClick}>{localize.text('Download Key File', 'walletDetail')}</ButtonSecondary>
+                    }
                   </FlexRow>
-                  <Header5 style={{...styles.infoHeader, ...styles.publicKeyHeader}}>{localize.text('Public Key', 'universal')}</Header5>
-                  <FlexRow justifyContent={'flex-start'}>
-                    <TextInput style={styles.input} type={'text'} value={wallet?.publicKey} readOnly={true} />
-                    <ButtonSecondary style={styles.infoButton} onClick={onRevealPrivateKeyClick}>{localize.text('Reveal Private Key', 'walletDetail')}</ButtonSecondary>
-                  </FlexRow>
-                  <TextButton style={styles.removeButton} onClick={onRemoveWallet}>
-                    <BodyText2 style={styles.removeButtonText}>{localize.text('Remove this account', 'walletDetail')}</BodyText2>
-                  </TextButton>
+                  {!watchOnly ? <Header5 style={{...styles.infoHeader, ...styles.publicKeyHeader}}>{localize.text('Public Key', 'universal')}</Header5> : null}
+                  {!watchOnly ?
+                    <FlexRow justifyContent={'flex-start'}>
+                      <TextInput style={styles.input} type={'text'} value={wallet?.publicKey} readOnly={true}/>
+                      <ButtonSecondary style={styles.infoButton}
+                                       onClick={onRevealPrivateKeyClick}>{localize.text('Reveal Private Key', 'walletDetail')}</ButtonSecondary>
+                    </FlexRow>
+                    :
+                    null
+                  }
+                  {!watchOnly ?
+                    <TextButton style={styles.removeButton} onClick={onRemoveWallet}>
+                      <BodyText2
+                        style={styles.removeButtonText}>{localize.text('Remove this account', 'walletDetail')}</BodyText2>
+                    </TextButton>
+                    :
+                    null
+                  }
                 </div>
                 :
                 null

@@ -58,6 +58,7 @@ export class Wallet {
     if(typeof data.stakedAmount === 'string')
       this.stakedAmount = bignumber(data.stakedAmount);
     this.jailed = data.jailed || this.jailed;
+    this.watchOnly = data.watchOnly || this.watchOnly;
   }
 
   private logError(message: string): void {

@@ -55,7 +55,7 @@ export class WalletController {
       address: account.addressHex,
     };
     this.addWallet(walletData, true);
-    return walletData.publicKey;
+    return walletData.address;
   }
 
   async importWalletFromPPK(name: string, ppkJson: string, ppkPassword: string, password = makePassword()): Promise<string> {
@@ -73,7 +73,7 @@ export class WalletController {
     if(this._wallets.some(w => w.address === walletData.address))
       return '';
     this.addWallet(walletData, true);
-    return walletData.publicKey;
+    return walletData.address;
   }
 
   async importWalletFromRawPrivateKey(name: string, rawPrivateKey: string, password = makePassword()): Promise<string> {
@@ -91,22 +91,37 @@ export class WalletController {
     if(this._wallets.some(w => w.address === walletData.address))
       return '';
     this.addWallet(walletData, true);
-    return walletData.publicKey;
+    return walletData.address;
   }
 
-  async getRawPrivateKeyFromWallet(publicKey: string, password: string): Promise<string> {
-    const wallet = this._wallets.find(w => w.publicKey === publicKey);
+  async importWatchAccount(name: string, address: string): Promise<string> {
+    const walletData = {
+      name,
+      publicKey: '',
+      privateKeyEncrypted: '',
+      ppk: '',
+      address,
+      watchOnly: true,
+    };
+    if(this._wallets.some(w => w.address === walletData.address))
+      return '';
+    this.addWallet(walletData);
+    return address;
+  }
+
+  async getRawPrivateKeyFromWallet(address: string, password: string): Promise<string> {
+    const wallet = this._wallets.find(w => w.address === address);
     if(!wallet)
       return '';
     return this._keyUtils.getRawPrivateKeyFromPPK(password, wallet.ppk);
   }
 
-  deleteWallet(publicKey: string): boolean {
-    const idx = this._wallets.findIndex(w => w.publicKey === publicKey);
+  deleteWallet(address: string): boolean {
+    const idx = this._wallets.findIndex(w => w.address === address);
     if(idx < 0)
       return false;
     this._wallets.splice(idx, 1);
-    this.events.walletDeleted.next(publicKey);
+    this.events.walletDeleted.next(address);
     this.events.walletsChanged.next([...this._wallets]);
     return true;
   }
@@ -119,7 +134,7 @@ export class WalletController {
     const wallet = this._wallets.find(w => w.address === fromAddress);
     if(!wallet)
       return '';
-    const privateKey = await this.getRawPrivateKeyFromWallet(wallet.publicKey, password);
+    const privateKey = await this.getRawPrivateKeyFromWallet(wallet.address, password);
     const transactionSender = await this._pocket.withPrivateKey(privateKey);
     if(isError(transactionSender))
       return '';

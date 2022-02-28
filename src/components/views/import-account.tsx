@@ -162,7 +162,7 @@ export const ImportAccount = () => {
           if(res) {
             setTimeout(() => {
               const wallets = walletController.getWallets();
-              const wallet = wallets.find(w => w.publicKey === res);
+              const wallet = wallets.find(w => w.address === res);
               if(wallet) {
                 dispatch(setSelectedWallet({address: wallet.address}))
                 dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
@@ -189,7 +189,7 @@ export const ImportAccount = () => {
           if(res) {
             setTimeout(() => {
               const wallets = walletController.getWallets();
-              const wallet = wallets.find(w => w.publicKey === res);
+              const wallet = wallets.find(w => w.address === res);
               if(wallet) {
                 dispatch(setSelectedWallet({address: wallet.address}))
                 dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
