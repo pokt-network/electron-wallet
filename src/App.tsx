@@ -153,6 +153,19 @@ const App = () => {
         setInterval(updateAllTransactions, 30000);
         updateAllTransactions()
           .catch();
+        const updateAllAccountInfo = async () => {
+          const wallets = walletController.getWallets();
+          for(const w of wallets) {
+            try {
+              await w.updateAccountInfo();
+            } catch(err) {
+              // nothing to do, already logged
+            }
+          }
+        };
+        setInterval(updateAllAccountInfo, 30000);
+        updateAllAccountInfo()
+          .catch();
 
         setWalletController(walletController);
 

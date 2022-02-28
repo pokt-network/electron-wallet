@@ -7,7 +7,7 @@ import { localizeContext } from '../../hooks/localize-hook';
 import { ButtonPrimary, ButtonSecondary, TextButton } from '../ui/button';
 import { Header1, Header5 } from '../ui/header';
 import { APIContext } from '../../hooks/api-hook';
-import { activeViews } from '../../constants';
+import { accountStatus, accountTypes, activeViews } from '../../constants';
 import { WalletControllerContext } from '../../hooks/wallet-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -40,7 +40,6 @@ export const WalletDetail = () => {
   const [ showUnlockForPrivateKeyModal, setShowUnlockForPrivateKeyModal ] = useState(false);
   const [ showSaveKeyFileModal, setShowSaveKeyFileModal ] = useState(false);
   const [ showUnjailModal, setShowUnjailModal ] = useState(false);
-  const [ showStakeModal, setShowStakeModal ] = useState(false);
   const api = useContext(APIContext);
   const localize = useContext(localizeContext);
   const walletController = useContext(WalletControllerContext);
@@ -65,9 +64,15 @@ export const WalletDetail = () => {
     setSendAmount('');
     setSendAddress('');
     setSendMemo('');
+    setPrivateKey('');
   }, [selectedWallet]);
 
   const wallet = wallets.find(w => w.address === selectedWallet);
+
+  useEffect(() => {
+    wallet?.updateAccountInfo()
+      .catch(console.error);
+  }, [selectedWallet, wallet]);
 
   const styles = {
     container: {
@@ -277,6 +282,8 @@ export const WalletDetail = () => {
     setShowUnjailModal(false);
   };
 
+  let stakedAmount = wallet ? wallet.stakedAmount.toString() : '0';
+
   return (
     <FlexRow style={styles.container as React.CSSProperties}>
       <Sidebar />
@@ -302,25 +309,33 @@ export const WalletDetail = () => {
                   <FlexColumn style={styles.cardItem}>
                     <BodyText3>{localize.text('Account Type', 'walletOverview')}</BodyText3>
                     <FlexRow justifyContent={'flex-start'}>
-                      <BodyText1><strong>{localize.text('Node', 'universal')}</strong></BodyText1>
+                      <BodyText1><strong>{
+                        wallet?.accountType === accountTypes.APP ?
+                          localize.text('App', 'universal')
+                          :
+                          wallet?.accountType === accountTypes.NODE ?
+                            localize.text('Node', 'universal')
+                            :
+                            localize.text('Wallet', 'universal')
+                      }</strong></BodyText1>
                     </FlexRow>
                   </FlexColumn>
                   <FlexColumn style={styles.cardItem}>
                     <BodyText3>{localize.text('Status', 'walletOverview')}</BodyText3>
                     <FlexRow justifyContent={'flex-start'}>
-                      <BodyText1><strong>{'Not Staked'}</strong></BodyText1>
+                      <BodyText1><strong>{wallet?.status === accountStatus.STAKED ? localize.text('Staked', 'walletDetail') : wallet?.status === accountStatus.UNSTAKING ? localize.text('Unstaking', 'walletDetail') : localize.text('Not Staked', 'walletDetail')}</strong></BodyText1>
                     </FlexRow>
                   </FlexColumn>
                   <FlexColumn style={styles.cardItem}>
                     <BodyText3>{localize.text('Staked POKT', 'walletOverview')}</BodyText3>
                     <FlexRow justifyContent={'flex-start'}>
-                      <BodyText1><strong>{0}</strong></BodyText1>
+                      <BodyText1><strong>{stakedAmount}</strong></BodyText1>
                     </FlexRow>
                   </FlexColumn>
                   <FlexColumn style={styles.cardItem}>
                     <BodyText3>{localize.text('Jail Status', 'walletOverview')}</BodyText3>
                     <FlexRow justifyContent={'flex-start'}>
-                      <BodyText1><strong>{'Not Jailed'}</strong></BodyText1>
+                      <BodyText1><strong>{wallet?.jailed ? localize.text('Jailed', 'walletDetail') : localize.text('Not Jailed', 'walletDetail')}</strong></BodyText1>
                     </FlexRow>
                   </FlexColumn>
                   <FlexColumn justifyContent={'center'}>

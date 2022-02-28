@@ -8,14 +8,14 @@ import { localizeContext } from '../../hooks/localize-hook';
 import { ButtonPrimary, ButtonSecondary, TextButton } from '../ui/button';
 import { Header1, Header4, Header5 } from '../ui/header';
 import { APIContext } from '../../hooks/api-hook';
-import { activeViews, links } from '../../constants';
+import { accountTypes, activeViews, links } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { BodyText1, BodyText2, BodyText3 } from '../ui/text';
 import pocketLogo from '../../images/pocket-logo.svg';
 import { Wallet } from '../../modules/wallet';
 import * as math from 'mathjs';
-import { BigNumber } from 'mathjs';
+import { bignumber, BigNumber } from 'mathjs';
 import { Card } from '../ui/card';
 import ellipse from '../../images/icons/ellipse.svg';
 import { TransactionTable } from '../ui/transactions-table';
@@ -81,6 +81,12 @@ export const WalletOverview = () => {
     dispatch(setActiveView({activeView: activeViews.IMPORT_ACCOUNT}));
   };
 
+  const totalStaked: BigNumber = wallets
+    .reduce((sum: BigNumber, w): BigNumber => {
+      const { stakedAmount } = w;
+      return math.add(stakedAmount, sum) as BigNumber;
+    }, bignumber(0));
+
   return (
     <FlexRow style={styles.container as React.CSSProperties}>
       <Sidebar />
@@ -108,20 +114,20 @@ export const WalletOverview = () => {
               <FlexColumn style={styles.cardItem}>
                 <BodyText3>{localize.text('Total Nodes', 'walletOverview')}</BodyText3>
                 <FlexRow justifyContent={'flex-start'}>
-                  <BodyText1><strong>{0}</strong></BodyText1>
+                  <BodyText1><strong>{wallets.filter(w => w.status === accountTypes.NODE).length}</strong></BodyText1>
                 </FlexRow>
               </FlexColumn>
               <FlexColumn style={styles.cardItem}>
                 <BodyText3>{localize.text('Total Apps', 'walletOverview')}</BodyText3>
                 <FlexRow justifyContent={'flex-start'}>
                   <img style={styles.nodeTypeIcon} alt={localize.text('App icon', 'walletOverview')} src={ellipse} />
-                  <BodyText1><strong>{0}</strong></BodyText1>
+                  <BodyText1><strong>{wallets.filter(w => w.status === accountTypes.APP).length}</strong></BodyText1>
                 </FlexRow>
               </FlexColumn>
               <FlexColumn style={styles.cardItem}>
                 <BodyText3>{localize.text('Total Staked POKT', 'walletOverview')}</BodyText3>
                 <FlexRow justifyContent={'flex-start'}>
-                  <BodyText1><strong>{0}</strong></BodyText1>
+                  <BodyText1><strong>{totalStaked.toString()}</strong></BodyText1>
                 </FlexRow>
               </FlexColumn>
               <FlexColumn justifyContent={'center'}>
