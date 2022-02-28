@@ -27,6 +27,7 @@ import { ModalPrivateKey } from "../ui/modal-private-key";
 import { ModalUnlockWallet } from "../ui/modal-unlock-wallet";
 import { ModalExportKeyFile } from "../ui/modal-export-key-file";
 import { ModalUnjail } from "../ui/modal-unjail";
+import { ModalConfirm } from "../ui/modal-confirm";
 
 export const WalletDetail = () => {
 
@@ -40,6 +41,7 @@ export const WalletDetail = () => {
   const [ showUnlockForPrivateKeyModal, setShowUnlockForPrivateKeyModal ] = useState(false);
   const [ showSaveKeyFileModal, setShowSaveKeyFileModal ] = useState(false);
   const [ showUnjailModal, setShowUnjailModal ] = useState(false);
+  const [ showRemoveModal, setShowRemoveModal ] = useState(false);
   const api = useContext(APIContext);
   const localize = useContext(localizeContext);
   const walletController = useContext(WalletControllerContext);
@@ -184,11 +186,7 @@ export const WalletDetail = () => {
     setShowUnlockForPrivateKeyModal(true);
   };
   const onRemoveWallet = () => {
-    if(wallet && walletController) {
-      const success = walletController.deleteWallet(wallet.publicKey);
-      if(success)
-        dispatch(setActiveView({activeView: activeViews.WALLET_OVERVIEW}));
-    }
+    setShowRemoveModal(true);
   };
   const onSendAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -280,6 +278,18 @@ export const WalletDetail = () => {
   };
   const onUnjailModalSubmit = () => {
     setShowUnjailModal(false);
+  };
+  const onConfirmRemoveCancel = () => {
+    setShowRemoveModal(false);
+  };
+  const onConfirmRemoveConfirm = async () => {
+    setShowRemoveModal(false);
+    if(wallet && walletController) {
+      setShowRemoveModal(true);
+      const success = walletController.deleteWallet(wallet.publicKey);
+      if (success)
+        dispatch(setActiveView({activeView: activeViews.WALLET_OVERVIEW}));
+    }
   };
 
   let stakedAmount = wallet ? wallet.stakedAmount.toString() : '0';
@@ -400,6 +410,16 @@ export const WalletDetail = () => {
       }
       {showUnjailModal ?
         <ModalUnjail onClose={onUnjailModalClose} onSubmit={onUnjailModalSubmit} />
+        :
+        null
+      }
+      {showRemoveModal ?
+        <ModalConfirm
+          title={localize.text('Remove Account', 'walletDetail')}
+          text={localize.text('Are you sure you want remove this from your POKT Wallet?', 'walletDetail')}
+          confirmButtonText={localize.text('Remove', 'walletDetail')}
+          onCancel={onConfirmRemoveCancel}
+          onConfirm={onConfirmRemoveConfirm} />
         :
         null
       }
