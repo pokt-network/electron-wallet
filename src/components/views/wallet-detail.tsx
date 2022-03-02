@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import pocketLogo from '../../images/pocket-logo.svg';
 import * as math from 'mathjs';
-import { BigNumber } from 'mathjs';
+import { bignumber, BigNumber } from 'mathjs';
 import { PricingContext } from '../../hooks/pricing-hook';
 import { BodyText1, BodyText2, BodyText3 } from '../ui/text';
 import { Card } from '../ui/card';
@@ -303,7 +303,8 @@ export const WalletDetail = () => {
     }
   };
 
-  let stakedAmount = wallet ? wallet.stakedAmount.toString() : '0';
+  const stakedAmountUpokt = wallet ? wallet.stakedAmount : bignumber(0);
+  const stakedAmount = math.divide(stakedAmountUpokt, bignumber(1000000)).toString();
 
   const watchOnly = wallet?.watchOnly || false;
 
@@ -361,7 +362,7 @@ export const WalletDetail = () => {
                   <FlexColumn style={styles.cardItem}>
                     <BodyText3>{localize.text('Staked POKT', 'walletOverview')}</BodyText3>
                     <FlexRow justifyContent={'flex-start'}>
-                      <BodyText1><strong>{stakedAmount}</strong></BodyText1>
+                      <BodyText1><strong>{localize.number(Number(stakedAmount), {useGrouping: true})}</strong></BodyText1>
                     </FlexRow>
                   </FlexColumn>
                   <FlexColumn style={{...styles.cardItem, visibility: watchOnly ? 'hidden' : 'visible'}}>

@@ -16,7 +16,7 @@ export const actions = {
 export const accountTypes = {
   WALLET: 'WALLET',
   NODE: 'NODE',
-  APP: 'NODE',
+  APP: 'APP',
 };
 
 export const accountStatus = {

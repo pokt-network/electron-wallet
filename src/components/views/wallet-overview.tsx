@@ -81,11 +81,12 @@ export const WalletOverview = () => {
     dispatch(setActiveView({activeView: activeViews.IMPORT_ACCOUNT}));
   };
 
-  const totalStaked: BigNumber = wallets
+  const totalStakedUpokt: BigNumber = wallets
     .reduce((sum: BigNumber, w): BigNumber => {
       const { stakedAmount } = w;
       return math.add(stakedAmount, sum) as BigNumber;
     }, bignumber(0));
+  const totalStaked = math.divide(totalStakedUpokt, bignumber(1000000));
 
   return (
     <FlexRow style={styles.container as React.CSSProperties}>
@@ -114,20 +115,20 @@ export const WalletOverview = () => {
               <FlexColumn style={styles.cardItem}>
                 <BodyText3>{localize.text('Total Nodes', 'walletOverview')}</BodyText3>
                 <FlexRow justifyContent={'flex-start'}>
-                  <BodyText1><strong>{wallets.filter(w => w.status === accountTypes.NODE).length}</strong></BodyText1>
+                  <BodyText1><strong>{wallets.filter(w => w.accountType === accountTypes.NODE).length}</strong></BodyText1>
                 </FlexRow>
               </FlexColumn>
               <FlexColumn style={styles.cardItem}>
                 <BodyText3>{localize.text('Total Apps', 'walletOverview')}</BodyText3>
                 <FlexRow justifyContent={'flex-start'}>
                   <img style={styles.nodeTypeIcon} alt={localize.text('App icon', 'walletOverview')} src={ellipse} />
-                  <BodyText1><strong>{wallets.filter(w => w.status === accountTypes.APP).length}</strong></BodyText1>
+                  <BodyText1><strong>{wallets.filter(w => w.accountType === accountTypes.APP).length}</strong></BodyText1>
                 </FlexRow>
               </FlexColumn>
               <FlexColumn style={styles.cardItem}>
                 <BodyText3>{localize.text('Total Staked POKT', 'walletOverview')}</BodyText3>
                 <FlexRow justifyContent={'flex-start'}>
-                  <BodyText1><strong>{totalStaked.toString()}</strong></BodyText1>
+                  <BodyText1><strong>{localize.number(Number(totalStaked.toString()), {useGrouping: true})}</strong></BodyText1>
                 </FlexRow>
               </FlexColumn>
               <FlexColumn justifyContent={'center'}>
