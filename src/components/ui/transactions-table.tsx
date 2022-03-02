@@ -60,7 +60,7 @@ export const TransactionTable = ({ wallets }: TransactionsTableProps) => {
           const [ height, type, walletName, amount, address, txHash ] = t;
           const preppedAmount = math.divide(math.bignumber(amount), math.bignumber(1000000)).toString();
           return (
-            <FlexRow key={height + txHash} style={styles.row as React.CSSProperties} justifyContent={'flex-start'}>
+            <FlexRow key={type + height + txHash} style={styles.row as React.CSSProperties} justifyContent={'flex-start'}>
               <FlexColumn style={{...styles.column, width: 130, minWidth: 130}}>
                 <BodyText3>{type}</BodyText3>
                 <BodyText1><strong>{`${localize.number(Number(preppedAmount), {useGrouping: true})} POKT`}</strong></BodyText1>
