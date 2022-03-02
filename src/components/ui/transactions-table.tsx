@@ -5,7 +5,7 @@ import { BodyText1, BodyText3 } from './text';
 import { localizeContext } from '../../hooks/localize-hook';
 import { useTheme } from '@pokt-foundation/ui';
 import * as math from 'mathjs';
-import { BigNumber } from 'mathjs';
+import { bignumber, BigNumber } from 'mathjs';
 import { splitAddress, splitHash } from '../../util';
 import { TextButton } from './button';
 import chevronRight from '../../images/icons/chevron-right.svg';
@@ -25,7 +25,9 @@ export const TransactionTable = ({ wallets }: TransactionsTableProps) => {
   const transactions = [];
   for(const w of wallets) {
     for(const t of w.transactions) {
-      transactions.push([t.height, w.address === t.stdTx.msg.value.to_address ? 'Received' : 'Sent', w.name, t.stdTx.msg.value.amount, w.address, t.hash, ]);
+      let { value = {} } = t.stdTx.msg;
+      const amount = value.amount || value.value || bignumber(0);
+      transactions.push([t.height, w.address === t.stdTx.msg.value.to_address ? 'Received' : 'Sent', w.name, amount, w.address, t.hash, ]);
     }
   }
 
