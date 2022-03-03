@@ -9,9 +9,8 @@ import { ModalCreateWallet } from './modal-create';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { setActiveView, setSelectedWallet, setShowCreateModal } from '../../reducers/app-reducer';
-import walletIcon from '../../images/icons/wallet.svg';
-import chevronRight from '../../images/icons/chevron-right.svg';
 import { activeViews } from '../../constants';
+import { Icon } from "./icon";
 
 interface SidebarButtonProps {
   children: any
@@ -22,7 +21,6 @@ interface SidebarButtonProps {
 }
 const SidebarButton = ({ selected = false, children, leftIcon, rightIcon, onClick }: SidebarButtonProps) => {
 
-  const localize = useContext(localizeContext);
   const theme = useTheme();
 
   const styles = {
@@ -36,18 +34,15 @@ const SidebarButton = ({ selected = false, children, leftIcon, rightIcon, onClic
       borderLeftWidth: 3,
       borderLeftColor: selected ? theme.accent : 'transparent',
     },
-    leftIcon: {
-      marginRight: 12,
-    },
   };
 
   return (
     <TextButton style={styles.button} hoverBackground={'rgba(196, 196, 196, .1)'} onClick={onClick}>
       <FlexRow justifyContent={'flex-start'} alignItems={'center'}>
-        {leftIcon ? <img alt={localize.text('Wallet icon', 'sidebar')} style={styles.leftIcon} src={leftIcon} /> : null}
+        {leftIcon ? leftIcon : null}
         <BodyText2>{children}</BodyText2>
         <div style={{flexGrow: 1}} />
-        {rightIcon ? <img alt={localize.text('Open wallet icon', 'sidebar')} src={rightIcon} /> : null}
+        {rightIcon ? rightIcon : null}
       </FlexRow>
     </TextButton>
   );
@@ -96,7 +91,10 @@ export const Sidebar = () => {
     createButtonContainer: {
       paddingLeft: 25,
       paddingRight: 25,
-    }
+    },
+    leftIcon: {
+      marginRight: 12,
+    },
   };
 
   const onWalletOverviewClick = () => {
@@ -128,19 +126,19 @@ export const Sidebar = () => {
         <ButtonPrimary size={'md'} style={styles.createButton} disabled={false} onClick={() => dispatch(setShowCreateModal({show: true}))}>{localize.text('Create', 'universal')}</ButtonPrimary>
       </FlexRow>
       <div style={styles.topButtonContainer}>
-        <SidebarButton selected={activeView === activeViews.WALLET_OVERVIEW} rightIcon={chevronRight} onClick={onWalletOverviewClick}>{localize.text('Wallet Overview', 'sidebar')}</SidebarButton>
+        <SidebarButton selected={activeView === activeViews.WALLET_OVERVIEW} leftIcon={<Icon name={'target'} style={styles.leftIcon} />} rightIcon={<Icon name={'chevronRight'} />} onClick={onWalletOverviewClick}>{localize.text('Wallet Overview', 'sidebar')}</SidebarButton>
         {wallets
           .map(w => {
             return (
-              <SidebarButton key={w.address} selected={activeView === activeViews.WALLET_DETAIL && w.address === selectedWallet} leftIcon={walletIcon} rightIcon={chevronRight} onClick={() => onWalletClick(w.address)}>{w.name}</SidebarButton>
+              <SidebarButton key={w.address} selected={activeView === activeViews.WALLET_DETAIL && w.address === selectedWallet} leftIcon={<Icon name={w.watchOnly ? 'eyeOn' : 'wallet'} style={styles.leftIcon} />} rightIcon={<Icon name={'chevronRight'} />} onClick={() => onWalletClick(w.address)}>{w.name}</SidebarButton>
             );
           })
         }
       </div>
-      <SidebarButton onClick={onImportAccountClick}>{localize.text('Import Account', 'sidebar')}</SidebarButton>
-      <SidebarButton onClick={onWatchAccountClick}>{localize.text('Watch Account', 'sidebar')}</SidebarButton>
-      <SidebarButton onClick={onHardwareWalletClick}>{localize.text('Hardware Wallet', 'sidebar')}</SidebarButton>
-      <SidebarButton onClick={onStatsClick}>{localize.text('Stats', 'sidebar')}</SidebarButton>
+      <SidebarButton leftIcon={<Icon name={'import'} style={styles.leftIcon} />} onClick={onImportAccountClick}>{localize.text('Import Account', 'sidebar')}</SidebarButton>
+      <SidebarButton leftIcon={<Icon name={'eyeOn'} style={styles.leftIcon} />} onClick={onWatchAccountClick}>{localize.text('Watch Account', 'sidebar')}</SidebarButton>
+      <SidebarButton leftIcon={<Icon name={'cpu'} style={styles.leftIcon} />} onClick={onHardwareWalletClick}>{localize.text('Hardware Wallet', 'sidebar')}</SidebarButton>
+      <SidebarButton leftIcon={<Icon name={'barChart'} style={styles.leftIcon} />} onClick={onStatsClick}>{localize.text('Stats', 'sidebar')}</SidebarButton>
       <FlexRow style={styles.copyrightContainer} justifyContent={'center'}>
         <BodyText4>{localize.text('App Terms of Use - © Pocket Network Inc. 2021', 'sidebar')}</BodyText4>
       </FlexRow>

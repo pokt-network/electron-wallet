@@ -1,32 +1,28 @@
 import React, { useContext } from 'react';
 import { Sidebar } from '../ui/sidebar';
-import { MainHeader, MainHeaderTitle } from '../ui/main-header';
 import { FlexColumn, FlexRow } from '../ui/flex';
 import { MainContainer } from '../ui/main-container';
 import { MainBody } from '../ui/main-body';
 import { localizeContext } from '../../hooks/localize-hook';
-import { ButtonPrimary, ButtonSecondary, TextButton } from '../ui/button';
-import { Header1, Header4, Header5 } from '../ui/header';
-import { APIContext } from '../../hooks/api-hook';
-import { accountTypes, activeViews, links } from '../../constants';
+import { ButtonSecondary } from '../ui/button';
+import { Header1, Header4 } from '../ui/header';
+import { accountTypes, activeViews } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { BodyText1, BodyText2, BodyText3 } from '../ui/text';
 import pocketLogo from '../../images/pocket-logo.svg';
-import { Wallet } from '../../modules/wallet';
 import * as math from 'mathjs';
 import { bignumber, BigNumber } from 'mathjs';
 import { Card } from '../ui/card';
-import ellipse from '../../images/icons/ellipse.svg';
 import { TransactionTable } from '../ui/transactions-table';
 import { PricingContext } from '../../hooks/pricing-hook';
 import { AppHeader } from "../ui/app-header";
 import { setActiveView } from "../../reducers/app-reducer";
+import { Icon } from "../ui/icon";
 
 export const WalletOverview = () => {
 
   const dispatch = useDispatch();
-  const api = useContext(APIContext);
   const localize = useContext(localizeContext);
   const pricing = useContext(PricingContext);
   const {
@@ -115,19 +111,21 @@ export const WalletOverview = () => {
               <FlexColumn style={styles.cardItem}>
                 <BodyText3>{localize.text('Total Nodes', 'walletOverview')}</BodyText3>
                 <FlexRow justifyContent={'flex-start'}>
+                  <Icon name={'node'} style={styles.nodeTypeIcon} />
                   <BodyText1><strong>{wallets.filter(w => w.accountType === accountTypes.NODE).length}</strong></BodyText1>
                 </FlexRow>
               </FlexColumn>
               <FlexColumn style={styles.cardItem}>
                 <BodyText3>{localize.text('Total Apps', 'walletOverview')}</BodyText3>
                 <FlexRow justifyContent={'flex-start'}>
-                  <img style={styles.nodeTypeIcon} alt={localize.text('App icon', 'walletOverview')} src={ellipse} />
+                  <Icon name={'ellipse'} style={styles.nodeTypeIcon} />
                   <BodyText1><strong>{wallets.filter(w => w.accountType === accountTypes.APP).length}</strong></BodyText1>
                 </FlexRow>
               </FlexColumn>
               <FlexColumn style={styles.cardItem}>
                 <BodyText3>{localize.text('Total Staked POKT', 'walletOverview')}</BodyText3>
                 <FlexRow justifyContent={'flex-start'}>
+                  <Icon name={'stakedTokens'} style={styles.nodeTypeIcon} />
                   <BodyText1><strong>{localize.number(Number(totalStaked.toString()), {useGrouping: true})}</strong></BodyText1>
                 </FlexRow>
               </FlexColumn>
