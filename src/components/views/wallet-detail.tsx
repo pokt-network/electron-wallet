@@ -29,6 +29,7 @@ import { ModalExportKeyFile } from "../ui/modal-export-key-file";
 import { ModalUnjail } from "../ui/modal-unjail";
 import { ModalConfirm } from "../ui/modal-confirm";
 import { Icon } from "../ui/icon";
+import { ModalUnstake } from "../ui/modal-unstake-wallet";
 
 export const WalletDetail = () => {
 
@@ -43,6 +44,7 @@ export const WalletDetail = () => {
   const [ showSaveKeyFileModal, setShowSaveKeyFileModal ] = useState(false);
   const [ showUnjailModal, setShowUnjailModal ] = useState(false);
   const [ showRemoveModal, setShowRemoveModal ] = useState(false);
+  const [ showUnstakeModal, setShowUnstakeModal ] = useState(false);
   const api = useContext(APIContext);
   const localize = useContext(localizeContext);
   const walletController = useContext(WalletControllerContext);
@@ -214,6 +216,25 @@ export const WalletDetail = () => {
   const onSendMemoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setSendMemo(e.target.value);
+  };
+  const onUnstakeClick = () => {
+    setShowUnstakeModal(true);
+  };
+  const onUnstakeModalClose = () => {
+    setShowUnstakeModal(false);
+  };
+  const onUnstakeModalSubmit = (password: string) => {
+    if(wallet && walletController && password) {
+      walletController.sendUnstakeTransaction(
+        wallet.address,
+        password,
+      )
+        .then(tx => {
+          if(tx)
+            setShowUnstakeModal(false);
+        })
+        .catch(console.error);
+    }
   };
   const onUnlockForKeyFileClose = () => {
     setShowUnlockForKeyFileModal(false);
@@ -401,8 +422,19 @@ export const WalletDetail = () => {
                       <BodyText1><strong>{wallet?.jailed ? localize.text('Jailed', 'walletDetail') : localize.text('Not Jailed', 'walletDetail')}</strong></BodyText1>
                     </FlexRow>
                   </FlexColumn>
-                  <FlexColumn justifyContent={'center'} style={{visibility: watchOnly ? 'hidden' : 'visible'}}>
-                    <ButtonSecondary onClick={onUnjailClick} disabled={!wallet?.jailed}>{localize.text('Unjail', 'walletOverview')}</ButtonSecondary>
+                  <FlexColumn justifyContent={'center'} style={{minWidth: 219, visibility: watchOnly ? 'hidden' : 'visible'}}>
+                    {wallet?.accountType === accountTypes.WALLET
+                      ?
+                      null
+                      :
+                      wallet?.jailed ?
+                        <ButtonSecondary onClick={onUnjailClick} disabled={!wallet?.jailed}>{localize.text('Unjail', 'walletDetail')}</ButtonSecondary>
+                        :
+                        wallet?.status === accountStatus.STAKED ?
+                          <ButtonSecondary onClick={onUnstakeClick}>{localize.text('Unstake', 'walletDetail')}</ButtonSecondary>
+                          :
+                          null
+                    }
                   </FlexColumn>
                 </FlexRow>
               </Card>
@@ -479,6 +511,11 @@ export const WalletDetail = () => {
       }
       {showUnjailModal ?
         <ModalUnjail onClose={onUnjailModalClose} onSubmit={onUnjailModalSubmit} />
+        :
+        null
+      }
+      {showUnstakeModal ?
+        <ModalUnstake onClose={onUnstakeModalClose} onSubmit={onUnstakeModalSubmit} />
         :
         null
       }

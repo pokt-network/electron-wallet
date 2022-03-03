@@ -52,6 +52,8 @@ export const TransactionSummary = () => {
     }
   };
 
+  const amount = transaction?.stdTx.msg.value.amount || transaction?.stdTx.msg.value.value || 0;
+
   return (
     <FlexRow style={styles.container as React.CSSProperties}>
       <Sidebar />
@@ -64,7 +66,7 @@ export const TransactionSummary = () => {
           </FlexRow>
           <FlexRow style={styles.row} justifyContent={'flex-start'} wrap={'nowrap'} alignItems={'center'}>
             <BodyText1 style={styles.col1}>{localize.text('Amount', 'transactionSummary')}</BodyText1>
-            <BodyText1 style={styles.col2}>{transaction ? localize.number(transaction?.stdTx.msg.value.amount / 1000000, {useGrouping: true}) + ' POKT' : ''}</BodyText1>
+            <BodyText1 style={styles.col2}>{transaction ? localize.number(amount / 1000000, {useGrouping: true}) + ' POKT' : ''}</BodyText1>
           </FlexRow>
           <FlexRow style={styles.row} justifyContent={'flex-start'} wrap={'nowrap'} alignItems={'center'}>
             <BodyText1 style={styles.col1}>{localize.text('Transaction Fee', 'transactionSummary')}</BodyText1>
