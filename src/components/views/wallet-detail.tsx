@@ -28,6 +28,7 @@ import { ModalUnlockWallet } from "../ui/modal-unlock-wallet";
 import { ModalExportKeyFile } from "../ui/modal-export-key-file";
 import { ModalUnjail } from "../ui/modal-unjail";
 import { ModalConfirm } from "../ui/modal-confirm";
+import { Icon } from "../ui/icon";
 
 export const WalletDetail = () => {
 
@@ -159,7 +160,10 @@ export const WalletDetail = () => {
     },
     watchOnlyText: {
       fontSize: 16,
-    }
+    },
+    accountTypeIcon: {
+      marginRight: 12,
+    },
   };
   const balance = math.divide(math.bignumber(wallet?.balance || 0), math.bignumber(1000000)) as BigNumber;
   const convertedBalance = pricing.convert(balance, 'USD');
@@ -268,7 +272,7 @@ export const WalletDetail = () => {
               .then(({ canceled, filePath }) => {
                 if(!canceled && filePath) {
                   api.saveFile(filePath, ppk)
-                    .then(success => {
+                    .then(() => {
                       setShowSaveKeyFileModal(false);
                       setPrivateKey('');
                     })
@@ -308,6 +312,19 @@ export const WalletDetail = () => {
 
   const watchOnly = wallet?.watchOnly || false;
 
+  const accountType = wallet?.accountType;
+
+  const typeIcon = !accountType ?
+    null
+    :
+    accountType === accountTypes.NODE ?
+      <Icon name={'node'} style={styles.accountTypeIcon} />
+      :
+      accountType === accountTypes.APP ?
+        <Icon name={'ellipse'} style={styles.accountTypeIcon} />
+        :
+        null;
+
   return (
     <FlexRow style={styles.container as React.CSSProperties}>
       <Sidebar />
@@ -342,6 +359,7 @@ export const WalletDetail = () => {
                   <FlexColumn style={styles.cardItem}>
                     <BodyText3>{localize.text('Account Type', 'walletOverview')}</BodyText3>
                     <FlexRow justifyContent={'flex-start'}>
+                      {typeIcon}
                       <BodyText1><strong>{
                         wallet?.accountType === accountTypes.APP ?
                           localize.text('App', 'universal')
@@ -356,12 +374,14 @@ export const WalletDetail = () => {
                   <FlexColumn style={styles.cardItem}>
                     <BodyText3>{localize.text('Status', 'walletOverview')}</BodyText3>
                     <FlexRow justifyContent={'flex-start'}>
+                      <Icon name={wallet?.status === accountStatus.STAKED ? 'staked' : wallet?.status === accountStatus.UNSTAKING ? 'unstaking' : 'unstake'} style={styles.accountTypeIcon} />
                       <BodyText1><strong>{wallet?.status === accountStatus.STAKED ? localize.text('Staked', 'walletDetail') : wallet?.status === accountStatus.UNSTAKING ? localize.text('Unstaking', 'walletDetail') : localize.text('Not Staked', 'walletDetail')}</strong></BodyText1>
                     </FlexRow>
                   </FlexColumn>
                   <FlexColumn style={styles.cardItem}>
                     <BodyText3>{localize.text('Staked POKT', 'walletOverview')}</BodyText3>
                     <FlexRow justifyContent={'flex-start'}>
+                      <Icon name={'stakedTokens'} style={styles.accountTypeIcon} />
                       <BodyText1><strong>{localize.number(Number(stakedAmount), {useGrouping: true})}</strong></BodyText1>
                     </FlexRow>
                   </FlexColumn>
