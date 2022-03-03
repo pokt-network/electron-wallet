@@ -73,6 +73,8 @@ export const WalletDetail = () => {
   const wallet = wallets.find(w => w.address === selectedWallet);
 
   useEffect(() => {
+    wallet?.updateTransactions()
+      .catch(console.error);
     wallet?.updateAccountInfo()
       .catch(console.error);
   }, [selectedWallet, wallet]);
@@ -290,7 +292,17 @@ export const WalletDetail = () => {
     setShowUnjailModal(false);
   };
   const onUnjailModalSubmit = () => {
-    setShowUnjailModal(false);
+    const password = masterPassword?.get();
+    if(wallet && walletController && password) {
+      walletController.sendUnjailTransaction(
+        wallet.address,
+        password,
+      )
+        .then(tx => {
+          setShowUnjailModal(false);
+        })
+        .catch(console.error);
+    }
   };
   const onConfirmRemoveCancel = () => {
     setShowRemoveModal(false);
@@ -390,7 +402,7 @@ export const WalletDetail = () => {
                     </FlexRow>
                   </FlexColumn>
                   <FlexColumn justifyContent={'center'} style={{visibility: watchOnly ? 'hidden' : 'visible'}}>
-                    <ButtonSecondary onClick={onUnjailClick} disabled={!!wallet?.jailed}>{localize.text('Unjail', 'walletOverview')}</ButtonSecondary>
+                    <ButtonSecondary onClick={onUnjailClick} disabled={!wallet?.jailed}>{localize.text('Unjail', 'walletOverview')}</ButtonSecondary>
                   </FlexColumn>
                 </FlexRow>
               </Card>
