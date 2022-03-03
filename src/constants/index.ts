@@ -45,3 +45,5 @@ export const links = {
   BUY_POCKET: 'https://www.pokt.network/',
   HELP: 'https://www.pokt.network/',
 };
+
+export const TRANSACTION_FEE = '0.01'; // in POKT
