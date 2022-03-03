@@ -7,7 +7,7 @@ import { localizeContext } from '../../hooks/localize-hook';
 import { ButtonPrimary, ButtonSecondary, TextButton } from '../ui/button';
 import { Header1, Header5 } from '../ui/header';
 import { APIContext } from '../../hooks/api-hook';
-import { accountStatus, accountTypes, activeViews } from '../../constants';
+import { accountStatus, accountTypes, activeViews, TRANSACTION_FEE } from '../../constants';
 import { WalletControllerContext } from '../../hooks/wallet-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -176,7 +176,6 @@ export const WalletDetail = () => {
     const amount = Number(sendAmount);
     const password = masterPassword?.get();
     if(amount > 0 && wallet && walletController && password) {
-      console.log('Submit!', amount, sendAddress, sendMemo);
       walletController.sendTransaction(
         wallet.address,
         sendAmount,
@@ -185,7 +184,6 @@ export const WalletDetail = () => {
         password,
       )
         .then(tx => {
-          console.log('tx', tx);
           setShowSend(false);
           setSendAmount('');
           setSendAddress('');
@@ -392,7 +390,7 @@ export const WalletDetail = () => {
                     </FlexRow>
                   </FlexColumn>
                   <FlexColumn justifyContent={'center'} style={{visibility: watchOnly ? 'hidden' : 'visible'}}>
-                    <ButtonSecondary onClick={onUnjailClick} disabled={!wallet?.jailed}>{localize.text('Unjail', 'walletOverview')}</ButtonSecondary>
+                    <ButtonSecondary onClick={onUnjailClick} disabled={!!wallet?.jailed}>{localize.text('Unjail', 'walletOverview')}</ButtonSecondary>
                   </FlexColumn>
                 </FlexRow>
               </Card>
@@ -440,7 +438,7 @@ export const WalletDetail = () => {
               <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Send to Address', 'walletSend')} wide={true} value={sendAddress} onChange={onSendAddressChange} required={true} />
               <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Add a Tx memo', 'walletSend')} wide={true} value={sendMemo} onChange={onSendMemoChange} required={false} />
               <div style={styles.sendFeeContainer}>
-                <BodyText1>{localize.text('Transaction Fee 0.01 POKT', 'walletSend')}</BodyText1>
+                <BodyText1>{localize.text('Transaction Fee {{fee}} POKT', 'walletSend', {fee: TRANSACTION_FEE})}</BodyText1>
               </div>
               <ButtonPrimary type={'submit'} style={{marginTop: 32}}>{localize.text('Send', 'univeral')}</ButtonPrimary>
             </form>
