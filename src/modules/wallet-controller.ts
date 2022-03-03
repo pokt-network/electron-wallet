@@ -5,7 +5,7 @@ import { RPCController } from './rpc-controller';
 import { makePassword } from '../util';
 import { CoinDenom, Pocket, Transaction } from "@pokt-network/pocket-js";
 import { isError } from "lodash";
-import { accountTypes } from "../constants";
+import { accountTypes, TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT } from "../constants";
 
 export class WalletController {
 
@@ -141,7 +141,7 @@ export class WalletController {
       return '';
     const rawTxResponse = await transactionSender
       .send(fromAddress, toAddress, (Number(amount) * 1000000).toString(10))
-      .submit('testnet', '10000', CoinDenom.Upokt);
+      .submit(TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt);
     if(isError(rawTxResponse))
       return '';
     return rawTxResponse.hash;
@@ -159,11 +159,36 @@ export class WalletController {
     if(wallet.accountType === accountTypes.APP) {
       rawTxResponse = await transactionSender
         .appUnjail(address)
-        .submit('testnet', '10000', CoinDenom.Upokt);
+        .submit(TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt);
     } else if(wallet.accountType === accountTypes.NODE) {
       rawTxResponse = await transactionSender
         .nodeUnjail(address)
-        .submit('testnet', '10000', CoinDenom.Upokt);
+        .submit(TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt);
+    } else {
+      return '';
+    }
+    if(isError(rawTxResponse))
+      return '';
+    return rawTxResponse.hash;
+  }
+
+  async sendUnstakeTransaction(address: string, password: string): Promise<string> {
+    const wallet = this._wallets.find(w => w.address === address);
+    if(!wallet)
+      return '';
+    const privateKey = await this.getRawPrivateKeyFromWallet(wallet.address, password);
+    const transactionSender = await this._pocket.withPrivateKey(privateKey);
+    if(isError(transactionSender))
+      return '';
+    let rawTxResponse;
+    if(wallet.accountType === accountTypes.APP) {
+      rawTxResponse = await transactionSender
+        .appUnstake(address)
+        .submit(TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt);
+    } else if(wallet.accountType === accountTypes.NODE) {
+      rawTxResponse = await transactionSender
+        .nodeUnstake(address)
+        .submit(TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt);
     } else {
       return '';
     }

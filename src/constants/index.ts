@@ -46,4 +46,7 @@ export const links = {
   HELP: 'https://www.pokt.network/',
 };
 
-export const TRANSACTION_FEE = '0.01'; // in POKT
+export const TRANSACTION_FEE_UPOKT = '10000'; // in uPOKT
+export const TRANSACTION_FEE = (Number(TRANSACTION_FEE_UPOKT) / 1000000).toString(10); // in POKT
+
+export const TRANSACTION_CHAIN_ID = 'testnet';
