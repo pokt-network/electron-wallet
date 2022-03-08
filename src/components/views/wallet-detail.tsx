@@ -30,6 +30,8 @@ import { ModalUnjail } from "../ui/modal-unjail";
 import { ModalConfirm } from "../ui/modal-confirm";
 import { Icon } from "../ui/icon";
 import { ModalUnstake } from "../ui/modal-unstake-wallet";
+import { Toggle } from "../ui/toggle";
+import { AddressControllerContext } from "../../hooks/address-hook";
 
 export const WalletDetail = () => {
 
@@ -45,9 +47,12 @@ export const WalletDetail = () => {
   const [ showUnjailModal, setShowUnjailModal ] = useState(false);
   const [ showRemoveModal, setShowRemoveModal ] = useState(false);
   const [ showUnstakeModal, setShowUnstakeModal ] = useState(false);
+  const [ saveAddressEnabled, setSaveAddressEnabled ] = useState(false);
+  const [ saveAddressLabel, setSaveAddressLabel ] = useState('');
   const api = useContext(APIContext);
   const localize = useContext(localizeContext);
   const walletController = useContext(WalletControllerContext);
+  const addressController = useContext(AddressControllerContext);
   const pricing = useContext(PricingContext);
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -66,6 +71,8 @@ export const WalletDetail = () => {
   useEffect(() => {
     setSwitcherIdx(0);
     setShowSend(false);
+    setSaveAddressEnabled(false);
+    setSaveAddressLabel('');
     setSendAmount('');
     setSendAddress('');
     setSendMemo('');
@@ -168,6 +175,12 @@ export const WalletDetail = () => {
     accountTypeIcon: {
       marginRight: 12,
     },
+    enableSaveAddressRow: {
+      paddingTop: 20,
+    },
+    enableSaveToggle: {
+      marginRight: 10,
+    },
   };
   const balance = math.divide(math.bignumber(wallet?.balance || 0), math.bignumber(1000000)) as BigNumber;
   const convertedBalance = pricing.convert(balance, 'USD');
@@ -179,11 +192,17 @@ export const WalletDetail = () => {
     e.preventDefault();
     const amount = Number(sendAmount);
     const password = masterPassword?.get();
+    const preppedSendAddress = sendAddress.trim();
+    const preppedLabel = saveAddressLabel.trim();
+    if(!preppedSendAddress)
+      return;
+    if(saveAddressEnabled && !preppedLabel)
+      return;
     if(amount > 0 && wallet && walletController && password) {
       walletController.sendTransaction(
         wallet.address,
         sendAmount,
-        sendAddress,
+        preppedSendAddress,
         sendMemo,
         password,
       )
@@ -192,6 +211,10 @@ export const WalletDetail = () => {
           setSendAmount('');
           setSendAddress('');
           setSendMemo('');
+          setSaveAddressEnabled(false);
+          setSaveAddressLabel('');
+          if(saveAddressEnabled)
+            addressController?.createAddress(preppedLabel, preppedSendAddress);
         })
         .catch(console.error);
     }
@@ -216,6 +239,10 @@ export const WalletDetail = () => {
   const onSendMemoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setSendMemo(e.target.value);
+  };
+  const onSaveAddressLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setSaveAddressLabel(e.target.value);
   };
   const onUnstakeClick = () => {
     setShowUnstakeModal(true);
@@ -481,6 +508,17 @@ export const WalletDetail = () => {
               <TextInput style={styles.sendInput} type={'text'} placeholder={localize.text('Amount in POKT', 'walletSend')} wide={true} value={sendAmount} onChange={onSendAmountChange} autofocus={true} required={true} />
               <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Send to Address', 'walletSend')} wide={true} value={sendAddress} onChange={onSendAddressChange} required={true} />
               <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Add a Tx memo', 'walletSend')} wide={true} value={sendMemo} onChange={onSendMemoChange} required={false} />
+              <FlexRow style={styles.enableSaveAddressRow} wrap={'nowrap'} justifyContent={'flex-start'} alignItems={'center'}>
+                <Toggle style={styles.enableSaveToggle} enabled={saveAddressEnabled} onToggle={enabled => setSaveAddressEnabled(enabled)} />
+                <BodyText1>{localize.text('Save to Address Book', 'walletDetail')}</BodyText1>
+              </FlexRow>
+              {saveAddressEnabled ?
+                <TextInput style={{...styles.sendInput, marginTop: 16}} type={'text'}
+                           placeholder={localize.text('Enter label of the address', 'walletSend')} wide={true}
+                           value={saveAddressLabel} onChange={onSaveAddressLabelChange} required={true} />
+                :
+                null
+              }
               <div style={styles.sendFeeContainer}>
                 <BodyText1>{localize.text('Transaction Fee {{fee}} POKT', 'walletSend', {fee: TRANSACTION_FEE})}</BodyText1>
               </div>

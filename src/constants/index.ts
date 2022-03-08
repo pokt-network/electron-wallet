@@ -6,6 +6,7 @@ export const activeViews = {
   IMPORT_ACCOUNT: 'IMPORT_ACCOUNT',
   WATCH_ACCOUNT: 'WATCH_ACCOUNT',
   TRANSACTION_SUMMARY: 'TRANSACTION_SUMMARY',
+  ADDRESS_BOOK: 'ADDRESS_BOOK',
 };
 
 export const actions = {
@@ -39,6 +40,7 @@ export const localStorageKeys = {
   MASTER_PASSWORD_HASHED: 'MASTER_PASSWORD_HASHED',
   MASTER_PASSWORD_SALT: 'MASTER_PASSWORD_SALT',
   WALLETS: 'WALLETS',
+  ADDRESSES: 'ADDRESSES',
 };
 
 export const links = {

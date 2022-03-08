@@ -71,6 +71,7 @@ interface ButtonBaseProps {
   disabledBackgroundColor: string
   disabledBorderColor: string
   disabledColor: string
+  title: string
   type: string
   style: object
   size: ('lg'|'md'|'sm')
@@ -122,9 +123,10 @@ interface ButtonProps {
   size?: ('lg'|'md'|'sm')
   type?: ('button'|'submit')
   style?: object
+  title?: string
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
 }
-export const ButtonPrimary = ({ children, disabled = false, size = 'lg', style = {}, type = 'button', onClick }: ButtonProps) => {
+export const ButtonPrimary = ({ children, disabled = false, size = 'lg', style = {}, title = '', type = 'button', onClick }: ButtonProps) => {
 
   const theme = useTheme();
 
@@ -147,12 +149,13 @@ export const ButtonPrimary = ({ children, disabled = false, size = 'lg', style =
       disabledBorderColor={'#32404f'}
       disabledColor={'#898d92'}
       style={style}
+      title={title}
       onClick={onClick}
       type={type}>{children}</ButtonBase>
   );
 };
 
-export const ButtonSecondary = ({ children, disabled = false, size = 'lg', style = {}, type = 'button', onClick }: ButtonProps) => {
+export const ButtonSecondary = ({ children, disabled = false, size = 'lg', style = {}, title = '', type = 'button', onClick }: ButtonProps) => {
 
   const theme = useTheme();
 
@@ -176,6 +179,7 @@ export const ButtonSecondary = ({ children, disabled = false, size = 'lg', style
       disabledBorderColor={'#32404f'}
       disabledColor={'#898d92'}
       style={style}
+      title={title}
       onClick={onClick}
       type={type}>{children}</ButtonBase>
   );
@@ -194,12 +198,12 @@ const StyledTextButton = styled.button<{hoverBackground?: string}>`
     ${props => props.hoverBackground ? `background-color:${props.hoverBackground}` : ''}
   }
 `;
-export const TextButton = ({ children, hoverBackground, style = {}, onClick }: {children: any, style?: object, hoverBackground?: string, onClick: () => void}) => {
+export const TextButton = ({ children, hoverBackground, style = {}, title = '', onClick }: {children: any, style?: object, hoverBackground?: string, title?: string, onClick: () => void}) => {
   const onButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     onClick();
   };
   return (
-    <StyledTextButton style={style} hoverBackground={hoverBackground} onClick={onButtonClick}>{children}</StyledTextButton>
+    <StyledTextButton style={style} hoverBackground={hoverBackground} onClick={onButtonClick} title={title}>{children}</StyledTextButton>
   );
 };

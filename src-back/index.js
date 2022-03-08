@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, ipcMain, screen, shell } = require('electron');
+const { app, BrowserWindow, clipboard, dialog, ipcMain, screen, shell } = require('electron');
 const electronContextMenu = require('electron-context-menu');
 const isDev = require('electron-is-dev');
 const path = require('path');
@@ -32,6 +32,7 @@ const init = async function() {
     shell,
     dialog,
     fs,
+    clipboard,
   );
 
   const appWindow = new BrowserWindow({
