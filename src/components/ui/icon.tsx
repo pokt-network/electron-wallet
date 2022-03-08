@@ -12,9 +12,14 @@ import barChart from '../../images/icons/bar_chart.svg';
 import wallet from '../../images/icons/wallet.svg';
 import chevronRight from '../../images/icons/chevron-right.svg';
 import target from '../../images/icons/target.svg';
+import user from '../../images/icons/user.svg';
+import bookOpen from '../../images/icons/book_open.svg';
+import logOut from '../../images/icons/log_out.svg';
+import remove from '../../images/icons/remove.svg';
+import copyGreen from '../../images/icons/copy-green.svg';
 
 interface IconProps {
-  name: "node"|"ellipse"|"staked"|"unstaking"|"unstake"|"stakedTokens"|"import"|"eyeOn"|"cpu"|"barChart"|"wallet"|"chevronRight"|"target"
+  name: "node"|"ellipse"|"staked"|"unstaking"|"unstake"|"stakedTokens"|"import"|"eyeOn"|"cpu"|"barChart"|"wallet"|"chevronRight"|"target"|"user"|"bookOpen"|"logOut"|"remove"|"copyGreen"
   style?: React.CSSProperties
 }
 export const Icon = ({ name, style = {} }: IconProps) => {
@@ -32,6 +37,11 @@ export const Icon = ({ name, style = {} }: IconProps) => {
     wallet,
     chevronRight,
     target,
+    user,
+    bookOpen,
+    logOut,
+    remove,
+    copyGreen,
   };
   const src = sources[name];
   return (

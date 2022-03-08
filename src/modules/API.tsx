@@ -19,6 +19,7 @@ class API {
     OPEN_FILE: 'OPEN_FILE',
     OPEN_FILE_SAVE_DIALOG: 'OPEN_FILE_SAVE_DIALOG',
     SAVE_FILE: 'SAVE_FILE',
+    COPY_TO_CLIPBOARD: 'COPY_TO_CLIPBOARD',
     LOG_INFO: 'LOG_INFO',
     LOG_ERROR: 'LOG_ERROR',
   };
@@ -57,6 +58,11 @@ class API {
 
   openExternal(url: string): void {
     this._ipcRenderer.send(this.keys.OPEN_EXTERNAL, url);
+  }
+
+  copyToClipboard(text: string): boolean {
+    // @ts-ignore
+    return this._ipcRenderer.sendSync(this.keys.COPY_TO_CLIPBOARD, text);
   }
 
   logInfo(message: string): void {

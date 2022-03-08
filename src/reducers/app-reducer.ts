@@ -1,11 +1,13 @@
 import { Wallet } from '../modules/wallet';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { activeViews } from '../constants';
+import { AddressItem } from "../modules/address-item";
 
 export interface AppState {
   activeView: string;
   locale: string
   wallets: Wallet[]
+  addresses: AddressItem[]
   windowWidth: number
   windowHeight: number
   showCreateModal: boolean,
@@ -18,6 +20,7 @@ const getInitialState = (): AppState => ({
   activeView: activeViews.START,
   locale: 'en-US',
   wallets: [],
+  addresses: [],
   windowWidth: window.innerWidth,
   windowHeight: window.innerHeight,
   showCreateModal: false,
@@ -51,6 +54,9 @@ export const appSlice = createSlice({
     setWallets: (state, action: PayloadAction<{wallets: Wallet[]}>) => {
       state.wallets = action.payload.wallets;
     },
+    setAddresses: (state, action: PayloadAction<{addresses: AddressItem[]}>) => {
+      state.addresses = action.payload.addresses;
+    },
     setSelectedWallet: (state, action: PayloadAction<{address: string}>) => {
       state.selectedWallet = action.payload.address;
       state.activeView = activeViews.WALLET_DETAIL;
@@ -61,6 +67,6 @@ export const appSlice = createSlice({
   }
 });
 
-export const { setWindowSize, setLocale, setActiveView, setShowCreateModal, setShowPrivateKeyModal, setWallets, setSelectedWallet, setSelectedTransaction } = appSlice.actions;
+export const { setWindowSize, setLocale, setActiveView, setShowCreateModal, setShowPrivateKeyModal, setWallets, setAddresses, setSelectedWallet, setSelectedTransaction } = appSlice.actions;
 
 export default appSlice.reducer;

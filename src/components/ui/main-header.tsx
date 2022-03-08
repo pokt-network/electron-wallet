@@ -33,6 +33,7 @@ export const MainHeader = ({ children }: MainHeaderProps) => {
       paddingLeft: 25,
       paddingTop: 36,
       paddingBottom: 19,
+      position: 'relative',
     },
   };
 

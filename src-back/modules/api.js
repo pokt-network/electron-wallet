@@ -18,6 +18,7 @@ class API {
     OPEN_FILE: 'OPEN_FILE',
     OPEN_FILE_SAVE_DIALOG: 'OPEN_FILE_SAVE_DIALOG',
     SAVE_FILE: 'SAVE_FILE',
+    COPY_TO_CLIPBOARD: 'COPY_TO_CLIPBOARD',
     LOG_INFO: 'LOG_INFO',
     LOG_ERROR: 'LOG_ERROR',
   };
@@ -30,20 +31,23 @@ class API {
    * @param {Electron.Shell} shell
    * @param {Electron.Dialog} dialog
    * @param fs
+   * @param {Electron.Clipboard} clipboard
    */
-  constructor(ipcMain, packageJson, logger, shell, dialog, fs) {
+  constructor(ipcMain, packageJson, logger, shell, dialog, fs, clipboard) {
     this._ipcMain = ipcMain;
     this._packageJson = packageJson;
     this._logger = logger;
     this._shell = shell;
     this._dialog = dialog;
     this._fs = fs;
+    this._clipboard = clipboard;
     ipcMain
       .on(this.keys.GET_ENDPOINT, this.getEndpoint)
       .on(this.keys.GET_VERSION, this.getVersion.bind(this))
       .on(this.keys.OPEN_EXTERNAL, this.openExternal.bind(this))
       .on(this.keys.LOG_INFO, this.logInfo.bind(this))
       .on(this.keys.LOG_ERROR, this.logError.bind(this))
+      .on(this.keys.COPY_TO_CLIPBOARD, this.copyToClipboard.bind(this));
     ipcMain
       .handle(this.keys.OPEN_FILE_DIALOG, this.openFileDialog.bind(this));
     ipcMain
@@ -96,6 +100,16 @@ class API {
       return false;
     }
     return true;
+  }
+
+  copyToClipboard(e, text) {
+    try {
+      this._clipboard.writeText(text);
+    } catch(err) {
+      this._logger.error(`api.copyToClipboard() error. ` + err.message);
+      e.returnValue = false;
+    }
+    e.returnValue = true;
   }
 
   logInfo(e, message) {
