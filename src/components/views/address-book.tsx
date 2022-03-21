@@ -163,7 +163,7 @@ export const AddressBook = () => {
           </div>
         </MainBody>
         {showConfirmDeleteModal ?
-          <ModalConfirm title={localize.text('Delete Address', 'addressBook')} text={localize.text('Are you sure you want to delete {{name}}-{{address}} from the address book?', 'addressBook', {name: selectedAddress?.name, address: selectedAddress?.address.slice(-4)})} confirmButtonText={localize.text('Delete', 'addressBook')} onCancel={onDeleteModalCancel} onConfirm={onDeleteModalConfirm} />
+          <ModalConfirm title={localize.text('Delete Address', 'addressBook')} text={localize.text('Are you sure you want to delete {{name}}-{{address}} from the address book?', 'addressBook', {name: selectedAddress?.name, address: selectedAddress?.address.slice(-4)})} shape={'circle'} confirmButtonText={localize.text('Delete', 'addressBook')} onCancel={onDeleteModalCancel} onConfirm={onDeleteModalConfirm} />
           :
           null
         }

@@ -7,14 +7,16 @@ import { ButtonPrimary } from './button';
 import { FlexRow } from './flex';
 import { InputErrorMessage } from './input-error';
 import { InputRightButton } from './input-adornment';
+import { BigShapeType } from './big-shape';
 
 interface ModalUnlockWalletProps {
   errorMessage?: string
+  shape: BigShapeType
   onClose: ()=>void
   onSubmit: (password: string)=>void
 }
 
-export const ModalUnlockWallet = ({ errorMessage: errorMessageProp = '', onClose, onSubmit }: ModalUnlockWalletProps) => {
+export const ModalUnlockWallet = ({ errorMessage: errorMessageProp = '', shape, onClose, onSubmit }: ModalUnlockWalletProps) => {
 
   const localize = useContext(localizeContext);
 
@@ -63,7 +65,7 @@ export const ModalUnlockWallet = ({ errorMessage: errorMessageProp = '', onClose
   };
 
   return (
-    <Modal onClose={handleClose}>
+    <Modal shape={shape} onClose={handleClose}>
       <div>
         <Header4>{localize.text('Unlock Your Wallet', 'modalUnlock')}</Header4>
         <form style={styles.form} onSubmit={handleSubmit}>

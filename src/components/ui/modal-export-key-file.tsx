@@ -62,7 +62,7 @@ export const ModalExportKeyFile = ({ onClose, onSubmit }: ModalExportKeyFileProp
   };
 
   return (
-    <Modal onClose={handleClose}>
+    <Modal onClose={handleClose} shape={'square'}>
       <div>
         <Header4>{localize.text('Download Key File', 'modalExportKeyFile')}</Header4>
         <div style={styles.textContainer}>
