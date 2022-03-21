@@ -14,6 +14,8 @@ import { useDispatch } from 'react-redux';
 import { masterPasswordContext } from '../../hooks/master-password-hook';
 import { setActiveView } from '../../reducers/app-reducer';
 import { activeViews } from '../../constants';
+import { InputRightButton } from "../ui/input-adornment";
+import { InputErrorMessage } from "../ui/input-error";
 
 export const CreatePassword = () => {
 
@@ -22,6 +24,8 @@ export const CreatePassword = () => {
   const { setMasterPassword } = useContext(masterPasswordContext);
   const [ password, setPassword ] = useState('');
   const [ passwordRepeat, setPasswordRepeat ] = useState('');
+  const [ showPassword, setShowPassword ] = useState(false);
+  const [ errorMessage, setErrorMessage ] = useState('');
 
   const poktTheme = useTheme();
 
@@ -50,13 +54,19 @@ export const CreatePassword = () => {
     input: {
       marginBottom: 30,
       backgroundColor: 'transparent',
-    }
+    },
+    errorMessage: {
+      marginTop: -20,
+    },
   };
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if(password !== passwordRepeat)
-      return;
+    if(!password.trim()) {
+      return setErrorMessage(localize.text('You must enter a password', 'create-password'));
+    } else if(password !== passwordRepeat) {
+      return setErrorMessage(localize.text('Password and repeated password must match', 'create-password'));
+    }
     const isSet = masterPasswordIsSet();
     const masterPassword = MasterPassword(password);
     if(!isSet)
@@ -92,8 +102,22 @@ export const CreatePassword = () => {
           <p><BodyText1>{localize.text('Create a password to lock your Wallet. You will need this to unlock your accounts, perform transactions, and export your keys.', 'create-password')}</BodyText1></p>
           <p><BodyText1 style={styles.warningParagraph}>{localize.text('We can NOT help you recover this password so please back it up securely.', 'create-password')}</BodyText1></p>
           <form style={styles.form} onSubmit={onSubmit}>
-            <TextInput type={'password'} style={styles.input} wide={true} value={password} onChange={onPasswordChange} required={true} autofocus={true} placeholder={localize.text('Password', 'universal')} />
-            <TextInput type={'password'} style={styles.input} wide={true} value={passwordRepeat} onChange={onPasswordRepeatChange} required={true} placeholder={localize.text('Confirm Password', 'universal')} />
+            <TextInput type={showPassword ? 'text' : 'password'}
+                       style={styles.input}
+                       wide={true}
+                       value={password}
+                       onChange={onPasswordChange}
+                       adornment={<InputRightButton icon={showPassword ? 'eyeOff' : 'eyeOn'} onClick={() => setShowPassword(!showPassword)} />}
+                       adornmentPosition={'end'}
+                       autofocus={true}
+                       placeholder={localize.text('Password', 'universal')} />
+            <TextInput type={showPassword ? 'text' : 'password'}
+                       style={styles.input}
+                       wide={true}
+                       value={passwordRepeat}
+                       onChange={onPasswordRepeatChange}
+                       placeholder={localize.text('Confirm Password', 'universal')} />
+            {errorMessage ? <InputErrorMessage style={styles.errorMessage} message={errorMessage} /> : null}
             <ButtonPrimary size={'md'} type={'submit'}>{localize.text('Create', 'universal')}</ButtonPrimary>
           </form>
         </MainBody>

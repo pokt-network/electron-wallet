@@ -7,6 +7,7 @@ export const activeViews = {
   WATCH_ACCOUNT: 'WATCH_ACCOUNT',
   TRANSACTION_SUMMARY: 'TRANSACTION_SUMMARY',
   ADDRESS_BOOK: 'ADDRESS_BOOK',
+  SEND: 'SEND',
 };
 
 export const actions = {

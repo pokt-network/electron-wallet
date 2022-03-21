@@ -130,7 +130,7 @@ export const Sidebar = () => {
         {wallets
           .map(w => {
             return (
-              <SidebarButton key={w.address} selected={activeView === activeViews.WALLET_DETAIL && w.address === selectedWallet} leftIcon={<Icon name={w.watchOnly ? 'eyeOn' : 'wallet'} style={styles.leftIcon} />} rightIcon={<Icon name={'chevronRight'} />} onClick={() => onWalletClick(w.address)}>{w.name}</SidebarButton>
+              <SidebarButton key={w.address} selected={[activeViews.WALLET_DETAIL, activeViews.SEND].includes(activeView) && w.address === selectedWallet} leftIcon={<Icon name={w.watchOnly ? 'eyeOn' : 'wallet'} style={styles.leftIcon} />} rightIcon={<Icon name={'chevronRight'} />} onClick={() => onWalletClick(w.address)}>{w.name}</SidebarButton>
             );
           })
         }

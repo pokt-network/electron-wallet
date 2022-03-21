@@ -219,7 +219,7 @@ const App = () => {
                       activeView === activeViews.WALLET_OVERVIEW ?
                         <WalletOverview />
                         :
-                        activeView === activeViews.WALLET_DETAIL ?
+                        (activeView === activeViews.WALLET_DETAIL || activeView === activeViews.SEND) ?
                           <WalletDetail />
                           :
                           activeView === activeViews.IMPORT_ACCOUNT ?

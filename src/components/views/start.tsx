@@ -13,6 +13,7 @@ import { MasterPassword, masterPasswordIsSet } from '../../modules/master-passwo
 import { TextInput } from '@pokt-foundation/ui';
 import { masterPasswordContext } from '../../hooks/master-password-hook';
 import { APIContext } from '../../hooks/api-hook';
+import { InputErrorMessage } from '../ui/input-error';
 
 export const Start = () => {
 
@@ -22,6 +23,7 @@ export const Start = () => {
   const localize = useContext(localizeContext);
   const passwordSet = masterPasswordIsSet();
   const [ password, setPassword ] = useState('');
+  const [ errorMessage, setErrorMessage ] = useState('');
   const { setMasterPassword } = useContext(masterPasswordContext);
 
   const styles = {
@@ -76,6 +78,10 @@ export const Start = () => {
       maxWidth: '100%',
       background: 'transparent',
     },
+    errorMessage: {
+      marginTop: 10,
+      marginBottom: -32,
+    },
   };
 
   const onHelpClick = () => {
@@ -94,10 +100,15 @@ export const Start = () => {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if(passwordSet) {
+      if(!password.trim()) {
+        return setErrorMessage(localize.text('You must enter a password', 'start'));
+      }
       const masterPassword = MasterPassword(password);
       if(masterPassword.verify()) {
         dispatch(setActiveView({activeView: activeViews.WALLET_OVERVIEW}));
         setMasterPassword(masterPassword);
+      } else {
+        return setErrorMessage(localize.text('Invalid password', 'start'));
       }
     } else {
       dispatch(setActiveView({activeView: activeViews.CREATE_PASSWORD}));
@@ -113,7 +124,12 @@ export const Start = () => {
           <p style={styles.description as React.CSSProperties}><BodyText1>{localize.text('This is an open-source interface for easy management of your POKT accounts.', 'start')}</BodyText1></p>
           <form onSubmit={onSubmit}>
             {passwordSet ?
-              <TextInput type={'password'} style={styles.input} wide={true} required={true} value={password} autofocus={true} onChange={onPasswordChange} placeholder={localize.text('Wallet Password', 'start')} />
+              <TextInput type={'password'} style={styles.input} wide={true} value={password} autofocus={true} onChange={onPasswordChange} placeholder={localize.text('Wallet Password', 'start')} />
+              :
+              null
+            }
+            {errorMessage ?
+              <InputErrorMessage style={styles.errorMessage} message={errorMessage} />
               :
               null
             }

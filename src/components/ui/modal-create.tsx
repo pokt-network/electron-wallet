@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 import { setShowCreateModal } from '../../reducers/app-reducer';
 import { WalletControllerContext } from '../../hooks/wallet-hook';
 import { masterPasswordContext } from "../../hooks/master-password-hook";
+import { InputErrorMessage } from './input-error';
 
 interface ModalCreateWalletProps {}
 
@@ -20,6 +21,7 @@ export const ModalCreateWallet = ({}: ModalCreateWalletProps) => {
   const { masterPassword } = useContext(masterPasswordContext);
 
   const [ name, setName ] = useState('');
+  const [ errorMessage, setErrorMessage ] = useState('');
 
   const styles = {
     header: {
@@ -34,6 +36,10 @@ export const ModalCreateWallet = ({}: ModalCreateWalletProps) => {
     submitButton: {
       marginTop: 36,
     },
+    errorMessage: {
+      marginTop: 10,
+      marginBottom: -32,
+    },
   };
 
   const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,9 +49,12 @@ export const ModalCreateWallet = ({}: ModalCreateWalletProps) => {
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Submit!');
     const password = masterPassword?.get();
-    walletController?.createWallet(name, password);
+    const trimmedName = name.trim();
+    if(!trimmedName) {
+      return setErrorMessage(localize.text('You must enter a name', 'modalCreate'));
+    }
+    walletController?.createWallet(trimmedName, password);
     dispatch(setShowCreateModal({show: false}));
   };
 
@@ -58,7 +67,12 @@ export const ModalCreateWallet = ({}: ModalCreateWalletProps) => {
       <div>
         <Header4>{localize.text('Account Name', 'modalCreate')}</Header4>
         <form style={styles.form} onSubmit={onSubmit}>
-          <TextInput type={'text'} wide={true} required={true} value={name} autofocus={true} onChange={onNameChange} placeholder={localize.text('My new POKT account', 'modalCreate')} />
+          <TextInput type={'text'} wide={true} value={name} autofocus={true} onChange={onNameChange} placeholder={localize.text('My new POKT account', 'modalCreate')} />
+          {errorMessage ?
+            <InputErrorMessage message={errorMessage} style={styles.errorMessage} />
+            :
+            null
+          }
           <FlexRow justifyContent={'center'}>
             <ButtonPrimary type={'submit'} size={'md'} style={styles.submitButton}>{localize.text('Create', 'modalCreate')}</ButtonPrimary>
           </FlexRow>

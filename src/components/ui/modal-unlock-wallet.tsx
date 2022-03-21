@@ -1,21 +1,28 @@
 import { Header4 } from './header';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { localizeContext } from '../../hooks/localize-hook';
 import { Modal } from './modal';
 import { TextInput } from '@pokt-foundation/ui';
 import { ButtonPrimary } from './button';
 import { FlexRow } from './flex';
+import { InputErrorMessage } from './input-error';
 
 interface ModalUnlockWalletProps {
+  errorMessage?: string
   onClose: ()=>void
   onSubmit: (password: string)=>void
 }
 
-export const ModalUnlockWallet = ({ onClose, onSubmit }: ModalUnlockWalletProps) => {
+export const ModalUnlockWallet = ({ errorMessage: errorMessageProp = '', onClose, onSubmit }: ModalUnlockWalletProps) => {
 
   const localize = useContext(localizeContext);
 
   const [ password, setPassword ] = useState('');
+  const [ errorMessage, setErrorMessage ] = useState('');
+
+  useEffect(() => {
+    setErrorMessage(errorMessageProp);
+  }, [errorMessageProp]);
 
   const styles = {
     header: {
@@ -30,6 +37,10 @@ export const ModalUnlockWallet = ({ onClose, onSubmit }: ModalUnlockWalletProps)
     submitButton: {
       marginTop: 36,
     },
+    errorMessage: {
+      marginTop: 10,
+      marginBottom: -32,
+    },
   };
 
   const onPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,6 +50,9 @@ export const ModalUnlockWallet = ({ onClose, onSubmit }: ModalUnlockWalletProps)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if(!password) {
+      return setErrorMessage(localize.text('You must enter a password', 'modalUnlock'));
+    }
     onSubmit(password);
   };
 
@@ -51,7 +65,12 @@ export const ModalUnlockWallet = ({ onClose, onSubmit }: ModalUnlockWalletProps)
       <div>
         <Header4>{localize.text('Unlock Your Wallet', 'modalUnlock')}</Header4>
         <form style={styles.form} onSubmit={handleSubmit}>
-          <TextInput type={'password'} wide={true} required={true} value={password} autofocus={true} onChange={onPasswordChange} placeholder={localize.text('Wallet Password', 'modalUnlock')} />
+          <TextInput type={'password'} wide={true} value={password} autofocus={true} onChange={onPasswordChange} placeholder={localize.text('Wallet Password', 'modalUnlock')} />
+          {errorMessage ?
+            <InputErrorMessage message={errorMessage} style={styles.errorMessage} />
+            :
+            null
+          }
           <FlexRow justifyContent={'center'}>
             <ButtonPrimary type={'submit'} size={'md'} style={styles.submitButton}>{localize.text('Unlock', 'modalUnlock')}</ButtonPrimary>
           </FlexRow>

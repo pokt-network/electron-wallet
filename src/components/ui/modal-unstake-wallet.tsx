@@ -7,13 +7,15 @@ import { ButtonPrimary } from './button';
 import { FlexRow } from './flex';
 import { BodyText1 } from "./text";
 import { TRANSACTION_FEE } from "../../constants";
+import { InputErrorMessage } from './input-error';
 
 interface ModalUnstakeProps {
+  errorMessage?: string
   onClose: ()=>void
   onSubmit: (password: string)=>void
 }
 
-export const ModalUnstake = ({ onClose, onSubmit }: ModalUnstakeProps) => {
+export const ModalUnstake = ({ errorMessage = '', onClose, onSubmit }: ModalUnstakeProps) => {
 
   const localize = useContext(localizeContext);
 
@@ -37,6 +39,10 @@ export const ModalUnstake = ({ onClose, onSubmit }: ModalUnstakeProps) => {
     },
     transactionCost: {
       fontSize: 18,
+    },
+    errorMessage: {
+      marginTop: 10,
+      marginBottom: -32,
     },
   };
 
@@ -65,7 +71,12 @@ export const ModalUnstake = ({ onClose, onSubmit }: ModalUnstakeProps) => {
           <BodyText1 style={styles.transactionCost}>{localize.text('Transaction Cost {{fee}} POKT', 'modalUnstake', {fee: TRANSACTION_FEE})}</BodyText1>
         </div>
         <form style={styles.form} onSubmit={handleSubmit}>
-          <TextInput type={'password'} wide={true} required={true} value={password} autofocus={true} onChange={onPasswordChange} placeholder={localize.text('Wallet Password', 'modalUnlock')} />
+          <TextInput type={'password'} wide={true} value={password} autofocus={true} onChange={onPasswordChange} placeholder={localize.text('Wallet Password', 'modalUnlock')} />
+          {errorMessage ?
+            <InputErrorMessage message={errorMessage} style={styles.errorMessage}/>
+            :
+            null
+          }
           <FlexRow justifyContent={'center'}>
             <ButtonPrimary type={'submit'} size={'md'} style={styles.submitButton}>{localize.text('Unstake', 'modalUnstake')}</ButtonPrimary>
           </FlexRow>

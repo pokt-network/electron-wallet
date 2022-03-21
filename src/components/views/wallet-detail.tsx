@@ -32,6 +32,7 @@ import { Icon } from "../ui/icon";
 import { ModalUnstake } from "../ui/modal-unstake-wallet";
 import { Toggle } from "../ui/toggle";
 import { AddressControllerContext } from "../../hooks/address-hook";
+import { InputErrorMessage } from '../ui/input-error';
 
 export const WalletDetail = () => {
 
@@ -49,6 +50,9 @@ export const WalletDetail = () => {
   const [ showUnstakeModal, setShowUnstakeModal ] = useState(false);
   const [ saveAddressEnabled, setSaveAddressEnabled ] = useState(false);
   const [ saveAddressLabel, setSaveAddressLabel ] = useState('');
+  const [ unlockErrorMessage, setUnlockErrorMessage ] = useState('');
+  const [ sendErrorMessage, setSendErrorMessage ] = useState('');
+  const [ unstakeErrorMessage, setUnstakeErrorMessage ] = useState('');
   const api = useContext(APIContext);
   const localize = useContext(localizeContext);
   const walletController = useContext(WalletControllerContext);
@@ -58,10 +62,29 @@ export const WalletDetail = () => {
   const dispatch = useDispatch();
   const { masterPassword } = useContext(masterPasswordContext);
   const {
+    activeView,
     wallets,
     selectedWallet,
     showPrivateKeyModal,
   } = useSelector(({ appState }: RootState) => appState);
+
+  useEffect(() => {
+    if(activeView === activeViews.WALLET_DETAIL) {
+      setShowSend(false);
+    } else if(activeView === activeViews.SEND) {
+      setShowSend(true);
+    }
+    setSendErrorMessage('');
+    setSendAmount('');
+    setSendAddress('');
+    setSendMemo('');
+    setSaveAddressEnabled(false);
+    setSaveAddressLabel('');
+  }, [activeView]);
+
+  useEffect(() => {
+    setUnlockErrorMessage('');
+  }, [showUnlockForKeyFileModal, showUnlockForPrivateKeyModal]);
 
   useEffect(() => {
     if(!showPrivateKeyModal)
@@ -69,15 +92,20 @@ export const WalletDetail = () => {
   }, [showPrivateKeyModal]);
 
   useEffect(() => {
+    setUnstakeErrorMessage('');
+  }, [showUnstakeModal]);
+
+  useEffect(() => {
     setSwitcherIdx(0);
-    setShowSend(false);
     setSaveAddressEnabled(false);
     setSaveAddressLabel('');
     setSendAmount('');
     setSendAddress('');
     setSendMemo('');
     setPrivateKey('');
-  }, [selectedWallet]);
+    setSendErrorMessage('');
+    dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
+  }, [selectedWallet, dispatch]);
 
   const wallet = wallets.find(w => w.address === selectedWallet);
 
@@ -194,11 +222,14 @@ export const WalletDetail = () => {
     const password = masterPassword?.get();
     const preppedSendAddress = sendAddress.trim();
     const preppedLabel = saveAddressLabel.trim();
-    if(!preppedSendAddress)
-      return;
-    if(saveAddressEnabled && !preppedLabel)
-      return;
-    if(amount > 0 && wallet && walletController && password) {
+    if(!sendAmount.trim() || !(amount > 0)) {
+      return setSendErrorMessage(localize.text('You must enter a valid amount', 'send'));
+    } else if(!preppedSendAddress) {
+      return setSendErrorMessage(localize.text('You must enter an address', 'send'));
+    } else if(saveAddressEnabled && !preppedLabel) {
+      return setSendErrorMessage(localize.text('You must enter a label in order to save the address', 'send'));
+    }
+    if(wallet && walletController && password) {
       walletController.sendTransaction(
         wallet.address,
         sendAmount,
@@ -207,14 +238,19 @@ export const WalletDetail = () => {
         password,
       )
         .then(tx => {
-          setShowSend(false);
-          setSendAmount('');
-          setSendAddress('');
-          setSendMemo('');
-          setSaveAddressEnabled(false);
-          setSaveAddressLabel('');
-          if(saveAddressEnabled)
-            addressController?.createAddress(preppedLabel, preppedSendAddress);
+          if(tx) {
+            dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
+            setSendAmount('');
+            setSendAddress('');
+            setSendMemo('');
+            setSaveAddressEnabled(false);
+            setSaveAddressLabel('');
+            setSendErrorMessage('');
+            if(saveAddressEnabled)
+              addressController?.createAddress(preppedLabel, preppedSendAddress);
+          } else {
+            setSendErrorMessage(localize.text('Unable to send transaction. Check the amount and address.', 'send'));
+          }
         })
         .catch(console.error);
     }
@@ -251,14 +287,20 @@ export const WalletDetail = () => {
     setShowUnstakeModal(false);
   };
   const onUnstakeModalSubmit = (password: string) => {
+    if(!password.trim()) {
+      return setUnstakeErrorMessage(localize.text('You must enter a password', 'walletDetail'));
+    }
     if(wallet && walletController && password) {
       walletController.sendUnstakeTransaction(
         wallet.address,
         password,
       )
         .then(tx => {
-          if(tx)
+          if(tx) {
             setShowUnstakeModal(false);
+          } else {
+            setUnstakeErrorMessage(localize.text('Invalid password', 'walletDetail'));
+          }
         })
         .catch(console.error);
     }
@@ -267,13 +309,15 @@ export const WalletDetail = () => {
     setShowUnlockForKeyFileModal(false);
   };
   const onUnlockForKeyFileSubmit = (password: string) => {
-    setShowUnlockForKeyFileModal(false);
     if(wallet && walletController) {
       walletController.getRawPrivateKeyFromWallet(wallet.address, password)
         .then(keyStr => {
           if(keyStr) {
+            setShowUnlockForKeyFileModal(false);
             setPrivateKey(keyStr);
             setShowSaveKeyFileModal(true);
+          } else {
+            setUnlockErrorMessage(localize.text('Invalid password', 'walletDetail'));
           }
         })
         .catch(console.error);
@@ -283,13 +327,15 @@ export const WalletDetail = () => {
     setShowUnlockForPrivateKeyModal(false);
   };
   const onUnlockForPrivateKeyModalSubmit = (password: string) => {
-    setShowUnlockForPrivateKeyModal(false);
     if(wallet && walletController) {
       walletController.getRawPrivateKeyFromWallet(wallet.address, password)
         .then(keyStr => {
           if(keyStr) {
+            setShowUnlockForPrivateKeyModal(false);
             setPrivateKey(keyStr);
             dispatch(setShowPrivateKeyModal({show: true}));
+          } else {
+            setUnlockErrorMessage(localize.text('Invalid password', 'walletDetail'));
           }
         })
         .catch(console.error);
@@ -301,7 +347,6 @@ export const WalletDetail = () => {
   };
   const onSaveKeyFileModalSubmit = (password: string) => {
     if(wallet && walletController) {
-      console.log(password, privateKey);
       walletController.getPPKFromRawKey(privateKey, password)
         .then(ppk => {
           if(ppk) {
@@ -396,7 +441,7 @@ export const WalletDetail = () => {
             <img alt={localize.text('Pocket logo', 'universal')} src={pocketLogo} />
             <Header1 style={styles.totalBalanceHeader}>{`${localize.number(Number(balance), {useGrouping: true})} POKT`}</Header1>
             <div style={styles.spacer} />
-            {(showSend || watchOnly) ? null : <ButtonPrimary style={styles.sendButton} onClick={() => setShowSend(true)}>{localize.text('Send', 'universal')}</ButtonPrimary>}
+            {(showSend || watchOnly) ? null : <ButtonPrimary style={styles.sendButton} onClick={() => dispatch(setActiveView({activeView: activeViews.SEND}))}>{localize.text('Send', 'universal')}</ButtonPrimary>}
             {watchOnly ?
               <Card round={true} style={styles.watchOnlyCard}>
                 <FlexRow style={styles.watchOnlyFlexRow} justifyContent={'center'}>
@@ -505,9 +550,9 @@ export const WalletDetail = () => {
             </div>
             :
             <form style={styles.sendContainer} onSubmit={onSendSubmit}>
-              <TextInput style={styles.sendInput} type={'text'} placeholder={localize.text('Amount in POKT', 'walletSend')} wide={true} value={sendAmount} onChange={onSendAmountChange} autofocus={true} required={true} />
-              <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Send to Address', 'walletSend')} wide={true} value={sendAddress} onChange={onSendAddressChange} required={true} />
-              <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Add a Tx memo', 'walletSend')} wide={true} value={sendMemo} onChange={onSendMemoChange} required={false} />
+              <TextInput style={styles.sendInput} type={'text'} placeholder={localize.text('Amount in POKT', 'walletSend')} wide={true} value={sendAmount} onChange={onSendAmountChange} autofocus={true} />
+              <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Send to Address', 'walletSend')} wide={true} value={sendAddress} onChange={onSendAddressChange} />
+              <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Add a Tx memo', 'walletSend')} wide={true} value={sendMemo} onChange={onSendMemoChange} />
               <FlexRow style={styles.enableSaveAddressRow} wrap={'nowrap'} justifyContent={'flex-start'} alignItems={'center'}>
                 <Toggle style={styles.enableSaveToggle} enabled={saveAddressEnabled} onToggle={enabled => setSaveAddressEnabled(enabled)} />
                 <BodyText1>{localize.text('Save to Address Book', 'walletDetail')}</BodyText1>
@@ -515,13 +560,18 @@ export const WalletDetail = () => {
               {saveAddressEnabled ?
                 <TextInput style={{...styles.sendInput, marginTop: 16}} type={'text'}
                            placeholder={localize.text('Enter label of the address', 'walletSend')} wide={true}
-                           value={saveAddressLabel} onChange={onSaveAddressLabelChange} required={true} />
+                           value={saveAddressLabel} onChange={onSaveAddressLabelChange} />
                 :
                 null
               }
               <div style={styles.sendFeeContainer}>
                 <BodyText1>{localize.text('Transaction Fee {{fee}} POKT', 'walletSend', {fee: TRANSACTION_FEE})}</BodyText1>
               </div>
+              {sendErrorMessage ?
+                <InputErrorMessage message={sendErrorMessage} />
+                :
+                null
+              }
               <ButtonPrimary type={'submit'} style={{marginTop: 32}}>{localize.text('Send', 'univeral')}</ButtonPrimary>
             </form>
           }
@@ -533,12 +583,12 @@ export const WalletDetail = () => {
         </MainBody>
       </MainContainer>
       {showUnlockForKeyFileModal ?
-        <ModalUnlockWallet onClose={onUnlockForKeyFileClose} onSubmit={onUnlockForKeyFileSubmit} />
+        <ModalUnlockWallet errorMessage={unlockErrorMessage} onClose={onUnlockForKeyFileClose} onSubmit={onUnlockForKeyFileSubmit} />
         :
         null
       }
       {showUnlockForPrivateKeyModal ?
-        <ModalUnlockWallet onClose={onUnlockForPrivateKeyModalClose} onSubmit={onUnlockForPrivateKeyModalSubmit} />
+        <ModalUnlockWallet errorMessage={unlockErrorMessage} onClose={onUnlockForPrivateKeyModalClose} onSubmit={onUnlockForPrivateKeyModalSubmit} />
         :
         null
       }
@@ -553,7 +603,7 @@ export const WalletDetail = () => {
         null
       }
       {showUnstakeModal ?
-        <ModalUnstake onClose={onUnstakeModalClose} onSubmit={onUnstakeModalSubmit} />
+        <ModalUnstake errorMessage={unstakeErrorMessage} onClose={onUnstakeModalClose} onSubmit={onUnstakeModalSubmit} />
         :
         null
       }
