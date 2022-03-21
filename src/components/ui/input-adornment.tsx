@@ -5,9 +5,10 @@ import React from "react";
 
 interface InputRightButtonProps {
   icon: IconName
+  style?: object
   onClick: ()=>void
 }
-export const InputRightButton = ({ icon, onClick }: InputRightButtonProps) => {
+export const InputRightButton = ({ icon, style, onClick }: InputRightButtonProps) => {
 
   const styles = {
     flexRow: {
@@ -17,6 +18,9 @@ export const InputRightButton = ({ icon, onClick }: InputRightButtonProps) => {
       width: 52
     },
   };
+
+  if(style)
+    Object.assign(styles.flexRow, style);
 
   return (
     <TextButton onClick={onClick}>

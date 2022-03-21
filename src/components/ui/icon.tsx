@@ -19,8 +19,13 @@ import logOut from '../../images/icons/log_out.svg';
 import remove from '../../images/icons/remove.svg';
 import copyGreen from '../../images/icons/copy-green.svg';
 import error from '../../images/icons/error.svg';
+import backspace from '../../images/icons/backspace.svg';
+import copyBlue from '../../images/icons/copy_blue.svg';
+import locked from '../../images/icons/locked.svg';
+import download from '../../images/icons/download.svg';
+import send from '../../images/icons/send.svg';
 
-export type IconName = "node"|"ellipse"|"staked"|"unstaking"|"unstake"|"stakedTokens"|"import"|"eyeOn"|"eyeOff"|"cpu"|"barChart"|"wallet"|"chevronRight"|"target"|"user"|"bookOpen"|"logOut"|"remove"|"copyGreen"|"error"
+export type IconName = "send"|"download"|"locked"|"node"|"ellipse"|"staked"|"unstaking"|"unstake"|"stakedTokens"|"import"|"eyeOn"|"eyeOff"|"cpu"|"barChart"|"wallet"|"chevronRight"|"target"|"user"|"bookOpen"|"logOut"|"remove"|"copyGreen"|"error"|"backspace"|"copyBlue"
 
 interface IconProps {
   name: IconName
@@ -46,8 +51,13 @@ export const Icon = ({ name, style = {} }: IconProps) => {
     bookOpen,
     logOut,
     remove,
+    copyBlue,
     copyGreen,
     error,
+    backspace,
+    locked,
+    download,
+    send,
   };
   const src = sources[name];
   return (
