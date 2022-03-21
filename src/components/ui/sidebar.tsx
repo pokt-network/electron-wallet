@@ -87,6 +87,8 @@ export const Sidebar = () => {
       width: '100%',
       flexGrow: 1,
       minHeight: 0,
+      position: 'relative',
+      overflow: 'hidden',
     },
     createButtonContainer: {
       paddingLeft: 25,
@@ -125,15 +127,19 @@ export const Sidebar = () => {
       <FlexRow justifyContent={'center'} style={styles.createButtonContainer}>
         <ButtonPrimary size={'md'} style={styles.createButton} disabled={false} onClick={() => dispatch(setShowCreateModal({show: true}))}>{localize.text('Create', 'universal')}</ButtonPrimary>
       </FlexRow>
-      <div style={styles.topButtonContainer}>
-        <SidebarButton selected={activeView === activeViews.WALLET_OVERVIEW} leftIcon={<Icon name={'target'} style={styles.leftIcon} />} rightIcon={<Icon name={'chevronRight'} />} onClick={onWalletOverviewClick}>{localize.text('Wallet Overview', 'sidebar')}</SidebarButton>
-        {wallets
-          .map(w => {
-            return (
-              <SidebarButton key={w.address} selected={[activeViews.WALLET_DETAIL, activeViews.SEND].includes(activeView) && w.address === selectedWallet} leftIcon={<Icon name={w.watchOnly ? 'eyeOn' : 'wallet'} style={styles.leftIcon} />} rightIcon={<Icon name={'chevronRight'} />} onClick={() => onWalletClick(w.address)}>{w.name}</SidebarButton>
-            );
-          })
-        }
+      <div style={styles.topButtonContainer as React.CSSProperties}>
+        <FlexColumn style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0}}>
+          <SidebarButton selected={activeView === activeViews.WALLET_OVERVIEW} leftIcon={<Icon name={'target'} style={styles.leftIcon} />} rightIcon={<Icon name={'chevronRight'} />} onClick={onWalletOverviewClick}>{localize.text('Wallet Overview', 'sidebar')}</SidebarButton>
+          <div style={{flex: -1, overflow: 'scroll'}}>
+            {wallets
+              .map(w => {
+                return (
+                  <SidebarButton key={w.address} selected={[activeViews.WALLET_DETAIL, activeViews.SEND].includes(activeView) && w.address === selectedWallet} leftIcon={<Icon name={w.watchOnly ? 'eyeOn' : 'wallet'} style={styles.leftIcon} />} rightIcon={<Icon name={'chevronRight'} />} onClick={() => onWalletClick(w.address)}>{w.name}</SidebarButton>
+                );
+              })
+            }
+          </div>
+        </FlexColumn>
       </div>
       <SidebarButton leftIcon={<Icon name={'import'} style={styles.leftIcon} />} onClick={onImportAccountClick}>{localize.text('Import Account', 'sidebar')}</SidebarButton>
       <SidebarButton leftIcon={<Icon name={'eyeOn'} style={styles.leftIcon} />} onClick={onWatchAccountClick}>{localize.text('Watch Account', 'sidebar')}</SidebarButton>

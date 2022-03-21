@@ -14,9 +14,10 @@ import { setActiveView, setSelectedTransaction } from "../../reducers/app-reduce
 import { activeViews } from "../../constants";
 
 interface TransactionsTableProps {
+  style?: object
   wallets: Wallet[]
 }
-export const TransactionTable = ({ wallets }: TransactionsTableProps) => {
+export const TransactionTable = ({ style, wallets }: TransactionsTableProps) => {
 
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -55,7 +56,7 @@ export const TransactionTable = ({ wallets }: TransactionsTableProps) => {
   };
 
   return (
-    <div>
+    <div style={style ? style : {}}>
       {transactions
         .sort((a, b) => a[0] === b[0] ? 0 : a[0] > b[0] ? -1 : 1)
         .map(t => {
