@@ -6,6 +6,7 @@ import { TextInput } from '@pokt-foundation/ui';
 import { ButtonPrimary } from './button';
 import { FlexRow } from './flex';
 import { BodyText1 } from "./text";
+import { InputErrorMessage } from './input-error';
 
 interface ModalExportKeyFileProps {
   onClose: ()=>void
@@ -17,6 +18,7 @@ export const ModalExportKeyFile = ({ onClose, onSubmit }: ModalExportKeyFileProp
   const localize = useContext(localizeContext);
 
   const [ password, setPassword ] = useState('');
+  const [ errorMessage, setErrorMessage ] = useState('');
 
   const styles = {
     header: {
@@ -34,6 +36,10 @@ export const ModalExportKeyFile = ({ onClose, onSubmit }: ModalExportKeyFileProp
     submitButton: {
       marginTop: 36,
     },
+    errorMessage: {
+      marginTop: 10,
+      marginBottom: -32,
+    }
   };
 
   const onPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,7 +49,9 @@ export const ModalExportKeyFile = ({ onClose, onSubmit }: ModalExportKeyFileProp
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Submit!');
+    if(!password.trim()) {
+      return setErrorMessage(localize.text('You must enter a password', 'modalExportKeyFile'));
+    }
     onSubmit(password);
   };
 
@@ -59,7 +67,12 @@ export const ModalExportKeyFile = ({ onClose, onSubmit }: ModalExportKeyFileProp
           <BodyText1>{localize.text('Please enter an encryption password to protect the new key file. Be careful not to forget the password, because you will need it if you ever use or import the new key file.', 'modalExportKeyFile')}</BodyText1>
         </div>
         <form style={styles.form} onSubmit={handleSubmit}>
-          <TextInput type={'password'} wide={true} required={true} value={password} autofocus={true} onChange={onPasswordChange} placeholder={localize.text('Key File Password', 'modalExportKeyFile')} />
+          <TextInput type={'password'} wide={true} value={password} autofocus={true} onChange={onPasswordChange} placeholder={localize.text('Key File Password', 'modalExportKeyFile')} />
+          {errorMessage ?
+            <InputErrorMessage message={errorMessage} style={styles.errorMessage} />
+            :
+            null
+          }
           <FlexRow justifyContent={'center'}>
             <ButtonPrimary type={'submit'} size={'md'} style={styles.submitButton}>{localize.text('Save Key File', 'modalExportKeyFile')}</ButtonPrimary>
           </FlexRow>

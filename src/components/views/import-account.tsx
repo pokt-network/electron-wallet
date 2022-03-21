@@ -18,6 +18,7 @@ import { useDispatch } from "react-redux";
 import { setActiveView, setSelectedWallet } from "../../reducers/app-reducer";
 import { activeViews } from "../../constants";
 import { masterPasswordContext } from "../../hooks/master-password-hook";
+import { InputErrorMessage } from '../ui/input-error';
 
 interface CaretButtonProps {
   enabled: boolean
@@ -64,6 +65,8 @@ export const ImportAccount = () => {
   const [ keyFilePath, setKeyFilePath ] = useState('');
   const [ keyFilePassphrase, setKeyFilePassphrase ] = useState('');
   const [ privateKey, setPrivateKey ] = useState('');
+  const [ keyFileImportError, setKeyFileImportError ] = useState('');
+  const [ privateKeyImportError, setPrivateKeyImportError ] = useState('');
 
   const dispatch = useDispatch();
   const api = useContext(APIContext);
@@ -118,6 +121,10 @@ export const ImportAccount = () => {
     importKeyfileButton: {
       marginTop: 50,
     },
+    errorMessage: {
+      marginTop: 10,
+      marginBottom: -32,
+    },
   };
 
   const onKeyfileImportClick = () => {
@@ -142,6 +149,8 @@ export const ImportAccount = () => {
       .then(({ canceled, filePaths }) => {
         if(!canceled && filePaths.length > 0)
           setKeyFilePath(filePaths[0]);
+        if(keyFileImportError)
+          setKeyFileImportError('');
         const keyfilePassphraseInputNode = document.getElementById('js-keyfilePassphraseInput');
         if(keyfilePassphraseInputNode) {
           keyfilePassphraseInputNode.focus();
@@ -152,6 +161,9 @@ export const ImportAccount = () => {
 
   const onImportKeyfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if(!keyFilePath) {
+      return setKeyFileImportError(localize.text('You must select a key file', 'importAccount'));
+    }
     const splitKeyFilePath = keyFilePath.split(/[/\\]/g);
     const name = splitKeyFilePath[splitKeyFilePath.length - 1].replace(/\.json$/i, '');
     const keyFileContents = await api.openFile(keyFilePath);
@@ -168,6 +180,8 @@ export const ImportAccount = () => {
                 dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
               }
             }, 500);
+          } else {
+            setKeyFileImportError(localize.text('Invalid password', 'importAccount'));
           }
         })
         .catch(console.error);
@@ -183,9 +197,14 @@ export const ImportAccount = () => {
   const onImportPrivateKeySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const password = masterPassword?.get();
+    const trimmedPrivateKey = privateKey.trim();
+    if(!trimmedPrivateKey) {
+      return setPrivateKeyImportError(localize.text('You must enter a private key', 'importAccount'));
+    }
     if(walletController && password)
-      walletController.importWalletFromRawPrivateKey('', privateKey, password)
+      walletController.importWalletFromRawPrivateKey('', trimmedPrivateKey, password)
         .then(res => {
+          console.log('then');
           if(res) {
             setTimeout(() => {
               const wallets = walletController.getWallets();
@@ -197,7 +216,10 @@ export const ImportAccount = () => {
             }, 500);
           }
         })
-        .catch(console.error);
+        .catch(err => {
+          setPrivateKeyImportError(localize.text('Invalid private key', 'importAccount'));
+          console.error(err);
+        });
   };
 
   return (
@@ -218,8 +240,13 @@ export const ImportAccount = () => {
             </div>
             {showKeyfile ?
               <form style={styles.keyFileInputsContainer} onSubmit={onImportKeyfileSubmit}>
-                <TextInput onClick={onKeyFileInputClick} style={styles.keyfileFileInput} placeholder={localize.text('Select File', 'importAccount')} type={'text'} wide={true} value={keyFilePath} required={true} />
-                <TextInput id={'js-keyfilePassphraseInput'} style={styles.keyfilePassphraseInput} placeholder={localize.text('Keyfile Passphrase', 'importAccount')} type={'password'} wide={true} value={keyFilePassphrase} onChange={onKeyFilePassphraseChange} required={true} />
+                <TextInput onClick={onKeyFileInputClick} style={styles.keyfileFileInput} placeholder={localize.text('Select File', 'importAccount')} type={'text'} wide={true} value={keyFilePath} />
+                <TextInput id={'js-keyfilePassphraseInput'} style={styles.keyfilePassphraseInput} placeholder={localize.text('Keyfile Passphrase', 'importAccount')} type={'password'} wide={true} value={keyFilePassphrase} onChange={onKeyFilePassphraseChange} />
+                {keyFileImportError ?
+                  <InputErrorMessage style={styles.errorMessage} message={keyFileImportError}/>
+                  :
+                  null
+                }
                 <ButtonPrimary style={styles.importKeyfileButton} type={'submit'}>{localize.text('Import', 'universal')}</ButtonPrimary>
               </form>
               :
@@ -230,7 +257,12 @@ export const ImportAccount = () => {
             </div>
             {showKeyText ?
               <form style={styles.keyFileInputsContainer} onSubmit={onImportPrivateKeySubmit}>
-                <TextInput id={'js-privateKeyInput'} style={styles.privateKeyInput} placeholder={localize.text('Raw Private Key', 'importAccount')} type={'password'} wide={true} value={privateKey} onChange={onPrivateKeyChange} required={true} />
+                <TextInput id={'js-privateKeyInput'} style={styles.privateKeyInput} placeholder={localize.text('Raw Private Key', 'importAccount')} type={'password'} wide={true} value={privateKey} onChange={onPrivateKeyChange} />
+                {privateKeyImportError ?
+                  <InputErrorMessage style={styles.errorMessage} message={privateKeyImportError}/>
+                  :
+                  null
+                }
                 <ButtonPrimary style={styles.importKeyfileButton} type={'submit'}>{localize.text('Import', 'universal')}</ButtonPrimary>
               </form>
               :
