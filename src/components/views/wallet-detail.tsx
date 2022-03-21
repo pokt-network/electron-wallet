@@ -603,29 +603,31 @@ export const WalletDetail = () => {
             </div>
             :
             <form style={styles.sendContainer} onSubmit={onSendSubmit}>
-              <TextInput style={styles.sendInput} type={'text'} placeholder={localize.text('Amount in POKT', 'walletSend')} wide={true} value={sendAmount} onChange={onSendAmountChange} autofocus={true} />
-              <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Send to Address', 'walletSend')} wide={true} value={sendAddress} onChange={onSendAddressChange} />
-              <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Add a Tx memo', 'walletSend')} wide={true} value={sendMemo} onChange={onSendMemoChange} />
-              <FlexRow style={styles.enableSaveAddressRow} wrap={'nowrap'} justifyContent={'flex-start'} alignItems={'center'}>
-                <Toggle style={styles.enableSaveToggle} enabled={saveAddressEnabled} onToggle={enabled => setSaveAddressEnabled(enabled)} />
-                <BodyText1>{localize.text('Save to Address Book', 'walletDetail')}</BodyText1>
-              </FlexRow>
-              {saveAddressEnabled ?
-                <TextInput style={{...styles.sendInput, marginTop: 16}} type={'text'}
-                           placeholder={localize.text('Enter label of the address', 'walletSend')} wide={true}
-                           value={saveAddressLabel} onChange={onSaveAddressLabelChange} />
-                :
-                null
-              }
-              <div style={styles.sendFeeContainer}>
-                <BodyText1>{localize.text('Transaction Fee {{fee}} POKT', 'walletSend', {fee: TRANSACTION_FEE})}</BodyText1>
-              </div>
-              {sendErrorMessage ?
-                <InputErrorMessage message={sendErrorMessage} />
-                :
-                null
-              }
-              <ButtonPrimary type={'submit'} style={{marginTop: 32}}>{localize.text('Send', 'univeral')}</ButtonPrimary>
+              <FlexColumn>
+                <TextInput style={styles.sendInput} type={'text'} placeholder={localize.text('Amount in POKT', 'walletSend')} wide={true} value={sendAmount} onChange={onSendAmountChange} autofocus={true} />
+                <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Send to Address', 'walletSend')} wide={true} value={sendAddress} onChange={onSendAddressChange} />
+                <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Add a Tx memo', 'walletSend')} wide={true} value={sendMemo} onChange={onSendMemoChange} />
+                <FlexRow style={styles.enableSaveAddressRow} wrap={'nowrap'} justifyContent={'flex-start'} alignItems={'center'}>
+                  <Toggle style={styles.enableSaveToggle} enabled={saveAddressEnabled} onToggle={enabled => setSaveAddressEnabled(enabled)} />
+                  <BodyText1>{localize.text('Save to Address Book', 'walletDetail')}</BodyText1>
+                </FlexRow>
+                {saveAddressEnabled ?
+                  <TextInput style={{...styles.sendInput, marginTop: 16}} type={'text'}
+                             placeholder={localize.text('Enter label of the address', 'walletSend')} wide={true}
+                             value={saveAddressLabel} onChange={onSaveAddressLabelChange} />
+                  :
+                  null
+                }
+                <div style={styles.sendFeeContainer}>
+                  <BodyText1>{localize.text('Transaction Fee {{fee}} POKT', 'walletSend', {fee: TRANSACTION_FEE})}</BodyText1>
+                </div>
+                {sendErrorMessage ?
+                  <InputErrorMessage message={sendErrorMessage} />
+                  :
+                  null
+                }
+                <ButtonPrimary type={'submit'} style={{marginTop: 32}}>{localize.text('Send', 'univeral')}</ButtonPrimary>
+              </FlexColumn>
             </form>
           }
           {showPrivateKeyModal ?
@@ -636,12 +638,12 @@ export const WalletDetail = () => {
         </MainBody>
       </MainContainer>
       {showUnlockForKeyFileModal ?
-        <ModalUnlockWallet errorMessage={unlockErrorMessage} onClose={onUnlockForKeyFileClose} onSubmit={onUnlockForKeyFileSubmit} />
+        <ModalUnlockWallet shape={'square'} errorMessage={unlockErrorMessage} onClose={onUnlockForKeyFileClose} onSubmit={onUnlockForKeyFileSubmit} />
         :
         null
       }
       {showUnlockForPrivateKeyModal ?
-        <ModalUnlockWallet errorMessage={unlockErrorMessage} onClose={onUnlockForPrivateKeyModalClose} onSubmit={onUnlockForPrivateKeyModalSubmit} />
+        <ModalUnlockWallet shape={'circle'} errorMessage={unlockErrorMessage} onClose={onUnlockForPrivateKeyModalClose} onSubmit={onUnlockForPrivateKeyModalSubmit} />
         :
         null
       }
@@ -664,6 +666,7 @@ export const WalletDetail = () => {
         <ModalConfirm
           title={localize.text('Remove Account', 'walletDetail')}
           text={localize.text('Are you sure you want remove this from your POKT Wallet?', 'walletDetail')}
+          shape={'circle'}
           confirmButtonText={localize.text('Remove', 'walletDetail')}
           onCancel={onConfirmRemoveCancel}
           onConfirm={onConfirmRemoveConfirm} />

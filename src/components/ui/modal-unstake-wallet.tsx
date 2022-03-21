@@ -63,7 +63,7 @@ export const ModalUnstake = ({ errorMessage = '', onClose, onSubmit }: ModalUnst
   };
 
   return (
-    <Modal onClose={handleClose}>
+    <Modal shape={'triangle'} onClose={handleClose}>
       <div>
         <Header4>{localize.text('Unstake Transaction', 'modalUnstake')}</Header4>
         <div style={styles.textContainer}>

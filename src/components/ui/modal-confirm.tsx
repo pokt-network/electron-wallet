@@ -5,17 +5,19 @@ import { Header4 } from "./header";
 import { BodyText1 } from "./text";
 import { FlexRow } from "./flex";
 import { ButtonPrimary, ButtonSecondary } from "./button";
+import { BigShapeType } from './big-shape';
 
 interface ModalConfirmProps {
   title?: string
   text: string
+  shape: BigShapeType
   cancelButtonText?: string
   confirmButtonText?: string
   onCancel: ()=>void
   onConfirm: ()=>void
 }
 
-export const ModalConfirm = ({ title, text, cancelButtonText, confirmButtonText, onCancel, onConfirm }: ModalConfirmProps) => {
+export const ModalConfirm = ({ title, text, shape, cancelButtonText, confirmButtonText, onCancel, onConfirm }: ModalConfirmProps) => {
   const localize = useContext(localizeContext);
 
   const styles = {
@@ -49,7 +51,7 @@ export const ModalConfirm = ({ title, text, cancelButtonText, confirmButtonText,
   };
 
   return (
-    <Modal onClose={handleClose}>
+    <Modal onClose={handleClose} shape={shape}>
       <div>
         <Header4>{title ? title : localize.text('Confirm', 'universal')}</Header4>
         <div style={styles.textContainer}>

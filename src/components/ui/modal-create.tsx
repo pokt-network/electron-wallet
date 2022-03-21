@@ -63,7 +63,7 @@ export const ModalCreateWallet = ({}: ModalCreateWalletProps) => {
   };
 
   return (
-    <Modal onClose={onClose}>
+    <Modal onClose={onClose} shape={'triangle'}>
       <div>
         <Header4>{localize.text('Account Name', 'modalCreate')}</Header4>
         <form style={styles.form} onSubmit={onSubmit}>

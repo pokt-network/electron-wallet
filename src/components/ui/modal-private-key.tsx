@@ -54,7 +54,7 @@ export const ModalPrivateKey = ({ privateKey }: ModalPrivateKeyProps) => {
   };
 
   return (
-    <Modal onClose={onClose}>
+    <Modal onClose={onClose} shape={'circle'}>
       <div>
         <Header4>{localize.text('Private Key', 'modalPrivateKey')}</Header4>
         <div style={styles.textContainer}>

@@ -48,7 +48,7 @@ export const ModalUnjail = ({ onClose, onSubmit }: ModalUnjailProps) => {
   };
 
   return (
-    <Modal onClose={handleClose}>
+    <Modal shape={'triangle'} onClose={handleClose}>
       <div>
         <Header4>{localize.text('Unjail Transaction', 'modalUnjail')}</Header4>
         <div style={styles.textContainer}>
