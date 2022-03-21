@@ -198,12 +198,12 @@ const StyledTextButton = styled.button<{hoverBackground?: string}>`
     ${props => props.hoverBackground ? `background-color:${props.hoverBackground}` : ''}
   }
 `;
-export const TextButton = ({ children, hoverBackground, style = {}, title = '', onClick }: {children: any, style?: object, hoverBackground?: string, title?: string, onClick: () => void}) => {
+export const TextButton = ({ children, hoverBackground, style = {}, title = '', type = 'button', onClick }: {children: any, type?: "button"|"submit", style?: object, hoverBackground?: string, title?: string, onClick: () => void}) => {
   const onButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     onClick();
   };
   return (
-    <StyledTextButton style={style} hoverBackground={hoverBackground} onClick={onButtonClick} title={title}>{children}</StyledTextButton>
+    <StyledTextButton style={style} hoverBackground={hoverBackground} onClick={onButtonClick} title={title} type={type}>{children}</StyledTextButton>
   );
 };
