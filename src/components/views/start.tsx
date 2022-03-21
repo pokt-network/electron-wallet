@@ -14,6 +14,7 @@ import { TextInput } from '@pokt-foundation/ui';
 import { masterPasswordContext } from '../../hooks/master-password-hook';
 import { APIContext } from '../../hooks/api-hook';
 import { InputErrorMessage } from '../ui/input-error';
+import { InputRightButton } from '../ui/input-adornment';
 
 export const Start = () => {
 
@@ -24,6 +25,7 @@ export const Start = () => {
   const passwordSet = masterPasswordIsSet();
   const [ password, setPassword ] = useState('');
   const [ errorMessage, setErrorMessage ] = useState('');
+  const [ showPassword, setShowPassword ] = useState(false);
   const { setMasterPassword } = useContext(masterPasswordContext);
 
   const styles = {
@@ -82,6 +84,9 @@ export const Start = () => {
       marginTop: 10,
       marginBottom: -32,
     },
+    showPassword: {
+      marginBottom: -39
+    },
   };
 
   const onHelpClick = () => {
@@ -124,7 +129,19 @@ export const Start = () => {
           <p style={styles.description as React.CSSProperties}><BodyText1>{localize.text('This is an open-source interface for easy management of your POKT accounts.', 'start')}</BodyText1></p>
           <form onSubmit={onSubmit}>
             {passwordSet ?
-              <TextInput type={'password'} style={styles.input} wide={true} value={password} autofocus={true} onChange={onPasswordChange} placeholder={localize.text('Wallet Password', 'start')} />
+              <TextInput type={showPassword ? 'text' : 'password'}
+                         style={styles.input}
+                         wide={true}
+                         value={password}
+                         adornment={<InputRightButton icon={showPassword ? 'eyeOff' : 'eyeOn'} style={styles.showPassword} onClick={() => setShowPassword(!showPassword)} />}
+                         adornmentPosition={'end'}
+                         adornmentSettings={{
+                           width: 52,
+                           padding: 0,
+                         }}
+                         autofocus={true}
+                         onChange={onPasswordChange}
+                         placeholder={localize.text('Wallet Password', 'start')} />
               :
               null
             }

@@ -13,8 +13,6 @@ export const InputRightButton = ({ icon, style, onClick }: InputRightButtonProps
   const styles = {
     flexRow: {
       height: 52,
-      marginTop: -30,
-      marginRight: -22,
       width: 52
     },
   };
@@ -28,5 +26,28 @@ export const InputRightButton = ({ icon, style, onClick }: InputRightButtonProps
         <Icon name={icon} />
       </FlexRow>
     </TextButton>
+  );
+};
+
+interface InputLeftIconProps {
+  icon: IconName
+  style?: object
+}
+export const InputLeftIcon = ({ icon, style }: InputLeftIconProps) => {
+
+  const styles = {
+    flexRow: {
+      height: 52,
+      width: 52
+    },
+  };
+
+  if(style)
+    Object.assign(styles.flexRow, style);
+
+  return (
+    <FlexRow justifyContent={'center'} alignItems={'center'} style={styles.flexRow}>
+      <Icon name={icon} />
+    </FlexRow>
   );
 };

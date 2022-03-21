@@ -16,6 +16,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { AddressControllerContext } from "../../hooks/address-hook";
 import { APIContext } from "../../hooks/api-hook";
+import { InputLeftIcon } from '../ui/input-adornment';
 
 export const AddressBook = () => {
 
@@ -117,6 +118,13 @@ export const AddressBook = () => {
         <MainBody>
           <div style={styles.inputContainer}>
             <TextInput type={'text'} value={filterText} onChange={onInputChange}
+                       style={{paddingLeft: 52}}
+                       adornment={<InputLeftIcon icon={'search'} />}
+                       adornmentPosition={'start'}
+                       adornmentSettings={{
+                         width: 52,
+                         padding: 0,
+                       }}
                        placeholder={localize.text('Enter name to filter addresses', 'addressBook')}
                        wide={true} autofocus={true} />
           </div>

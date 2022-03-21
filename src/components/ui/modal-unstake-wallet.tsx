@@ -8,6 +8,7 @@ import { FlexRow } from './flex';
 import { BodyText1 } from "./text";
 import { TRANSACTION_FEE } from "../../constants";
 import { InputErrorMessage } from './input-error';
+import { InputRightButton } from './input-adornment';
 
 interface ModalUnstakeProps {
   errorMessage?: string
@@ -20,6 +21,7 @@ export const ModalUnstake = ({ errorMessage = '', onClose, onSubmit }: ModalUnst
   const localize = useContext(localizeContext);
 
   const [ password, setPassword ] = useState('');
+  const [ showPassword, setShowPassword ] = useState(false);
 
   const styles = {
     header: {
@@ -71,7 +73,18 @@ export const ModalUnstake = ({ errorMessage = '', onClose, onSubmit }: ModalUnst
           <BodyText1 style={styles.transactionCost}>{localize.text('Transaction Cost {{fee}} POKT', 'modalUnstake', {fee: TRANSACTION_FEE})}</BodyText1>
         </div>
         <form style={styles.form} onSubmit={handleSubmit}>
-          <TextInput type={'password'} wide={true} value={password} autofocus={true} onChange={onPasswordChange} placeholder={localize.text('Wallet Password', 'modalUnlock')} />
+          <TextInput type={showPassword ? 'text' : 'password'}
+                     wide={true}
+                     value={password}
+                     adornment={<InputRightButton icon={showPassword ? 'eyeOff' : 'eyeOn'} onClick={() => setShowPassword(!showPassword)} />}
+                     adornmentPosition={'end'}
+                     adornmentSettings={{
+                       width: 52,
+                       padding: 0,
+                     }}
+                     autofocus={true}
+                     onChange={onPasswordChange}
+                     placeholder={localize.text('Wallet Password', 'modalUnlock')} />
           {errorMessage ?
             <InputErrorMessage message={errorMessage} style={styles.errorMessage}/>
             :

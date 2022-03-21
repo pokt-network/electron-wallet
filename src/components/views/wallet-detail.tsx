@@ -544,6 +544,10 @@ export const WalletDetail = () => {
                                value={wallet?.address}
                                adornment={<InputRightButton icon={'copyBlue'} onClick={onCopyAddress} style={styles.copyButton} />}
                                adornmentPosition={'end'}
+                               adornmentSettings={{
+                                 width: 52,
+                                 padding: 0,
+                               }}
                                readOnly={true} />
                     {watchOnly ?
                       <ButtonSecondary style={styles.infoButton}
@@ -566,6 +570,10 @@ export const WalletDetail = () => {
                                  value={wallet?.publicKey}
                                  adornment={<InputRightButton icon={'copyBlue'} onClick={onCopyPublicKey} style={styles.copyButton} />}
                                  adornmentPosition={'end'}
+                                 adornmentSettings={{
+                                   width: 52,
+                                   padding: 0,
+                                 }}
                                  readOnly={true}/>
                       <ButtonSecondary style={styles.infoButton} onClick={onRevealPrivateKeyClick}>
                         <FlexRow gap={'14px'} justifyContent={'center'} alignItems={'center'} wrap={'nowrap'}>
