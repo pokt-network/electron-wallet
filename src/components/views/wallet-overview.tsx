@@ -64,6 +64,14 @@ export const WalletOverview = () => {
       marginTop: 59,
       marginBottom: 39,
     },
+    mainColumn: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      overflow: 'hidden',
+    },
   };
 
   let totalBalance: BigNumber = math.bignumber(0);
@@ -90,52 +98,54 @@ export const WalletOverview = () => {
       <MainContainer>
         <AppHeader title={localize.text('Wallet Overview', 'wallet-overview')} />
         <MainBody>
-          <FlexRow justifyContent={'flex-start'}>
-            <BodyText2>{localize.text('Wallet Total Balance', 'walletOverview')}</BodyText2>
-          </FlexRow>
-          <FlexRow style={styles.balanceContainer} justifyContent={'flex-start'}>
-            <img alt={localize.text('Pocket logo', 'universal')} src={pocketLogo} />
-            <Header1 style={styles.totalBalanceHeader}>{`${localize.number(totalBalance.toNumber(), {useGrouping: true})} POKT`}</Header1>
-          </FlexRow>
-          <FlexRow style={styles.convertedBalanceContainer} justifyContent={'flex-start'}>
-            <BodyText1>{`$${localize.number(Number(convertedBalance), {useGrouping: true})} USD`}</BodyText1>
-          </FlexRow>
-          <Card round={true} style={styles.card}>
-            <FlexRow justifyContent={'space-between'}>
-              <FlexColumn style={styles.cardItem}>
-                <BodyText3>{localize.text('Total Accounts', 'walletOverview')}</BodyText3>
-                <FlexRow justifyContent={'flex-start'}>
-                  <BodyText1><strong>{wallets.length}</strong></BodyText1>
-                </FlexRow>
-              </FlexColumn>
-              <FlexColumn style={styles.cardItem}>
-                <BodyText3>{localize.text('Total Nodes', 'walletOverview')}</BodyText3>
-                <FlexRow justifyContent={'flex-start'}>
-                  <Icon name={'node'} style={styles.nodeTypeIcon} />
-                  <BodyText1><strong>{wallets.filter(w => w.accountType === accountTypes.NODE).length}</strong></BodyText1>
-                </FlexRow>
-              </FlexColumn>
-              <FlexColumn style={styles.cardItem}>
-                <BodyText3>{localize.text('Total Apps', 'walletOverview')}</BodyText3>
-                <FlexRow justifyContent={'flex-start'}>
-                  <Icon name={'ellipse'} style={styles.nodeTypeIcon} />
-                  <BodyText1><strong>{wallets.filter(w => w.accountType === accountTypes.APP).length}</strong></BodyText1>
-                </FlexRow>
-              </FlexColumn>
-              <FlexColumn style={styles.cardItem}>
-                <BodyText3>{localize.text('Total Staked POKT', 'walletOverview')}</BodyText3>
-                <FlexRow justifyContent={'flex-start'}>
-                  <Icon name={'stakedTokens'} style={styles.nodeTypeIcon} />
-                  <BodyText1><strong>{localize.number(Number(totalStaked.toString()), {useGrouping: true})}</strong></BodyText1>
-                </FlexRow>
-              </FlexColumn>
-              <FlexColumn justifyContent={'center'}>
-                <ButtonSecondary onClick={onImportAccountClick}>{localize.text('Import Account', 'walletOverview')}</ButtonSecondary>
-              </FlexColumn>
+          <FlexColumn style={styles.mainColumn as React.CSSProperties}>
+            <FlexRow justifyContent={'flex-start'}>
+              <BodyText2>{localize.text('Wallet Total Balance', 'walletOverview')}</BodyText2>
             </FlexRow>
-          </Card>
-          <Header4 style={styles.transactionHistoryHeader}>{localize.text('Aggregated Transaction History', 'walletOverview')}</Header4>
-          <TransactionTable wallets={wallets} />
+            <FlexRow style={styles.balanceContainer} justifyContent={'flex-start'}>
+              <img alt={localize.text('Pocket logo', 'universal')} src={pocketLogo} />
+              <Header1 style={styles.totalBalanceHeader}>{`${localize.number(totalBalance.toNumber(), {useGrouping: true})} POKT`}</Header1>
+            </FlexRow>
+            <FlexRow style={styles.convertedBalanceContainer} justifyContent={'flex-start'}>
+              <BodyText1>{`$${localize.number(Number(convertedBalance), {useGrouping: true})} USD`}</BodyText1>
+            </FlexRow>
+            <Card round={true} style={styles.card}>
+              <FlexRow justifyContent={'space-between'}>
+                <FlexColumn style={styles.cardItem}>
+                  <BodyText3>{localize.text('Total Accounts', 'walletOverview')}</BodyText3>
+                  <FlexRow justifyContent={'flex-start'}>
+                    <BodyText1><strong>{wallets.length}</strong></BodyText1>
+                  </FlexRow>
+                </FlexColumn>
+                <FlexColumn style={styles.cardItem}>
+                  <BodyText3>{localize.text('Total Nodes', 'walletOverview')}</BodyText3>
+                  <FlexRow justifyContent={'flex-start'}>
+                    <Icon name={'node'} style={styles.nodeTypeIcon} />
+                    <BodyText1><strong>{wallets.filter(w => w.accountType === accountTypes.NODE).length}</strong></BodyText1>
+                  </FlexRow>
+                </FlexColumn>
+                <FlexColumn style={styles.cardItem}>
+                  <BodyText3>{localize.text('Total Apps', 'walletOverview')}</BodyText3>
+                  <FlexRow justifyContent={'flex-start'}>
+                    <Icon name={'ellipse'} style={styles.nodeTypeIcon} />
+                    <BodyText1><strong>{wallets.filter(w => w.accountType === accountTypes.APP).length}</strong></BodyText1>
+                  </FlexRow>
+                </FlexColumn>
+                <FlexColumn style={styles.cardItem}>
+                  <BodyText3>{localize.text('Total Staked POKT', 'walletOverview')}</BodyText3>
+                  <FlexRow justifyContent={'flex-start'}>
+                    <Icon name={'stakedTokens'} style={styles.nodeTypeIcon} />
+                    <BodyText1><strong>{localize.number(Number(totalStaked.toString()), {useGrouping: true})}</strong></BodyText1>
+                  </FlexRow>
+                </FlexColumn>
+                <FlexColumn justifyContent={'center'}>
+                  <ButtonSecondary onClick={onImportAccountClick}>{localize.text('Import Account', 'walletOverview')}</ButtonSecondary>
+                </FlexColumn>
+              </FlexRow>
+            </Card>
+            <Header4 style={styles.transactionHistoryHeader}>{localize.text('Aggregated Transaction History', 'walletOverview')}</Header4>
+            <TransactionTable style={{flexGrow: -1, overflow: 'scroll'}} wallets={wallets} />
+          </FlexColumn>
         </MainBody>
       </MainContainer>
     </FlexRow>
