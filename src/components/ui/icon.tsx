@@ -24,8 +24,9 @@ import copyBlue from '../../images/icons/copy_blue.svg';
 import locked from '../../images/icons/locked.svg';
 import download from '../../images/icons/download.svg';
 import send from '../../images/icons/send.svg';
+import search from '../../images/icons/search.svg';
 
-export type IconName = "send"|"download"|"locked"|"node"|"ellipse"|"staked"|"unstaking"|"unstake"|"stakedTokens"|"import"|"eyeOn"|"eyeOff"|"cpu"|"barChart"|"wallet"|"chevronRight"|"target"|"user"|"bookOpen"|"logOut"|"remove"|"copyGreen"|"error"|"backspace"|"copyBlue"
+export type IconName = "search"|"send"|"download"|"locked"|"node"|"ellipse"|"staked"|"unstaking"|"unstake"|"stakedTokens"|"import"|"eyeOn"|"eyeOff"|"cpu"|"barChart"|"wallet"|"chevronRight"|"target"|"user"|"bookOpen"|"logOut"|"remove"|"copyGreen"|"error"|"backspace"|"copyBlue"
 
 interface IconProps {
   name: IconName
@@ -58,6 +59,7 @@ export const Icon = ({ name, style = {} }: IconProps) => {
     locked,
     download,
     send,
+    search,
   };
   const src = sources[name];
   return (

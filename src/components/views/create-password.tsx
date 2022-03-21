@@ -58,6 +58,9 @@ export const CreatePassword = () => {
     errorMessage: {
       marginTop: -20,
     },
+    showPassword: {
+      marginTop: -30
+    },
   };
 
   const onSubmit = (e: React.FormEvent) => {
@@ -107,8 +110,12 @@ export const CreatePassword = () => {
                        wide={true}
                        value={password}
                        onChange={onPasswordChange}
-                       adornment={<InputRightButton icon={showPassword ? 'eyeOff' : 'eyeOn'} onClick={() => setShowPassword(!showPassword)} />}
+                       adornment={<InputRightButton icon={showPassword ? 'eyeOff' : 'eyeOn'} onClick={() => setShowPassword(!showPassword)} style={styles.showPassword} />}
                        adornmentPosition={'end'}
+                       adornmentSettings={{
+                         width: 52,
+                         padding: 0,
+                       }}
                        autofocus={true}
                        placeholder={localize.text('Password', 'universal')} />
             <TextInput type={showPassword ? 'text' : 'password'}

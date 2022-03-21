@@ -7,6 +7,7 @@ import { ButtonPrimary } from './button';
 import { FlexRow } from './flex';
 import { BodyText1 } from "./text";
 import { InputErrorMessage } from './input-error';
+import { InputRightButton } from './input-adornment';
 
 interface ModalExportKeyFileProps {
   onClose: ()=>void
@@ -19,6 +20,7 @@ export const ModalExportKeyFile = ({ onClose, onSubmit }: ModalExportKeyFileProp
 
   const [ password, setPassword ] = useState('');
   const [ errorMessage, setErrorMessage ] = useState('');
+  const [ showPassword, setShowPassword ] = useState(false);
 
   const styles = {
     header: {
@@ -67,7 +69,18 @@ export const ModalExportKeyFile = ({ onClose, onSubmit }: ModalExportKeyFileProp
           <BodyText1>{localize.text('Please enter an encryption password to protect the new key file. Be careful not to forget the password, because you will need it if you ever use or import the new key file.', 'modalExportKeyFile')}</BodyText1>
         </div>
         <form style={styles.form} onSubmit={handleSubmit}>
-          <TextInput type={'password'} wide={true} value={password} autofocus={true} onChange={onPasswordChange} placeholder={localize.text('Key File Password', 'modalExportKeyFile')} />
+          <TextInput type={showPassword ? 'text' : 'password'}
+                     wide={true}
+                     value={password}
+                     adornment={<InputRightButton icon={showPassword ? 'eyeOff' : 'eyeOn'} onClick={() => setShowPassword(!showPassword)} />}
+                     adornmentPosition={'end'}
+                     adornmentSettings={{
+                       width: 52,
+                       padding: 0,
+                     }}
+                     autofocus={true}
+                     onChange={onPasswordChange}
+                     placeholder={localize.text('Key File Password', 'modalExportKeyFile')} />
           {errorMessage ?
             <InputErrorMessage message={errorMessage} style={styles.errorMessage} />
             :
