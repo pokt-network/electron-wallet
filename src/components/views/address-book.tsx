@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Sidebar } from '../ui/sidebar';
-import { FlexRow } from '../ui/flex';
+import {FlexColumn, FlexRow} from '../ui/flex';
 import { MainContainer } from '../ui/main-container';
 import { localizeContext } from '../../hooks/localize-hook';
 import { AppHeader } from "../ui/app-header";
@@ -45,10 +45,17 @@ export const AddressBook = () => {
       width: 808,
       maxWidth: '100%',
     },
+    listHeaderContainer: {
+      display: 'block',
+      width: 808,
+      maxWidth: '100%',
+    },
     listContainer: {
       display: 'block',
       width: 808,
       maxWidth: '100%',
+      flexGrow: -1,
+      overflowY: 'auto',
     },
     listItem: {
       listStyleType: 'none',
@@ -71,6 +78,13 @@ export const AddressBook = () => {
     },
     col3: {
 
+    },
+    mainColumn: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
     },
   };
 
@@ -116,51 +130,55 @@ export const AddressBook = () => {
       <MainContainer>
         <AppHeader title={localize.text('Address Book', 'addressBook')} />
         <MainBody>
-          <div style={styles.inputContainer}>
-            <TextInput type={'text'} value={filterText} onChange={onInputChange}
-                       style={{paddingLeft: 52}}
-                       adornment={<InputLeftIcon icon={'search'} />}
-                       adornmentPosition={'start'}
-                       adornmentSettings={{
-                         width: 52,
-                         padding: 0,
-                       }}
-                       placeholder={localize.text('Enter name to filter addresses', 'addressBook')}
-                       wide={true} autofocus={true} />
-          </div>
-          <div style={styles.listContainer}>
-            <FlexRow justifyContent={'flex-start'} wrap={'nowrap'} alignItems={'center'} style={styles.listItemRow as React.CSSProperties}>
-              <Header5 style={styles.col1}>{localize.text('Name', 'addressBook')}</Header5>
-              <Header5>{localize.text('Address', 'addressBook')}</Header5>
-            </FlexRow>
-            <ul>
-              {addresses
-                .filter(a => trimmedFilterText ? filterPatt.test(a.name.toLowerCase()) : true)
-                .map(a => {
-                  return (
-                    <li key={a.id} style={styles.listItem as React.CSSProperties}>
-                      <FlexRow justifyContent={'flex-start'} wrap={'nowrap'} alignItems={'center'} style={styles.listItemRow as React.CSSProperties}>
-                        <BodyText2 style={styles.col1}>{a.name}</BodyText2>
-                        <FlexRow style={styles.col2} justifyContent={'flex-start'} alignItems={'center'}>
-                          <BodyText2 style={{marginRight: 18}}>{a.address}</BodyText2>
-                          <TextButton onClick={() => onAddressCopy(a.address)} title={localize.text('Copy address', 'addressBook')}>
+          <FlexColumn style={styles.mainColumn as React.CSSProperties}>
+            <div style={styles.inputContainer}>
+              <TextInput type={'text'} value={filterText} onChange={onInputChange}
+                         style={{paddingLeft: 52}}
+                         adornment={<InputLeftIcon icon={'search'} />}
+                         adornmentPosition={'start'}
+                         adornmentSettings={{
+                           width: 52,
+                           padding: 0,
+                         }}
+                         placeholder={localize.text('Enter name to filter addresses', 'addressBook')}
+                         wide={true} autofocus={true} />
+            </div>
+            <div style={styles.listHeaderContainer}>
+              <FlexRow justifyContent={'flex-start'} wrap={'nowrap'} alignItems={'center'} style={styles.listItemRow as React.CSSProperties}>
+                <Header5 style={styles.col1}>{localize.text('Name', 'addressBook')}</Header5>
+                <Header5>{localize.text('Address', 'addressBook')}</Header5>
+              </FlexRow>
+            </div>
+            <div style={styles.listContainer as React.CSSProperties}>
+              <ul>
+                {addresses
+                  .filter(a => trimmedFilterText ? filterPatt.test(a.name.toLowerCase()) : true)
+                  .map(a => {
+                    return (
+                      <li key={a.id} style={styles.listItem as React.CSSProperties}>
+                        <FlexRow justifyContent={'flex-start'} wrap={'nowrap'} alignItems={'center'} style={styles.listItemRow as React.CSSProperties}>
+                          <BodyText2 style={styles.col1}>{a.name}</BodyText2>
+                          <FlexRow style={styles.col2} justifyContent={'flex-start'} alignItems={'center'}>
+                            <BodyText2 style={{marginRight: 18}}>{a.address}</BodyText2>
+                            <TextButton onClick={() => onAddressCopy(a.address)} title={localize.text('Copy address', 'addressBook')}>
+                              <FlexRow justifyContent={'center'} alignItems={'center'}>
+                                <Icon name={'copyGreen'} />
+                              </FlexRow>
+                            </TextButton>
+                          </FlexRow>
+                          <TextButton style={styles.col3} title={localize.text('Delete address', 'addressBook')} onClick={() => onDeleteClick(a.id)}>
                             <FlexRow justifyContent={'center'} alignItems={'center'}>
-                              <Icon name={'copyGreen'} />
+                              <Icon name={'remove'} />
                             </FlexRow>
                           </TextButton>
                         </FlexRow>
-                        <TextButton style={styles.col3} title={localize.text('Delete address', 'addressBook')} onClick={() => onDeleteClick(a.id)}>
-                          <FlexRow justifyContent={'center'} alignItems={'center'}>
-                            <Icon name={'remove'} />
-                          </FlexRow>
-                        </TextButton>
-                      </FlexRow>
-                    </li>
-                  );
-                })
-              }
-            </ul>
-          </div>
+                      </li>
+                    );
+                  })
+                }
+              </ul>
+            </div>
+          </FlexColumn>
         </MainBody>
         {showConfirmDeleteModal ?
           <ModalConfirm title={localize.text('Delete Address', 'addressBook')} text={localize.text('Are you sure you want to delete {{name}}-{{address}} from the address book?', 'addressBook', {name: selectedAddress?.name, address: selectedAddress?.address.slice(-4)})} shape={'circle'} confirmButtonText={localize.text('Delete', 'addressBook')} onCancel={onDeleteModalCancel} onConfirm={onDeleteModalConfirm} />
