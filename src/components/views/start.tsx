@@ -15,6 +15,7 @@ import { masterPasswordContext } from '../../hooks/master-password-hook';
 import { APIContext } from '../../hooks/api-hook';
 import { InputErrorMessage } from '../ui/input-error';
 import { InputRightButton } from '../ui/input-adornment';
+import { BigShape } from '../ui/big-shape';
 
 export const Start = () => {
 
@@ -41,6 +42,7 @@ export const Start = () => {
       maxWidth: '90%',
       paddingTop: 105,
       paddingBottom: 0,
+      position: 'relative',
     },
     textLogo: {
       width: 236,
@@ -87,6 +89,13 @@ export const Start = () => {
     showPassword: {
       marginBottom: -39
     },
+    shapeContainer: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: -85,
+      height: 182,
+    },
   };
 
   const onHelpClick = () => {
@@ -123,7 +132,12 @@ export const Start = () => {
   return (
     <FlexColumn style={styles.column as React.CSSProperties} justifyContent={'center'} alignItems={'center'}>
       <div style={styles.topSpacer} />
-      <Card round={true} style={styles.card}>
+      <Card round={true} style={styles.card as React.CSSProperties}>
+        <FlexRow style={styles.shapeContainer as React.CSSProperties} wrap={'nowrap'} justifyContent={'space-evenly'}>
+          <BigShape name={'square'} />
+          <BigShape name={'triangle'} />
+          <BigShape name={'circle'} />
+        </FlexRow>
         <FlexColumn alignItems={'center'}>
           <img style={styles.textLogo} src={walletTextLogo} alt={localize.text('Wallet text logo', 'start')} />
           <p style={styles.description as React.CSSProperties}><BodyText1>{localize.text('This is an open-source interface for easy management of your POKT accounts.', 'start')}</BodyText1></p>
