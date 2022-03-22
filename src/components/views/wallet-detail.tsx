@@ -155,6 +155,8 @@ export const WalletDetail = () => {
     infoContainer: {
       paddingLeft: 32,
       paddingRight: 32,
+      flexGrow: -1,
+      overflowY: 'auto',
     },
     infoHeader: {
       marginBottom: 10,
@@ -175,8 +177,9 @@ export const WalletDetail = () => {
     },
     sendContainer: {
       marginTop: 35,
-      // width: 400,
-      // maxWidth: '90%',
+      flexGrow: 1,
+      position: 'relative',
+      overflowY: 'auto',
     },
     sendInput: {
       width: 600,
@@ -190,7 +193,6 @@ export const WalletDetail = () => {
     },
     sendFeeContainer: {
       marginTop: 22,
-      marginBottom: 22,
     },
     watchOnlyCard: {
       marginRight: 32,
@@ -214,7 +216,37 @@ export const WalletDetail = () => {
     },
     copyButton: {
       marginTop: 0,
-    }
+    },
+    mainColumn: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+    },
+    detailsContainer: {
+      flexGrow: 1,
+      position: 'relative'
+    },
+    detailsInnerContainer: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0
+    },
+    transactionsTable: {
+      flexGrow: -1,
+      overflow: 'auto',
+    },
+    sendSubmitButton: {
+      marginTop: 54,
+      marginBottom: 16,
+    },
+    sendErrorMessage: {
+      marginTop: 10,
+      marginBottom: -32,
+    },
   };
   const balance = math.divide(math.bignumber(wallet?.balance || 0), math.bignumber(1000000)) as BigNumber;
   const convertedBalance = pricing.convert(balance, 'USD');
@@ -448,193 +480,197 @@ export const WalletDetail = () => {
       <MainContainer>
         <AppHeader title={showSend ? localize.text('Send from {{name}}', 'walletDetail', {name: wallet?.name}) : (wallet?.name || '')} />
         <MainBody>
-          <FlexRow style={{visibility: 'hidden'} as React.CSSProperties} justifyContent={'flex-start'}>
-            <BodyText2>{localize.text('Wallet Balance', 'walletOverview')}</BodyText2>
-          </FlexRow>
-          <FlexRow style={styles.balanceContainer} justifyContent={'flex-start'}>
-            <img alt={localize.text('Pocket logo', 'universal')} src={pocketLogo} />
-            <Header1 style={styles.totalBalanceHeader}>{`${localize.number(Number(balance), {useGrouping: true})} POKT`}</Header1>
-            <div style={styles.spacer} />
-            {(showSend || watchOnly) ?
-              null
-              :
-              <ButtonPrimary style={styles.sendButton} onClick={() => dispatch(setActiveView({activeView: activeViews.SEND}))}>
-                <FlexRow wrap={'nowrap'} justifyContent={'center'} alignItems={'center'} gap={'12px'}>
-                  {localize.text('Send', 'universal')}
-                  <Icon name={'send'} />
-                </FlexRow>
-              </ButtonPrimary>
-            }
-            {watchOnly ?
-              <Card round={true} style={styles.watchOnlyCard}>
-                <FlexRow style={styles.watchOnlyFlexRow} justifyContent={'center'}>
-                  <Header5 style={styles.watchOnlyText}>{localize.text('Watch Only', 'walletDetail')}</Header5>
-                </FlexRow>
-              </Card>
-              :
-              null
-            }
-          </FlexRow>
-          <FlexRow style={styles.convertedBalanceContainer} justifyContent={'flex-start'}>
-            <BodyText1>{`$${localize.number(Number(convertedBalance), {useGrouping: true})} USD`}</BodyText1>
-          </FlexRow>
-          {!showSend ?
-            <div>
-              <Card round={true} style={styles.card}>
-                <FlexRow justifyContent={'space-between'}>
-                  <FlexColumn style={styles.cardItem}>
-                    <BodyText3>{localize.text('Account Type', 'walletOverview')}</BodyText3>
-                    <FlexRow justifyContent={'flex-start'}>
-                      {typeIcon}
-                      <BodyText1><strong>{
-                        wallet?.accountType === accountTypes.APP ?
-                          localize.text('App', 'universal')
-                          :
-                          wallet?.accountType === accountTypes.NODE ?
-                            localize.text('Node', 'universal')
-                            :
-                            localize.text('Wallet', 'universal')
-                      }</strong></BodyText1>
-                    </FlexRow>
-                  </FlexColumn>
-                  <FlexColumn style={styles.cardItem}>
-                    <BodyText3>{localize.text('Status', 'walletOverview')}</BodyText3>
-                    <FlexRow justifyContent={'flex-start'}>
-                      <Icon name={wallet?.status === accountStatus.STAKED ? 'staked' : wallet?.status === accountStatus.UNSTAKING ? 'unstaking' : 'unstake'} style={styles.accountTypeIcon} />
-                      <BodyText1><strong>{wallet?.status === accountStatus.STAKED ? localize.text('Staked', 'walletDetail') : wallet?.status === accountStatus.UNSTAKING ? localize.text('Unstaking', 'walletDetail') : localize.text('Not Staked', 'walletDetail')}</strong></BodyText1>
-                    </FlexRow>
-                  </FlexColumn>
-                  <FlexColumn style={styles.cardItem}>
-                    <BodyText3>{localize.text('Staked POKT', 'walletOverview')}</BodyText3>
-                    <FlexRow justifyContent={'flex-start'}>
-                      <Icon name={'stakedTokens'} style={styles.accountTypeIcon} />
-                      <BodyText1><strong>{localize.number(Number(stakedAmount), {useGrouping: true})}</strong></BodyText1>
-                    </FlexRow>
-                  </FlexColumn>
-                  <FlexColumn style={{...styles.cardItem, visibility: watchOnly ? 'hidden' : 'visible'}}>
-                    <BodyText3>{localize.text('Jail Status', 'walletOverview')}</BodyText3>
-                    <FlexRow justifyContent={'flex-start'}>
-                      <BodyText1><strong>{wallet?.jailed ? localize.text('Jailed', 'walletDetail') : localize.text('Not Jailed', 'walletDetail')}</strong></BodyText1>
-                    </FlexRow>
-                  </FlexColumn>
-                  <FlexColumn justifyContent={'center'} style={{minWidth: 219, visibility: watchOnly ? 'hidden' : 'visible'}}>
-                    {wallet?.accountType === accountTypes.WALLET
-                      ?
-                      null
-                      :
-                      wallet?.jailed ?
-                        <ButtonSecondary onClick={onUnjailClick} disabled={!wallet?.jailed}>{localize.text('Unjail', 'walletDetail')}</ButtonSecondary>
-                        :
-                        wallet?.status === accountStatus.STAKED ?
-                          <ButtonSecondary onClick={onUnstakeClick}>{localize.text('Unstake', 'walletDetail')}</ButtonSecondary>
-                          :
-                          null
-                    }
-                  </FlexColumn>
-                </FlexRow>
-              </Card>
-              <Switcher labels={[localize.text('Account Info', 'walletDetail'), localize.text('Transaction History', 'walletDetail')]} selected={switcherIdx} onChange={onSwitcherChange} />
-              {switcherIdx === 0 ?
-                <div style={styles.infoContainer}>
-                  <Header5 style={styles.infoHeader}>{localize.text('Address', 'universal')}</Header5>
-                  <FlexRow justifyContent={'flex-start'} gap={'60px'}>
-                    <TextInput style={styles.input}
-                               wide={true}
-                               type={'text'}
-                               value={wallet?.address}
-                               adornment={<InputRightButton icon={'copyBlue'} onClick={onCopyAddress} style={styles.copyButton} />}
-                               adornmentPosition={'end'}
-                               adornmentSettings={{
-                                 width: 52,
-                                 padding: 0,
-                               }}
-                               readOnly={true} />
-                    {watchOnly ?
-                      <ButtonSecondary style={styles.infoButton}
-                                       onClick={onRemoveWallet}>{localize.text('Remove this Account', 'walletDetail')}</ButtonSecondary>
-                      :
-                      <ButtonSecondary style={styles.infoButton} onClick={onSaveKeyFileClick}>
-                        <FlexRow gap={'14px'} justifyContent={'center'} alignItems={'center'} wrap={'nowrap'}>
-                          {localize.text('Download Key File', 'walletDetail')}
-                          <Icon name={'download'} />
-                        </FlexRow>
-                      </ButtonSecondary>
-                    }
+          <FlexColumn style={styles.mainColumn as React.CSSProperties}>
+            <FlexRow style={{visibility: 'hidden'} as React.CSSProperties} justifyContent={'flex-start'}>
+              <BodyText2>{localize.text('Wallet Balance', 'walletOverview')}</BodyText2>
+            </FlexRow>
+            <FlexRow style={styles.balanceContainer} justifyContent={'flex-start'}>
+              <img alt={localize.text('Pocket logo', 'universal')} src={pocketLogo} />
+              <Header1 style={styles.totalBalanceHeader}>{`${localize.number(Number(balance), {useGrouping: true})} POKT`}</Header1>
+              <div style={styles.spacer} />
+              {(showSend || watchOnly) ?
+                null
+                :
+                <ButtonPrimary style={styles.sendButton} onClick={() => dispatch(setActiveView({activeView: activeViews.SEND}))}>
+                  <FlexRow wrap={'nowrap'} justifyContent={'center'} alignItems={'center'} gap={'12px'}>
+                    {localize.text('Send', 'universal')}
+                    <Icon name={'send'} />
                   </FlexRow>
-                  {!watchOnly ? <Header5 style={{...styles.infoHeader, ...styles.publicKeyHeader}}>{localize.text('Public Key', 'universal')}</Header5> : null}
-                  {!watchOnly ?
-                    <FlexRow justifyContent={'flex-start'} gap={'60px'}>
-                      <TextInput style={styles.input}
-                                 wide={true}
-                                 type={'text'}
-                                 value={wallet?.publicKey}
-                                 adornment={<InputRightButton icon={'copyBlue'} onClick={onCopyPublicKey} style={styles.copyButton} />}
-                                 adornmentPosition={'end'}
-                                 adornmentSettings={{
-                                   width: 52,
-                                   padding: 0,
-                                 }}
-                                 readOnly={true}/>
-                      <ButtonSecondary style={styles.infoButton} onClick={onRevealPrivateKeyClick}>
-                        <FlexRow gap={'14px'} justifyContent={'center'} alignItems={'center'} wrap={'nowrap'}>
-                          {localize.text('Reveal Private Key', 'walletDetail')}
-                          <Icon name={'locked'} />
-                        </FlexRow>
-                      </ButtonSecondary>
-                    </FlexRow>
-                    :
-                    null
-                  }
-                  {!watchOnly ?
-                    <TextButton style={styles.removeButton} onClick={onRemoveWallet}>
-                      <FlexRow wrap={'nowrap'} justifyContent={'flex-start'} alignItems={'center'} gap={'8px'}>
-                        <Icon name={'backspace'} />
-                        <BodyText2 style={styles.removeButtonText}>{localize.text('Remove this account', 'walletDetail')}</BodyText2>
-                      </FlexRow>
-                    </TextButton>
-                    :
-                    null
-                  }
-                </div>
+                </ButtonPrimary>
+              }
+              {watchOnly ?
+                <Card round={true} style={styles.watchOnlyCard}>
+                  <FlexRow style={styles.watchOnlyFlexRow} justifyContent={'center'}>
+                    <Header5 style={styles.watchOnlyText}>{localize.text('Watch Only', 'walletDetail')}</Header5>
+                  </FlexRow>
+                </Card>
                 :
                 null
               }
-              {switcherIdx === 1 ? <TransactionTable wallets={wallet ? [wallet] : []} /> : null}
-            </div>
-            :
-            <form style={styles.sendContainer} onSubmit={onSendSubmit}>
-              <FlexColumn>
-                <TextInput style={styles.sendInput} type={'text'} placeholder={localize.text('Amount in POKT', 'walletSend')} wide={true} value={sendAmount} onChange={onSendAmountChange} autofocus={true} />
-                <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Send to Address', 'walletSend')} wide={true} value={sendAddress} onChange={onSendAddressChange} />
-                <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Add a Tx memo', 'walletSend')} wide={true} value={sendMemo} onChange={onSendMemoChange} />
-                <FlexRow style={styles.enableSaveAddressRow} wrap={'nowrap'} justifyContent={'flex-start'} alignItems={'center'}>
-                  <Toggle style={styles.enableSaveToggle} enabled={saveAddressEnabled} onToggle={enabled => setSaveAddressEnabled(enabled)} />
-                  <BodyText1>{localize.text('Save to Address Book', 'walletDetail')}</BodyText1>
-                </FlexRow>
-                {saveAddressEnabled ?
-                  <TextInput style={{...styles.sendInput, marginTop: 16}} type={'text'}
-                             placeholder={localize.text('Enter label of the address', 'walletSend')} wide={true}
-                             value={saveAddressLabel} onChange={onSaveAddressLabelChange} />
-                  :
-                  null
-                }
-                <div style={styles.sendFeeContainer}>
-                  <BodyText1>{localize.text('Transaction Fee {{fee}} POKT', 'walletSend', {fee: TRANSACTION_FEE})}</BodyText1>
-                </div>
-                {sendErrorMessage ?
-                  <InputErrorMessage message={sendErrorMessage} />
-                  :
-                  null
-                }
-                <ButtonPrimary type={'submit'} style={{marginTop: 32}}>{localize.text('Send', 'univeral')}</ButtonPrimary>
-              </FlexColumn>
-            </form>
-          }
-          {showPrivateKeyModal ?
-            <ModalPrivateKey privateKey={privateKey} />
-            :
-            null
-          }
+            </FlexRow>
+            <FlexRow style={styles.convertedBalanceContainer} justifyContent={'flex-start'}>
+              <BodyText1>{`$${localize.number(Number(convertedBalance), {useGrouping: true})} USD`}</BodyText1>
+            </FlexRow>
+            {!showSend ?
+              <div style={styles.detailsContainer as React.CSSProperties}>
+                <FlexColumn style={styles.detailsInnerContainer as React.CSSProperties}>
+                  <Card round={true} style={styles.card}>
+                    <FlexRow justifyContent={'space-between'}>
+                      <FlexColumn style={styles.cardItem}>
+                        <BodyText3>{localize.text('Account Type', 'walletOverview')}</BodyText3>
+                        <FlexRow justifyContent={'flex-start'}>
+                          {typeIcon}
+                          <BodyText1><strong>{
+                            wallet?.accountType === accountTypes.APP ?
+                              localize.text('App', 'universal')
+                              :
+                              wallet?.accountType === accountTypes.NODE ?
+                                localize.text('Node', 'universal')
+                                :
+                                localize.text('Wallet', 'universal')
+                          }</strong></BodyText1>
+                        </FlexRow>
+                      </FlexColumn>
+                      <FlexColumn style={styles.cardItem}>
+                        <BodyText3>{localize.text('Status', 'walletOverview')}</BodyText3>
+                        <FlexRow justifyContent={'flex-start'}>
+                          <Icon name={wallet?.status === accountStatus.STAKED ? 'staked' : wallet?.status === accountStatus.UNSTAKING ? 'unstaking' : 'unstake'} style={styles.accountTypeIcon} />
+                          <BodyText1><strong>{wallet?.status === accountStatus.STAKED ? localize.text('Staked', 'walletDetail') : wallet?.status === accountStatus.UNSTAKING ? localize.text('Unstaking', 'walletDetail') : localize.text('Not Staked', 'walletDetail')}</strong></BodyText1>
+                        </FlexRow>
+                      </FlexColumn>
+                      <FlexColumn style={styles.cardItem}>
+                        <BodyText3>{localize.text('Staked POKT', 'walletOverview')}</BodyText3>
+                        <FlexRow justifyContent={'flex-start'}>
+                          <Icon name={'stakedTokens'} style={styles.accountTypeIcon} />
+                          <BodyText1><strong>{localize.number(Number(stakedAmount), {useGrouping: true})}</strong></BodyText1>
+                        </FlexRow>
+                      </FlexColumn>
+                      <FlexColumn style={{...styles.cardItem, visibility: watchOnly ? 'hidden' : 'visible'}}>
+                        <BodyText3>{localize.text('Jail Status', 'walletOverview')}</BodyText3>
+                        <FlexRow justifyContent={'flex-start'}>
+                          <BodyText1><strong>{wallet?.jailed ? localize.text('Jailed', 'walletDetail') : localize.text('Not Jailed', 'walletDetail')}</strong></BodyText1>
+                        </FlexRow>
+                      </FlexColumn>
+                      <FlexColumn justifyContent={'center'} style={{minWidth: 219, visibility: watchOnly ? 'hidden' : 'visible'}}>
+                        {wallet?.accountType === accountTypes.WALLET
+                          ?
+                          null
+                          :
+                          wallet?.jailed ?
+                            <ButtonSecondary onClick={onUnjailClick} disabled={!wallet?.jailed}>{localize.text('Unjail', 'walletDetail')}</ButtonSecondary>
+                            :
+                            wallet?.status === accountStatus.STAKED ?
+                              <ButtonSecondary onClick={onUnstakeClick}>{localize.text('Unstake', 'walletDetail')}</ButtonSecondary>
+                              :
+                              null
+                        }
+                      </FlexColumn>
+                    </FlexRow>
+                  </Card>
+                  <Switcher labels={[localize.text('Account Info', 'walletDetail'), localize.text('Transaction History', 'walletDetail')]} selected={switcherIdx} onChange={onSwitcherChange} />
+                  {switcherIdx === 0 ?
+                    <div style={styles.infoContainer as React.CSSProperties}>
+                      <Header5 style={styles.infoHeader}>{localize.text('Address', 'universal')}</Header5>
+                      <FlexRow justifyContent={'flex-start'} gap={'60px'}>
+                        <TextInput style={styles.input}
+                                   wide={true}
+                                   type={'text'}
+                                   value={wallet?.address}
+                                   adornment={<InputRightButton icon={'copyBlue'} onClick={onCopyAddress} style={styles.copyButton} />}
+                                   adornmentPosition={'end'}
+                                   adornmentSettings={{
+                                     width: 52,
+                                     padding: 0,
+                                   }}
+                                   readOnly={true} />
+                        {watchOnly ?
+                          <ButtonSecondary style={styles.infoButton}
+                                           onClick={onRemoveWallet}>{localize.text('Remove this Account', 'walletDetail')}</ButtonSecondary>
+                          :
+                          <ButtonSecondary style={styles.infoButton} onClick={onSaveKeyFileClick}>
+                            <FlexRow gap={'14px'} justifyContent={'center'} alignItems={'center'} wrap={'nowrap'}>
+                              {localize.text('Download Key File', 'walletDetail')}
+                              <Icon name={'download'} />
+                            </FlexRow>
+                          </ButtonSecondary>
+                        }
+                      </FlexRow>
+                      {!watchOnly ? <Header5 style={{...styles.infoHeader, ...styles.publicKeyHeader}}>{localize.text('Public Key', 'universal')}</Header5> : null}
+                      {!watchOnly ?
+                        <FlexRow justifyContent={'flex-start'} gap={'60px'}>
+                          <TextInput style={styles.input}
+                                     wide={true}
+                                     type={'text'}
+                                     value={wallet?.publicKey}
+                                     adornment={<InputRightButton icon={'copyBlue'} onClick={onCopyPublicKey} style={styles.copyButton} />}
+                                     adornmentPosition={'end'}
+                                     adornmentSettings={{
+                                       width: 52,
+                                       padding: 0,
+                                     }}
+                                     readOnly={true}/>
+                          <ButtonSecondary style={styles.infoButton} onClick={onRevealPrivateKeyClick}>
+                            <FlexRow gap={'14px'} justifyContent={'center'} alignItems={'center'} wrap={'nowrap'}>
+                              {localize.text('Reveal Private Key', 'walletDetail')}
+                              <Icon name={'locked'} />
+                            </FlexRow>
+                          </ButtonSecondary>
+                        </FlexRow>
+                        :
+                        null
+                      }
+                      {!watchOnly ?
+                        <TextButton style={styles.removeButton} onClick={onRemoveWallet}>
+                          <FlexRow wrap={'nowrap'} justifyContent={'flex-start'} alignItems={'center'} gap={'8px'}>
+                            <Icon name={'backspace'} />
+                            <BodyText2 style={styles.removeButtonText}>{localize.text('Remove this account', 'walletDetail')}</BodyText2>
+                          </FlexRow>
+                        </TextButton>
+                        :
+                        null
+                      }
+                    </div>
+                    :
+                    null
+                  }
+                  {switcherIdx === 1 ? <TransactionTable style={styles.transactionsTable} wallets={wallet ? [wallet] : []} /> : null}
+                </FlexColumn>
+              </div>
+              :
+              <form style={styles.sendContainer as React.CSSProperties} onSubmit={onSendSubmit}>
+                <FlexColumn>
+                  <TextInput style={styles.sendInput} type={'text'} placeholder={localize.text('Amount in POKT', 'walletSend')} wide={true} value={sendAmount} onChange={onSendAmountChange} autofocus={true} />
+                  <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Send to Address', 'walletSend')} wide={true} value={sendAddress} onChange={onSendAddressChange} />
+                  <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Add a Tx memo', 'walletSend')} wide={true} value={sendMemo} onChange={onSendMemoChange} />
+                  <FlexRow style={styles.enableSaveAddressRow} wrap={'nowrap'} justifyContent={'flex-start'} alignItems={'center'}>
+                    <Toggle style={styles.enableSaveToggle} enabled={saveAddressEnabled} onToggle={enabled => setSaveAddressEnabled(enabled)} />
+                    <BodyText1>{localize.text('Save to Address Book', 'walletDetail')}</BodyText1>
+                  </FlexRow>
+                  {saveAddressEnabled ?
+                    <TextInput style={{...styles.sendInput, marginTop: 16}} type={'text'}
+                               placeholder={localize.text('Enter label of the address', 'walletSend')} wide={true}
+                               value={saveAddressLabel} onChange={onSaveAddressLabelChange} />
+                    :
+                    null
+                  }
+                  <div style={styles.sendFeeContainer}>
+                    <BodyText1>{localize.text('Transaction Fee {{fee}} POKT', 'walletSend', {fee: TRANSACTION_FEE})}</BodyText1>
+                  </div>
+                  {sendErrorMessage ?
+                    <InputErrorMessage style={styles.sendErrorMessage} message={sendErrorMessage} />
+                    :
+                    null
+                  }
+                  <ButtonPrimary type={'submit'} style={styles.sendSubmitButton}>{localize.text('Send', 'univeral')}</ButtonPrimary>
+                </FlexColumn>
+              </form>
+            }
+            {showPrivateKeyModal ?
+              <ModalPrivateKey privateKey={privateKey} />
+              :
+              null
+            }
+          </FlexColumn>
         </MainBody>
       </MainContainer>
       {showUnlockForKeyFileModal ?

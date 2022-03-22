@@ -72,6 +72,10 @@ export const WalletOverview = () => {
       bottom: 0,
       overflow: 'hidden',
     },
+    transactionsTable: {
+      flexGrow: -1,
+      overflow: 'auto'
+    },
   };
 
   let totalBalance: BigNumber = math.bignumber(0);
@@ -144,7 +148,7 @@ export const WalletOverview = () => {
               </FlexRow>
             </Card>
             <Header4 style={styles.transactionHistoryHeader}>{localize.text('Aggregated Transaction History', 'walletOverview')}</Header4>
-            <TransactionTable style={{flexGrow: -1, overflow: 'scroll'}} wallets={wallets} />
+            <TransactionTable style={styles.transactionsTable} wallets={wallets} />
           </FlexColumn>
         </MainBody>
       </MainContainer>
