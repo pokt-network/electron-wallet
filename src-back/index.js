@@ -40,7 +40,7 @@ const init = async function() {
     width: width > defaultWidth ? defaultWidth : width - 200,
     minWidth: 1280,
     height: height > defaultHeight ? defaultHeight : height - 200,
-    minHeight: 720,
+    minHeight: 800,
     show: false,
     webPreferences: {
       webSecurity: false,
