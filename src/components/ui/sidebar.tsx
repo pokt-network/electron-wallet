@@ -97,6 +97,17 @@ export const Sidebar = () => {
     leftIcon: {
       marginRight: 12,
     },
+    walletsOuterContainer: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+    },
+    scrollableWalletsContainer: {
+      flex: -1,
+      overflowY: 'auto',
+    },
   };
 
   const onWalletOverviewClick = () => {
@@ -128,9 +139,9 @@ export const Sidebar = () => {
         <ButtonPrimary size={'md'} style={styles.createButton} disabled={false} onClick={() => dispatch(setShowCreateModal({show: true}))}>{localize.text('Create', 'universal')}</ButtonPrimary>
       </FlexRow>
       <div style={styles.topButtonContainer as React.CSSProperties}>
-        <FlexColumn style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0}}>
+        <FlexColumn style={styles.walletsOuterContainer as React.CSSProperties}>
           <SidebarButton selected={activeView === activeViews.WALLET_OVERVIEW} leftIcon={<Icon name={'target'} style={styles.leftIcon} />} rightIcon={<Icon name={'chevronRight'} />} onClick={onWalletOverviewClick}>{localize.text('Wallet Overview', 'sidebar')}</SidebarButton>
-          <div style={{flex: -1, overflow: 'scroll'}}>
+          <div style={styles.scrollableWalletsContainer as React.CSSProperties}>
             {wallets
               .map(w => {
                 return (
