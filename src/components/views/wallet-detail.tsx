@@ -665,14 +665,14 @@ export const WalletDetail = () => {
                 </FlexColumn>
               </form>
             }
-            {showPrivateKeyModal ?
-              <ModalPrivateKey privateKey={privateKey} />
-              :
-              null
-            }
           </FlexColumn>
         </MainBody>
       </MainContainer>
+      {showPrivateKeyModal ?
+        <ModalPrivateKey privateKey={privateKey} />
+        :
+        null
+      }
       {showUnlockForKeyFileModal ?
         <ModalUnlockWallet shape={'square'} errorMessage={unlockErrorMessage} onClose={onUnlockForKeyFileClose} onSubmit={onUnlockForKeyFileSubmit} />
         :
