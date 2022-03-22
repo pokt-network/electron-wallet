@@ -37,7 +37,7 @@ export const AppHeader = ({ title = '' }: AppHeaderProps) => {
       position: 'absolute',
       top: 42,
       right: -10,
-      // zIndex: 2000,
+      zIndex: 1000,
       background: 'linear-gradient(180deg, #121C25 0%, #2C313C 100%)',
     },
     dropdownFlexRow: {
