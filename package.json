@@ -31,6 +31,7 @@
     "@pokt-foundation/ui": "^0.3.1",
     "@pokt-network/pocket-js": "^0.7.0-rc",
     "@reduxjs/toolkit": "^1.6.2",
+    "dayjs": "^1.11.0",
     "electron-context-menu": "^3.1.1",
     "electron-is-dev": "^2.0.0",
     "electron-serve": "^1.1.0",

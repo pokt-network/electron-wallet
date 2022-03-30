@@ -31,7 +31,7 @@ export const MainContainer = ({ children }: MainContainerProps) => {
   let bigShape;
   if([activeViews.IMPORT_ACCOUNT, activeViews.WATCH_ACCOUNT].includes(activeView)) {
     bigShape = 'circle';
-  } else if([activeViews.SEND, activeViews.ADDRESS_BOOK].includes(activeView)) {
+  } else if([activeViews.SEND, activeViews.ADDRESS_BOOK, activeViews.TRANSACTION_SUMMARY].includes(activeView)) {
     bigShape = 'square';
   } else if([activeViews.CREATE_PASSWORD].includes(activeView)) {
     bigShape = 'triangle';

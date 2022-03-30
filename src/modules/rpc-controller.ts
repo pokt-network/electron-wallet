@@ -1,5 +1,6 @@
 import {
   Application,
+  Block,
   Node,
   Pocket, RawTxResponse,
   Transaction
@@ -87,6 +88,16 @@ export class RPCController {
       throw res;
     } else {
       return res;
+    }
+  }
+
+  async getBlock(blockHeight: string): Promise<Block> {
+    // @ts-ignore
+    const res = await this._pocket.rpc().query.getBlock(BigInt(blockHeight));
+    if(isError(res)) {
+      throw res;
+    } else {
+      return res.block;
     }
   }
 

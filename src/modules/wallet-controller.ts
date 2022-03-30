@@ -3,7 +3,7 @@ import { KeyUtils } from './key-utils';
 import { Subject } from 'rxjs';
 import { RPCController } from './rpc-controller';
 import { makePassword } from '../util';
-import { CoinDenom, Pocket, Transaction } from "@pokt-network/pocket-js";
+import { Block, CoinDenom, Pocket, Transaction } from "@pokt-network/pocket-js";
 import { isError } from "lodash";
 import { accountTypes, TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT } from "../constants";
 
@@ -195,6 +195,10 @@ export class WalletController {
     if(isError(rawTxResponse))
       return '';
     return rawTxResponse.hash;
+  }
+
+  async getBlock(blockHeight: string): Promise<Block> {
+    return await this._rpcController.getBlock(blockHeight);
   }
 
   async getTransaction(tx: string): Promise<Transaction> {
