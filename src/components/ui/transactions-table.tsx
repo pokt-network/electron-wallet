@@ -12,6 +12,7 @@ import chevronRight from '../../images/icons/chevron-right.svg';
 import { useDispatch } from "react-redux";
 import { setActiveView, setSelectedTransaction } from "../../reducers/app-reducer";
 import { activeViews } from "../../constants";
+import { BlockDate } from './block-date';
 
 interface TransactionsTableProps {
   style?: object
@@ -77,7 +78,7 @@ export const TransactionTable = ({ style, wallets }: TransactionsTableProps) => 
                 <BodyText1 style={styles.accentText}><strong>{splitHash(txHash)}</strong></BodyText1>
               </FlexColumn>
               <FlexColumn style={{...styles.column, width: 100, minWidth: 100}} justifyContent={'center'}>
-                <BodyText1>Jan 14, 2022</BodyText1>
+                <BodyText1><BlockDate blockHeight={height ? height.toString() : ''} dateType={'localeDateString'} /></BodyText1>
               </FlexColumn>
               <FlexColumn style={{...styles.column, width: 40, minWidth: 40}} justifyContent={'center'}>
                 <TextButton onClick={() => onOpenTransactionClick(txHash)}><img alt={localize.text('Open transaction icon', 'transactionsTable')} src={chevronRight} /></TextButton>
