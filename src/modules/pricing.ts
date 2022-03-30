@@ -11,7 +11,7 @@ export class Pricing {
       try {
         const currency = currencies[i];
         const { body } = await request
-          .get('https://api.coingecko.com/api/v3/coins/pocket-network')
+          .get('https://api.coingecko.com/api/v3/coins/pocket-network?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false')
           .timeout(10000);
         data[currency] = body.market_data.current_price[currency.toLowerCase()];
       } catch(err) {
