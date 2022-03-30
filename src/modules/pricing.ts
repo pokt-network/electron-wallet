@@ -11,9 +11,9 @@ export class Pricing {
       try {
         const currency = currencies[i];
         const { body } = await request
-          .get(`https://min-api.cryptocompare.com/data/price?fsym=POKT&tsyms=${currency}`)
+          .get('https://api.coingecko.com/api/v3/coins/pocket-network')
           .timeout(10000);
-        Object.assign(data, body);
+        data[currency] = body.market_data.current_price[currency.toLowerCase()];
       } catch(err) {
         // do nothing with error
       }
