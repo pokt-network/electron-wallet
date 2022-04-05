@@ -16,6 +16,7 @@ import { APIContext } from '../../hooks/api-hook';
 import { InputErrorMessage } from '../ui/input-error';
 import { InputRightButton } from '../ui/input-adornment';
 import { BigShape } from '../ui/big-shape';
+import { Icon } from '../ui/icon';
 
 export const Start = () => {
 
@@ -60,7 +61,7 @@ export const Start = () => {
     bottomRow: {
       width: '100%',
       height: 111,
-      gap: 116,
+      gap: 122,
     },
     pocketLogo: {
       width: 154,
@@ -122,7 +123,7 @@ export const Start = () => {
         dispatch(setActiveView({activeView: activeViews.WALLET_OVERVIEW}));
         setMasterPassword(masterPassword);
       } else {
-        return setErrorMessage(localize.text('Invalid password', 'start'));
+        return setErrorMessage(localize.text('Incorrect password', 'start'));
       }
     } else {
       dispatch(setActiveView({activeView: activeViews.CREATE_PASSWORD}));
@@ -173,9 +174,18 @@ export const Start = () => {
             </FlexRow>
           </form>
           <FlexRow style={styles.bottomRow} justifyContent={'center'} alignItems={'center'}>
-            <TextButton onClick={onHelpClick}><BodyText2>{localize.text('Help', 'universal')}</BodyText2></TextButton>
-            <TextButton onClick={onImportClick}><BodyText2>{localize.text('Import', 'universal')}</BodyText2></TextButton>
-            <TextButton onClick={onQuitClick}><BodyText2>{localize.text('Quit', 'universal')}</BodyText2></TextButton>
+            <TextButton onClick={onHelpClick}>
+              <FlexRow gap={'9px'} justifyContent={'center'} alignItems={'center'}>
+                <Icon name={'questionCircle'} />
+                <BodyText2>{localize.text('Help', 'universal')}</BodyText2>
+              </FlexRow>
+            </TextButton>
+            <TextButton onClick={onQuitClick}>
+              <FlexRow gap={'9px'} justifyContent={'center'} alignItems={'center'}>
+                <Icon name={'quitCircle'} />
+                <BodyText2>{localize.text('Quit', 'universal')}</BodyText2>
+              </FlexRow>
+            </TextButton>
           </FlexRow>
         </FlexColumn>
       </Card>
