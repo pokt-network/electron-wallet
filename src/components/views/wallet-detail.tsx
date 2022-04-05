@@ -34,6 +34,7 @@ import { Toggle } from "../ui/toggle";
 import { AddressControllerContext } from "../../hooks/address-hook";
 import { InputErrorMessage } from '../ui/input-error';
 import { InputRightButton } from '../ui/input-adornment';
+import { Hex } from '@pokt-network/pocket-js';
 
 export const WalletDetail = () => {
 
@@ -53,6 +54,8 @@ export const WalletDetail = () => {
   const [ saveAddressLabel, setSaveAddressLabel ] = useState('');
   const [ unlockErrorMessage, setUnlockErrorMessage ] = useState('');
   const [ sendErrorMessage, setSendErrorMessage ] = useState('');
+  const [ sendAmountErrorMessage, setSendAmountErrorMessage ] = useState('');
+  const [ sendAddressErrorMessage, setSendAddressErrorMessage ] = useState('');
   const [ unstakeErrorMessage, setUnstakeErrorMessage ] = useState('');
   const api = useContext(APIContext);
   const localize = useContext(localizeContext);
@@ -76,6 +79,8 @@ export const WalletDetail = () => {
       setShowSend(true);
     }
     setSendErrorMessage('');
+    setSendAmountErrorMessage('');
+    setSendAddressErrorMessage('');
     setSendAmount('');
     setSendAddress('');
     setSendMemo('');
@@ -105,6 +110,8 @@ export const WalletDetail = () => {
     setSendMemo('');
     setPrivateKey('');
     setSendErrorMessage('');
+    setSendAmountErrorMessage('');
+    setSendAddressErrorMessage('');
     dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
   }, [selectedWallet, dispatch]);
 
@@ -261,12 +268,22 @@ export const WalletDetail = () => {
     const preppedSendAddress = sendAddress.trim();
     const preppedLabel = saveAddressLabel.trim();
     if(!sendAmount.trim() || !(amount > 0)) {
-      return setSendErrorMessage(localize.text('You must enter a valid amount', 'send'));
-    } else if(!preppedSendAddress) {
-      return setSendErrorMessage(localize.text('You must enter an address', 'send'));
-    } else if(saveAddressEnabled && !preppedLabel) {
+      return setSendAmountErrorMessage(localize.text('You must enter a valid amount', 'send'));
+    } else if(balance.lt(bignumber(amount).add(bignumber(TRANSACTION_FEE)))) {
+      return setSendAmountErrorMessage(localize.text('Not enough balance to send', 'send'));
+    }
+    setSendAmountErrorMessage('');
+    if(!preppedSendAddress) {
+      return setSendAddressErrorMessage(localize.text('You must enter an address', 'send'));
+    } else if(!Hex.validateAddress(preppedSendAddress)) {
+      return setSendAddressErrorMessage(localize.text('Invalid address', 'send'));
+    }
+    setSendAddressErrorMessage('');
+    if(saveAddressEnabled && !preppedLabel) {
       return setSendErrorMessage(localize.text('You must enter a label in order to save the address', 'send'));
     }
+    // if((balance.toNumber()) < (amount + Number(TRANSACTION_FEE))) {
+
     if(wallet && walletController && password) {
       walletController.sendTransaction(
         wallet.address,
@@ -284,6 +301,8 @@ export const WalletDetail = () => {
             setSaveAddressEnabled(false);
             setSaveAddressLabel('');
             setSendErrorMessage('');
+            setSendAmountErrorMessage('');
+            setSendAddressErrorMessage('');
             if(saveAddressEnabled)
               addressController?.createAddress(preppedLabel, preppedSendAddress);
           } else {
@@ -337,7 +356,7 @@ export const WalletDetail = () => {
           if(tx) {
             setShowUnstakeModal(false);
           } else {
-            setUnstakeErrorMessage(localize.text('Invalid password', 'walletDetail'));
+            setUnstakeErrorMessage(localize.text('Incorrect password', 'walletDetail'));
           }
         })
         .catch(console.error);
@@ -355,7 +374,7 @@ export const WalletDetail = () => {
             setPrivateKey(keyStr);
             setShowSaveKeyFileModal(true);
           } else {
-            setUnlockErrorMessage(localize.text('Invalid password', 'walletDetail'));
+            setUnlockErrorMessage(localize.text('Incorrect password', 'walletDetail'));
           }
         })
         .catch(console.error);
@@ -373,7 +392,7 @@ export const WalletDetail = () => {
             setPrivateKey(keyStr);
             dispatch(setShowPrivateKeyModal({show: true}));
           } else {
-            setUnlockErrorMessage(localize.text('Invalid password', 'walletDetail'));
+            setUnlockErrorMessage(localize.text('Incorrect password', 'walletDetail'));
           }
         })
         .catch(console.error);
@@ -640,8 +659,18 @@ export const WalletDetail = () => {
               <form style={styles.sendContainer as React.CSSProperties} onSubmit={onSendSubmit}>
                 <FlexColumn>
                   <TextInput style={styles.sendInput} type={'text'} placeholder={localize.text('Amount in POKT', 'walletSend')} wide={true} value={sendAmount} onChange={onSendAmountChange} autofocus={true} />
-                  <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Send to Address', 'walletSend')} wide={true} value={sendAddress} onChange={onSendAddressChange} />
-                  <TextInput style={{...styles.sendInput, marginTop: 32}} type={'text'} placeholder={localize.text('Add a Tx memo', 'walletSend')} wide={true} value={sendMemo} onChange={onSendMemoChange} />
+                  {sendAmountErrorMessage ?
+                    <InputErrorMessage style={styles.sendErrorMessage} message={sendAmountErrorMessage} />
+                    :
+                    null
+                  }
+                  <TextInput style={{...styles.sendInput, marginTop: sendAmountErrorMessage ? 64 : 32}} type={'text'} placeholder={localize.text('Send to Address', 'walletSend')} wide={true} value={sendAddress} onChange={onSendAddressChange} />
+                  {sendAddressErrorMessage ?
+                    <InputErrorMessage style={styles.sendErrorMessage} message={sendAddressErrorMessage} />
+                    :
+                    null
+                  }
+                  <TextInput style={{...styles.sendInput, marginTop: sendAddressErrorMessage ? 64 : 32}} type={'text'} placeholder={localize.text('Add a Tx memo', 'walletSend')} wide={true} value={sendMemo} onChange={onSendMemoChange} />
                   <FlexRow style={styles.enableSaveAddressRow} wrap={'nowrap'} justifyContent={'flex-start'} alignItems={'center'}>
                     <Toggle style={styles.enableSaveToggle} enabled={saveAddressEnabled} onToggle={enabled => setSaveAddressEnabled(enabled)} />
                     <BodyText1>{localize.text('Save to Address Book', 'walletDetail')}</BodyText1>

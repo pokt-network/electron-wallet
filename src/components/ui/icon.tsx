@@ -25,8 +25,10 @@ import locked from '../../images/icons/locked.svg';
 import download from '../../images/icons/download.svg';
 import send from '../../images/icons/send.svg';
 import search from '../../images/icons/search.svg';
+import questionCircle from '../../images/icons/question-circle.svg';
+import quitCircle from '../../images/icons/quit-circle.svg';
 
-export type IconName = "search"|"send"|"download"|"locked"|"node"|"ellipse"|"staked"|"unstaking"|"unstake"|"stakedTokens"|"import"|"eyeOn"|"eyeOff"|"cpu"|"barChart"|"wallet"|"chevronRight"|"target"|"user"|"bookOpen"|"logOut"|"remove"|"copyGreen"|"error"|"backspace"|"copyBlue"
+export type IconName = "search"|"send"|"download"|"locked"|"node"|"ellipse"|"staked"|"unstaking"|"unstake"|"stakedTokens"|"import"|"eyeOn"|"eyeOff"|"cpu"|"barChart"|"wallet"|"chevronRight"|"target"|"user"|"bookOpen"|"logOut"|"remove"|"copyGreen"|"error"|"backspace"|"copyBlue"|"questionCircle"|"quitCircle"
 
 interface IconProps {
   name: IconName
@@ -60,6 +62,8 @@ export const Icon = ({ name, style = {} }: IconProps) => {
     download,
     send,
     search,
+    questionCircle,
+    quitCircle,
   };
   const src = sources[name];
   return (

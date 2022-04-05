@@ -181,7 +181,7 @@ export const ImportAccount = () => {
               }
             }, 500);
           } else {
-            setKeyFileImportError(localize.text('Invalid password', 'importAccount'));
+            setKeyFileImportError(localize.text('Incorrect Keyfile or Password', 'importAccount'));
           }
         })
         .catch(console.error);
@@ -217,7 +217,7 @@ export const ImportAccount = () => {
           }
         })
         .catch(err => {
-          setPrivateKeyImportError(localize.text('Invalid private key', 'importAccount'));
+          setPrivateKeyImportError(localize.text('Incorrect Private Key', 'importAccount'));
           console.error(err);
         });
   };
