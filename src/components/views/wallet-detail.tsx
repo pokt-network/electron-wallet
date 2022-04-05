@@ -35,6 +35,7 @@ import { AddressControllerContext } from "../../hooks/address-hook";
 import { InputErrorMessage } from '../ui/input-error';
 import { InputRightButton } from '../ui/input-adornment';
 import { Hex } from '@pokt-network/pocket-js';
+import { ModalSendSuccess } from '../ui/modal-send-success';
 
 export const WalletDetail = () => {
 
@@ -57,6 +58,8 @@ export const WalletDetail = () => {
   const [ sendAmountErrorMessage, setSendAmountErrorMessage ] = useState('');
   const [ sendAddressErrorMessage, setSendAddressErrorMessage ] = useState('');
   const [ unstakeErrorMessage, setUnstakeErrorMessage ] = useState('');
+  const [ showSendSuccessModal, setShowSendSuccessModal ] = useState(false);
+  const [ sentTXID, setSentTXID ] = useState('');
   const api = useContext(APIContext);
   const localize = useContext(localizeContext);
   const walletController = useContext(WalletControllerContext);
@@ -294,15 +297,11 @@ export const WalletDetail = () => {
       )
         .then(tx => {
           if(tx) {
-            dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
-            setSendAmount('');
-            setSendAddress('');
-            setSendMemo('');
-            setSaveAddressEnabled(false);
-            setSaveAddressLabel('');
+            setSentTXID(tx);
             setSendErrorMessage('');
             setSendAmountErrorMessage('');
             setSendAddressErrorMessage('');
+            setShowSendSuccessModal(true);
             if(saveAddressEnabled)
               addressController?.createAddress(preppedLabel, preppedSendAddress);
           } else {
@@ -311,6 +310,16 @@ export const WalletDetail = () => {
         })
         .catch(console.error);
     }
+  };
+  const onCloseSendSuccessModal = () => {
+    dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
+    setShowSendSuccessModal(false);
+    setSendAmount('');
+    setSendAddress('');
+    setSendMemo('');
+    setSaveAddressEnabled(false);
+    setSaveAddressLabel('');
+    setSentTXID('');
   };
   const onSaveKeyFileClick = () => {
     setShowUnlockForKeyFileModal(true);
@@ -735,6 +744,17 @@ export const WalletDetail = () => {
           confirmButtonText={localize.text('Remove', 'walletDetail')}
           onCancel={onConfirmRemoveCancel}
           onConfirm={onConfirmRemoveConfirm} />
+        :
+        null
+      }
+      {showSendSuccessModal ?
+        <ModalSendSuccess
+          txid={sentTXID}
+          fee={TRANSACTION_FEE}
+          amount={sendAmount}
+          from={wallet?.address || ''}
+          to={sendAddress}
+          onClose={onCloseSendSuccessModal} />
         :
         null
       }
