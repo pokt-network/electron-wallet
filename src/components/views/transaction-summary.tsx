@@ -5,16 +5,18 @@ import { MainContainer } from "../ui/main-container";
 import { AppHeader } from "../ui/app-header";
 import { MainBody } from "../ui/main-body";
 import { localizeContext } from "../../hooks/localize-hook";
-import { BodyText1 } from "../ui/text";
-import { useSelector } from "react-redux";
+import { BodyText1, BodyText2 } from "../ui/text";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useTheme } from "@pokt-foundation/ui";
 import { WalletControllerContext } from "../../hooks/wallet-hook";
 import { Transaction } from "@pokt-network/pocket-js";
-import { TextButton } from '../ui/button';
+import { ButtonPrimary, TextButton } from '../ui/button';
 import { Icon } from '../ui/icon';
 import { APIContext } from '../../hooks/api-hook';
 import { BlockDate } from '../ui/block-date';
+import { setActiveView, setSelectedWallet } from '../../reducers/app-reducer';
+import { activeViews } from '../../constants';
 
 const CopyButton = ({ style, onClick }: {style?: any, onClick: ()=>void}) => {
   return (
@@ -28,6 +30,7 @@ const CopyButton = ({ style, onClick }: {style?: any, onClick: ()=>void}) => {
 
 export const TransactionSummary = () => {
 
+  const dispatch = useDispatch();
   const theme = useTheme();
   const api = useContext(APIContext);
   const localize = useContext(localizeContext);
@@ -36,6 +39,7 @@ export const TransactionSummary = () => {
 
   const {
     selectedTransaction,
+    wallets,
   } = useSelector(({ appState }: RootState) => appState);
 
   useEffect(() => {
@@ -89,6 +93,16 @@ export const TransactionSummary = () => {
     api.copyToClipboard(value);
   };
 
+  const onBackClick = () => {
+    if(transaction) {
+      let wallet = wallets.find(w => w.address === fromAddress) || wallets.find(w => w.address === toAddress);
+      if(wallet) {
+        dispatch(setSelectedWallet({address: wallet.address}))
+        dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
+      }
+    }
+  };
+
   const height = transaction?.height;
   const fromAddress = transaction?.stdTx.msg.value.from_address;
   const toAddress = transaction?.stdTx.msg.value.to_address;
@@ -99,6 +113,9 @@ export const TransactionSummary = () => {
       <MainContainer>
         <AppHeader title={localize.text('Transaction Summary', 'transactionSummary')} />
         <MainBody>
+          <ButtonPrimary style={{position: 'absolute', right: 0} as React.CSSProperties} size={'md'} onClick={onBackClick}>
+            <BodyText2>{localize.text('Back to Account', 'transactionSummary')}</BodyText2>
+          </ButtonPrimary>
           <FlexRow style={styles.row} justifyContent={'flex-start'} wrap={'nowrap'} alignItems={'center'}>
             <BodyText1 style={styles.col1}>{localize.text('Transaction Hash', 'transactionSummary')}</BodyText1>
             <BodyText1 style={{...styles.col2, color: theme.accent}}>{selectedTransaction}</BodyText1>
