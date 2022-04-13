@@ -53,6 +53,8 @@ export const ModalCreateWallet = ({}: ModalCreateWalletProps) => {
     const trimmedName = name.trim();
     if(!trimmedName) {
       return setErrorMessage(localize.text('You must enter a name', 'modalCreate'));
+    } else if(trimmedName.length > 12) {
+      return setErrorMessage(localize.text('Account name must be twelve characters or less', 'modalCreate'));
     }
     walletController?.createWallet(trimmedName, password);
     dispatch(setShowCreateModal({show: false}));

@@ -165,7 +165,9 @@ export const ImportAccount = () => {
       return setKeyFileImportError(localize.text('You must select a key file', 'importAccount'));
     }
     const splitKeyFilePath = keyFilePath.split(/[/\\]/g);
-    const name = splitKeyFilePath[splitKeyFilePath.length - 1].replace(/\.json$/i, '');
+    const name = splitKeyFilePath[splitKeyFilePath.length - 1]
+      .replace(/\.json$/i, '')
+      .slice(0, 12);
     const keyFileContents = await api.openFile(keyFilePath);
     const password = masterPassword?.get();
     if(walletController && password)
