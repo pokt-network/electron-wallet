@@ -15,7 +15,7 @@ import { ButtonPrimary, TextButton } from '../ui/button';
 import { Icon } from '../ui/icon';
 import { APIContext } from '../../hooks/api-hook';
 import { BlockDate } from '../ui/block-date';
-import { setActiveView, setSelectedWallet } from '../../reducers/app-reducer';
+import { setActiveView } from '../../reducers/app-reducer';
 import { activeViews } from '../../constants';
 
 const CopyButton = ({ style, onClick }: {style?: any, onClick: ()=>void}) => {
@@ -38,8 +38,8 @@ export const TransactionSummary = () => {
   const [ transaction, setTransaction ] = useState<Transaction|null>(null);
 
   const {
+    selectedWallet,
     selectedTransaction,
-    wallets,
   } = useSelector(({ appState }: RootState) => appState);
 
   useEffect(() => {
@@ -76,36 +76,31 @@ export const TransactionSummary = () => {
 
   console.log('transaction', transaction, transaction?.txResult?.messageType);
 
-  const type: string|undefined = transaction?.txResult?.messageType;
-  const preppedType = !type ? '' : type
-    .replace(/_/g, ' ')
-    .split(/\s+/)
-    .map(s => {
-      if(s.length > 0) {
-        return s[0].toUpperCase() + s.slice(1);
-      } else {
-        return s;
-      }
-    })
-    .join(' ');
-
   const onCopy = (value: string) => {
     api.copyToClipboard(value);
   };
 
   const onBackClick = () => {
-    if(transaction) {
-      let wallet = wallets.find(w => w.address === fromAddress) || wallets.find(w => w.address === toAddress);
-      if(wallet) {
-        dispatch(setSelectedWallet({address: wallet.address}))
-        dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
-      }
-    }
+    if(selectedWallet)
+      dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
+    else
+      dispatch(setActiveView({activeView: activeViews.WALLET_OVERVIEW}));
   };
 
   const height = transaction?.height;
   const fromAddress = transaction?.stdTx.msg.value.from_address;
   const toAddress = transaction?.stdTx.msg.value.to_address;
+  const type: string|undefined = transaction?.txResult?.messageType;
+  const preppedType = !type ?
+    ''
+    :
+    fromAddress === selectedWallet ?
+      localize.text('Sent', 'transactionSummary')
+      :
+      toAddress === selectedWallet ?
+        localize.text('Received', 'transactionSummary')
+        :
+        type.replace(/_+/g, ' ');
 
   return (
     <FlexRow style={styles.container as React.CSSProperties}>

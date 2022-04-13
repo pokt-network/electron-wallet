@@ -204,7 +204,6 @@ export const ImportAccount = () => {
     if(walletController && password)
       walletController.importWalletFromRawPrivateKey('', trimmedPrivateKey, password)
         .then(res => {
-          console.log('then');
           if(res) {
             setTimeout(() => {
               const wallets = walletController.getWallets();
