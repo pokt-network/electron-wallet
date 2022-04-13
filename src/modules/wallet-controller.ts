@@ -83,7 +83,7 @@ export class WalletController {
       return '';
     const ppk = await this._keyUtils.getPPK(password, account.addressHex);
     const walletData = {
-      name: name || account.addressHex.slice(0, 11),
+      name: name || account.addressHex.slice(0, 12),
       publicKey: account.publicKey.toString('hex'),
       privateKeyEncrypted: account.encryptedPrivateKeyHex,
       ppk,
