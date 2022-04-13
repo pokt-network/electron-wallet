@@ -11,6 +11,7 @@ VOLUME /pocket-wallet/build-native
 
 # Install app dependencies
 COPY package.json /pocket-wallet/
+COPY yarn.lock /pocket-wallet/
 RUN yarn
 
 # Bundle app source
