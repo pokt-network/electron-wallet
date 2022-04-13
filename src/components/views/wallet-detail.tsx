@@ -194,6 +194,10 @@ export const WalletDetail = () => {
     sendInput: {
       width: 600,
     },
+    maxButton: {
+      marginRight: 10,
+      color: theme.accent,
+    },
     removeButton: {
       marginTop: 30,
       color: theme.accent,
@@ -329,6 +333,10 @@ export const WalletDetail = () => {
   };
   const onRemoveWallet = () => {
     setShowRemoveModal(true);
+  };
+  const onMaxClick = () => {
+    const amount = math.subtract(balance, bignumber(TRANSACTION_FEE));
+    setSendAmount(amount.toString());
   };
   const onSendAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -667,6 +675,9 @@ export const WalletDetail = () => {
               :
               <form style={styles.sendContainer as React.CSSProperties} onSubmit={onSendSubmit}>
                 <FlexColumn>
+                  <FlexRow style={styles.sendInput} justifyContent={'flex-end'}>
+                    <TextButton style={styles.maxButton} onClick={onMaxClick}><BodyText1>{localize.text('MAX', 'walletSend')}</BodyText1></TextButton>
+                  </FlexRow>
                   <TextInput style={styles.sendInput} type={'text'} placeholder={localize.text('Amount in POKT', 'walletSend')} wide={true} value={sendAmount} onChange={onSendAmountChange} autofocus={true} />
                   {sendAmountErrorMessage ?
                     <InputErrorMessage style={styles.sendErrorMessage} message={sendAmountErrorMessage} />
