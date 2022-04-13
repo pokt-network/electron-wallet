@@ -154,8 +154,8 @@ export const Sidebar = () => {
       </div>
       <SidebarButton leftIcon={<Icon name={'import'} style={styles.leftIcon} />} onClick={onImportAccountClick}>{localize.text('Import Account', 'sidebar')}</SidebarButton>
       <SidebarButton leftIcon={<Icon name={'eyeOn'} style={styles.leftIcon} />} onClick={onWatchAccountClick}>{localize.text('Watch Account', 'sidebar')}</SidebarButton>
-      <SidebarButton leftIcon={<Icon name={'cpu'} style={styles.leftIcon} />} onClick={onHardwareWalletClick}>{localize.text('Hardware Wallet', 'sidebar')}</SidebarButton>
-      <SidebarButton leftIcon={<Icon name={'barChart'} style={styles.leftIcon} />} onClick={onStatsClick}>{localize.text('Stats', 'sidebar')}</SidebarButton>
+      {/*<SidebarButton leftIcon={<Icon name={'cpu'} style={styles.leftIcon} />} onClick={onHardwareWalletClick}>{localize.text('Hardware Wallet', 'sidebar')}</SidebarButton>*/}
+      {/*<SidebarButton leftIcon={<Icon name={'barChart'} style={styles.leftIcon} />} onClick={onStatsClick}>{localize.text('Stats', 'sidebar')}</SidebarButton>*/}
       <FlexRow style={styles.copyrightContainer} justifyContent={'center'}>
         <BodyText4>{localize.text('App Terms of Use - © Pocket Network Inc. 2021', 'sidebar')}</BodyText4>
       </FlexRow>
