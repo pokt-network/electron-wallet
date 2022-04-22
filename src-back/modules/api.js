@@ -72,7 +72,7 @@ class API {
   }
 
   getEndpoint(e) {
-    e.returnValue = process.env.POCKET_WALLET_RPC_ENDPOINT || 'https://node1.testnet.pokt.network';
+    e.returnValue = process.env.POCKET_WALLET_RPC_ENDPOINT || 'https://testnet-1.nodes.pokt.network:4201';
   }
 
   openFileDialog(e, options) {
