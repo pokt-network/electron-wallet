@@ -144,6 +144,10 @@ export const TransactionSummary = () => {
             <BodyText1 style={{...styles.col2, color: theme.accent}}>{toAddress}</BodyText1>
             {toAddress ? <CopyButton style={styles.copyButton} onClick={() => onCopy(toAddress)} /> : null}
           </FlexRow>
+          <FlexRow style={styles.row} justifyContent={'flex-start'} wrap={'nowrap'} alignItems={'center'}>
+            <BodyText1 style={styles.col1}>{localize.text('Memo', 'transactionSummary')}</BodyText1>
+            <BodyText1 style={styles.col2}>{(transaction?.stdTx?.memo || '').slice(0, 80)}</BodyText1>
+          </FlexRow>
         </MainBody>
       </MainContainer>
     </FlexRow>
