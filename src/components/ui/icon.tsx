@@ -27,8 +27,9 @@ import send from '../../images/icons/send.svg';
 import search from '../../images/icons/search.svg';
 import questionCircle from '../../images/icons/question-circle.svg';
 import quitCircle from '../../images/icons/quit-circle.svg';
+import suggestedCircle from '../../images/icons/suggested-circle.svg';
 
-export type IconName = "search"|"send"|"download"|"locked"|"node"|"ellipse"|"staked"|"unstaking"|"unstake"|"stakedTokens"|"import"|"eyeOn"|"eyeOff"|"cpu"|"barChart"|"wallet"|"chevronRight"|"target"|"user"|"bookOpen"|"logOut"|"remove"|"copyGreen"|"error"|"backspace"|"copyBlue"|"questionCircle"|"quitCircle"
+export type IconName = "search"|"send"|"download"|"locked"|"node"|"ellipse"|"staked"|"unstaking"|"unstake"|"stakedTokens"|"import"|"eyeOn"|"eyeOff"|"cpu"|"barChart"|"wallet"|"chevronRight"|"target"|"user"|"bookOpen"|"logOut"|"remove"|"copyGreen"|"error"|"backspace"|"copyBlue"|"questionCircle"|"quitCircle"|"suggestedCircle"
 
 interface IconProps {
   name: IconName
@@ -64,6 +65,7 @@ export const Icon = ({ name, style = {} }: IconProps) => {
     search,
     questionCircle,
     quitCircle,
+    suggestedCircle,
   };
   const src = sources[name];
   return (

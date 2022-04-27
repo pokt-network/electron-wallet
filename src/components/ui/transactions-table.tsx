@@ -11,8 +11,11 @@ import { TextButton } from './button';
 import chevronRight from '../../images/icons/chevron-right.svg';
 import { useDispatch } from "react-redux";
 import { setActiveView, setSelectedTransaction } from "../../reducers/app-reducer";
-import { activeViews } from "../../constants";
+import { activeViews, links } from "../../constants";
 import { BlockDate } from './block-date';
+import { Icon } from './icon';
+import { Header5 } from './header';
+import { APIContext } from '../../hooks/api-hook';
 
 interface TransactionsTableProps {
   style?: object
@@ -23,6 +26,7 @@ export const TransactionTable = ({ style, wallets }: TransactionsTableProps) => 
   const dispatch = useDispatch();
   const theme = useTheme();
   const localize = useContext(localizeContext);
+  const api = useContext(APIContext);
 
   const transactions = [];
   for(const w of wallets) {
@@ -49,6 +53,20 @@ export const TransactionTable = ({ style, wallets }: TransactionsTableProps) => 
     accentText: {
       color: theme.accent,
     },
+    noTransactionsContainer: {
+      minHeight: 60,
+      paddingBottom: 17,
+      borderBottomStyle: 'solid',
+      borderBottomWidth: 2,
+      borderBottomColor: '#32404F',
+    },
+    noTransactionsIcon: {
+      marginLeft: 40,
+      marginRight: 28,
+    },
+    noTransactionsBody: {
+      fontSize: 16,
+    },
   };
 
   const onOpenTransactionClick = (tx: string) => {
@@ -58,6 +76,22 @@ export const TransactionTable = ({ style, wallets }: TransactionsTableProps) => 
 
   return (
     <div style={style ? style : {}}>
+      {transactions.length === 0 ?
+        <div>
+          <FlexRow style={styles.noTransactionsContainer as React.CSSProperties} justifyContent={'flex-start'} wrap={'nowrap'} alignItems={'center'}>
+            <Icon style={styles.noTransactionsIcon} name={'suggestedCircle'} />
+            <div>
+              <TextButton onClick={() => api.openExternal(links.BUY_POCKET)}><BodyText3>{localize.text('Buy some POKT', 'transactionsTable')}</BodyText3></TextButton>
+              <Header5 style={styles.noTransactionsBody}>{localize.text('Uh oh!  It’s empty in here, you don\'t have any transactions.', 'transactionsTable')}</Header5>
+            </div>
+          </FlexRow>
+          <div style={styles.noTransactionsContainer as React.CSSProperties}></div>
+          <div style={styles.noTransactionsContainer as React.CSSProperties}></div>
+          <div style={styles.noTransactionsContainer as React.CSSProperties}></div>
+        </div>
+        :
+        null
+      }
       {transactions
         .sort((a, b) => a[0] === b[0] ? 0 : a[0] > b[0] ? -1 : 1)
         .map(t => {
