@@ -274,6 +274,7 @@ export const WalletDetail = () => {
     const password = masterPassword?.get();
     const preppedSendAddress = sendAddress.trim();
     const preppedLabel = saveAddressLabel.trim();
+    const preppedMemo = saveAddressEnabled ? '' : sendMemo.trim();
     if(!sendAmount.trim() || !(amount > 0)) {
       return setSendAmountErrorMessage(localize.text('You must enter a valid amount', 'send'));
     } else if(balance.lt(bignumber(amount).add(bignumber(TRANSACTION_FEE)))) {
@@ -296,7 +297,7 @@ export const WalletDetail = () => {
         wallet.address,
         sendAmount,
         preppedSendAddress,
-        sendMemo,
+        preppedMemo,
         password,
       )
         .then(tx => {
@@ -348,7 +349,7 @@ export const WalletDetail = () => {
   };
   const onSendMemoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    setSendMemo(e.target.value);
+    setSendMemo(e.target.value.slice(0, 80));
   };
   const onSaveAddressLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -690,7 +691,6 @@ export const WalletDetail = () => {
                     :
                     null
                   }
-                  <TextInput style={{...styles.sendInput, marginTop: sendAddressErrorMessage ? 64 : 32}} type={'text'} placeholder={localize.text('Add a Tx memo', 'walletSend')} wide={true} value={sendMemo} onChange={onSendMemoChange} />
                   <FlexRow style={styles.enableSaveAddressRow} wrap={'nowrap'} justifyContent={'flex-start'} alignItems={'center'}>
                     <Toggle style={styles.enableSaveToggle} enabled={saveAddressEnabled} onToggle={enabled => setSaveAddressEnabled(enabled)} />
                     <BodyText1>{localize.text('Save to Address Book', 'walletDetail')}</BodyText1>
@@ -701,6 +701,18 @@ export const WalletDetail = () => {
                                value={saveAddressLabel} onChange={onSaveAddressLabelChange} />
                     :
                     null
+                  }
+                  {saveAddressEnabled ?
+                    null
+                    :
+                    <div style={styles.sendInput}>
+                      <TextInput style={{marginTop: sendAddressErrorMessage ? 64 : 32}} type={'text'}
+                                 placeholder={localize.text('Add a Tx memo', 'walletSend')} wide={true} value={sendMemo}
+                                 multiline={true} onChange={onSendMemoChange}/>
+                      <FlexRow justifyContent={'flex-end'}>
+                        <BodyText3 style={{color: '#fff'}}>{sendMemo.trim().length}/80</BodyText3>
+                      </FlexRow>
+                    </div>
                   }
                   <div style={styles.sendFeeContainer}>
                     <BodyText1>{localize.text('Transaction Fee {{fee}} POKT', 'walletSend', {fee: TRANSACTION_FEE})}</BodyText1>

@@ -5,7 +5,7 @@ import { RPCController } from './rpc-controller';
 import { makePassword } from '../util';
 import { Block, CoinDenom, Pocket, Transaction } from "@pokt-network/pocket-js";
 import { isError } from "lodash";
-import { accountTypes, TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT } from "../constants";
+import { accountTypes, DEFAULT_REQUEST_TIMEOUT, TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT } from "../constants";
 
 export class WalletController {
 
@@ -141,7 +141,7 @@ export class WalletController {
       return '';
     const rawTxResponse = await transactionSender
       .send(fromAddress, toAddress, (Number(amount) * 1000000).toString(10))
-      .submit(TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt);
+      .submit(TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt, memo, DEFAULT_REQUEST_TIMEOUT);
     if(isError(rawTxResponse))
       return '';
     return rawTxResponse.hash;
