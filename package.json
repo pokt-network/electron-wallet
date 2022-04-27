@@ -1,6 +1,6 @@
 {
   "name": "pocket-wallet",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Official lite wallet of Pocket Foundation.",
   "main": "./src-back/index.js",
   "private": true,
