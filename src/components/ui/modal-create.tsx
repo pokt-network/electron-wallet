@@ -6,10 +6,12 @@ import { TextInput } from '@pokt-foundation/ui';
 import { ButtonPrimary } from './button';
 import { FlexRow } from './flex';
 import { useDispatch } from 'react-redux';
-import { setShowCreateModal } from '../../reducers/app-reducer';
+import { setActiveView, setSelectedWallet, setShowCreateModal } from '../../reducers/app-reducer';
 import { WalletControllerContext } from '../../hooks/wallet-hook';
 import { masterPasswordContext } from "../../hooks/master-password-hook";
 import { InputErrorMessage } from './input-error';
+import { activeViews } from '../../constants';
+import { timeout } from '../../util';
 
 interface ModalCreateWalletProps {}
 
@@ -47,7 +49,7 @@ export const ModalCreateWallet = ({}: ModalCreateWalletProps) => {
     setName(e.target.value);
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const password = masterPassword?.get();
     const trimmedName = name.trim();
@@ -56,8 +58,13 @@ export const ModalCreateWallet = ({}: ModalCreateWalletProps) => {
     } else if(trimmedName.length > 12) {
       return setErrorMessage(localize.text('Account name must be twelve characters or less', 'modalCreate'));
     }
-    walletController?.createWallet(trimmedName, password);
+    const address = await walletController?.createWallet(trimmedName, password);
     dispatch(setShowCreateModal({show: false}));
+    if(address) {
+      await timeout();
+      dispatch(setSelectedWallet({address}))
+      dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
+    }
   };
 
   const onClose = () => {
