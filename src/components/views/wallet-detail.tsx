@@ -19,7 +19,8 @@ import { BodyText1, BodyText2, BodyText3 } from '../ui/text';
 import { Card } from '../ui/card';
 import { Switcher } from '../ui/switcher';
 import { TransactionTable } from '../ui/transactions-table';
-import { TextInput, useTheme } from '@pokt-foundation/ui';
+// @ts-ignore
+import { Dropdown, DropdownItem, TextInput, useTheme } from '@pokt-foundation/ui';
 import { AppHeader } from "../ui/app-header";
 import { setActiveView, setShowPrivateKeyModal } from "../../reducers/app-reducer";
 import { masterPasswordContext } from "../../hooks/master-password-hook";
@@ -36,6 +37,8 @@ import { InputErrorMessage } from '../ui/input-error';
 import { InputRightButton } from '../ui/input-adornment';
 import { Hex } from '@pokt-network/pocket-js';
 import { ModalSendSuccess } from '../ui/modal-send-success';
+import escapeRegExp from 'lodash/escapeRegExp';
+import { AddressItem } from '../../modules/address-item';
 
 export const WalletDetail = () => {
 
@@ -59,6 +62,7 @@ export const WalletDetail = () => {
   const [ sendAddressErrorMessage, setSendAddressErrorMessage ] = useState('');
   const [ unstakeErrorMessage, setUnstakeErrorMessage ] = useState('');
   const [ showSendSuccessModal, setShowSendSuccessModal ] = useState(false);
+  const [ showAddressDropdown, setShowAddressDropdown ] = useState(false);
   const [ sentTXID, setSentTXID ] = useState('');
   const api = useContext(APIContext);
   const localize = useContext(localizeContext);
@@ -70,10 +74,13 @@ export const WalletDetail = () => {
   const { masterPassword } = useContext(masterPasswordContext);
   const {
     activeView,
+    addresses,
     wallets,
     selectedWallet,
     showPrivateKeyModal,
   } = useSelector(({ appState }: RootState) => appState);
+
+  const foundAddress = addresses.find(a => a.address === sendAddress);
 
   useEffect(() => {
     if(activeView === activeViews.WALLET_DETAIL) {
@@ -89,6 +96,7 @@ export const WalletDetail = () => {
     setSendMemo('');
     setSaveAddressEnabled(false);
     setSaveAddressLabel('');
+    setShowAddressDropdown(false);
   }, [activeView]);
 
   useEffect(() => {
@@ -115,6 +123,7 @@ export const WalletDetail = () => {
     setSendErrorMessage('');
     setSendAmountErrorMessage('');
     setSendAddressErrorMessage('');
+    setShowAddressDropdown(false);
     dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
   }, [selectedWallet, dispatch]);
 
@@ -287,7 +296,7 @@ export const WalletDetail = () => {
       return setSendAddressErrorMessage(localize.text('Invalid address', 'send'));
     }
     setSendAddressErrorMessage('');
-    if(saveAddressEnabled && !preppedLabel) {
+    if(saveAddressEnabled && !foundAddress && !preppedLabel) {
       return setSendErrorMessage(localize.text('You must enter a label in order to save the address', 'send'));
     }
     // if((balance.toNumber()) < (amount + Number(TRANSACTION_FEE))) {
@@ -307,7 +316,7 @@ export const WalletDetail = () => {
             setSendAmountErrorMessage('');
             setSendAddressErrorMessage('');
             setShowSendSuccessModal(true);
-            if(saveAddressEnabled)
+            if(saveAddressEnabled && !foundAddress)
               addressController?.createAddress(preppedLabel, preppedSendAddress);
           } else {
             setSendErrorMessage(localize.text('Unable to send transaction. Check the amount and address.', 'send'));
@@ -346,6 +355,11 @@ export const WalletDetail = () => {
   const onSendAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setSendAddress(e.target.value.trim());
+  };
+  const onDropdownItemClick = (a: AddressItem) => {
+    setSendAddress(a.address);
+    setSendAddressErrorMessage('');
+    setShowAddressDropdown(false);
   };
   const onSendMemoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -510,6 +524,8 @@ export const WalletDetail = () => {
         <Icon name={'ellipse'} style={styles.accountTypeIcon} />
         :
         null;
+
+  const addressDropdownFilterPatt = new RegExp(sendAddress ? escapeRegExp(sendAddress) : '.', 'i');
 
   return (
     <FlexRow style={styles.container as React.CSSProperties}>
@@ -685,35 +701,54 @@ export const WalletDetail = () => {
                     :
                     null
                   }
-                  <TextInput style={{...styles.sendInput, marginTop: sendAmountErrorMessage ? 64 : 32}} type={'text'} placeholder={localize.text('Send to Address', 'walletSend')} wide={true} value={sendAddress} onChange={onSendAddressChange} />
+                  <Dropdown style={{...styles.sendInput, marginTop: sendAmountErrorMessage ? 64 : 32}}
+                            type={'text'} placeholder={localize.text('Send to Address', 'walletSend')}
+                            wide={true} value={sendAddress} onChange={onSendAddressChange}
+                            handleToggle={() => setShowAddressDropdown(true)} visible={showAddressDropdown}
+                            onClose={() => setShowAddressDropdown(false)}>
+                    {addresses
+                      .filter(a => wallet ? a.address !== wallet.address : true)
+                      .filter(a => {
+                        return foundAddress ? a === foundAddress : addressDropdownFilterPatt.test(a.name);
+                      })
+                      .slice(0, 5)
+                      .map(a => {
+                        return (
+                          <DropdownItem key={a.id} label={`${a.name} - ${a.address}`} onClick={() => onDropdownItemClick(a)} />
+                        );
+                      })
+                    }
+                  </Dropdown>
                   {sendAddressErrorMessage ?
                     <InputErrorMessage style={styles.sendErrorMessage} message={sendAddressErrorMessage} />
                     :
                     null
                   }
-                  <FlexRow style={styles.enableSaveAddressRow} wrap={'nowrap'} justifyContent={'flex-start'} alignItems={'center'}>
-                    <Toggle style={styles.enableSaveToggle} enabled={saveAddressEnabled} onToggle={enabled => setSaveAddressEnabled(enabled)} />
-                    <BodyText1>{localize.text('Save to Address Book', 'walletDetail')}</BodyText1>
-                  </FlexRow>
-                  {saveAddressEnabled ?
+                  {foundAddress ?
+                    <FlexRow style={styles.enableSaveAddressRow} wrap={'nowrap'} justifyContent={'flex-start'}>
+                      <BodyText2>{localize.text('Address', 'walletSend')}: {foundAddress.name}</BodyText2>
+                    </FlexRow>
+                    :
+                    <FlexRow style={{...styles.enableSaveAddressRow, ...(sendAddressErrorMessage ? {marginTop: 20} : {})}} wrap={'nowrap'} justifyContent={'flex-start'} alignItems={'center'}>
+                      <Toggle style={styles.enableSaveToggle} enabled={saveAddressEnabled} onToggle={enabled => setSaveAddressEnabled(enabled)} />
+                      <BodyText1>{localize.text('Save to Address Book', 'walletDetail')}</BodyText1>
+                    </FlexRow>
+                  }
+                  {!foundAddress && saveAddressEnabled ?
                     <TextInput style={{...styles.sendInput, marginTop: 16}} type={'text'}
                                placeholder={localize.text('Enter label of the address', 'walletSend')} wide={true}
                                value={saveAddressLabel} onChange={onSaveAddressLabelChange} />
                     :
                     null
                   }
-                  {saveAddressEnabled ?
-                    null
-                    :
-                    <div style={styles.sendInput}>
-                      <TextInput style={{marginTop: sendAddressErrorMessage ? 64 : 32}} type={'text'}
-                                 placeholder={localize.text('Add a Tx memo', 'walletSend')} wide={true} value={sendMemo}
-                                 multiline={true} onChange={onSendMemoChange}/>
-                      <FlexRow justifyContent={'flex-end'}>
-                        <BodyText3 style={{color: '#fff'}}>{sendMemo.trim().length}/80</BodyText3>
-                      </FlexRow>
-                    </div>
-                  }
+                  <div style={styles.sendInput}>
+                    <TextInput style={{marginTop: sendAddressErrorMessage ? 64 : 32}} type={'text'}
+                               placeholder={localize.text('Add a Tx memo', 'walletSend')} wide={true} value={sendMemo}
+                               multiline={true} onChange={onSendMemoChange}/>
+                    <FlexRow justifyContent={'flex-end'}>
+                      <BodyText3 style={{color: '#fff'}}>{sendMemo.trim().length}/80</BodyText3>
+                    </FlexRow>
+                  </div>
                   <div style={styles.sendFeeContainer}>
                     <BodyText1>{localize.text('Transaction Fee {{fee}} POKT', 'walletSend', {fee: TRANSACTION_FEE})}</BodyText1>
                   </div>
