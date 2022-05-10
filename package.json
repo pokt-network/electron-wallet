@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@fontsource/manrope": "^4.5.1",
-    "@pokt-foundation/ui": "0.3.5",
+    "@pokt-foundation/ui": "^0.3.9",
     "@pokt-network/pocket-js": "^0.7.0-rc",
     "@reduxjs/toolkit": "^1.6.2",
     "dayjs": "^1.11.0",
