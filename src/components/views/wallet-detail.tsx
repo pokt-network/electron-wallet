@@ -7,7 +7,7 @@ import { localizeContext } from '../../hooks/localize-hook';
 import { ButtonPrimary, ButtonSecondary, TextButton } from '../ui/button';
 import { Header1, Header5 } from '../ui/header';
 import { APIContext } from '../../hooks/api-hook';
-import { accountStatus, accountTypes, activeViews, TRANSACTION_FEE } from '../../constants';
+import { accountStatus, accountTypes, activeViews, ADDRESS_LENGTH, TRANSACTION_FEE } from '../../constants';
 import { WalletControllerContext } from '../../hooks/wallet-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -354,7 +354,8 @@ export const WalletDetail = () => {
   };
   const onSendAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    setSendAddress(e.target.value.trim());
+    if(e.target.value.trim().length <= ADDRESS_LENGTH)
+      setSendAddress(e.target.value);
   };
   const onDropdownItemClick = (a: AddressItem) => {
     setSendAddress(a.address);
