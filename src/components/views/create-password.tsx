@@ -16,6 +16,7 @@ import { setActiveView } from '../../reducers/app-reducer';
 import { activeViews } from '../../constants';
 import { InputRightButton } from "../ui/input-adornment";
 import { InputErrorMessage } from "../ui/input-error";
+import { BuyPoktButton } from './buy-pokt-button';
 
 export const CreatePassword = () => {
 
@@ -96,9 +97,7 @@ export const CreatePassword = () => {
       <MainContainer>
         <MainHeader>
           <MainHeaderTitle>{localize.text('Welcome to Pocket Wallet', 'create-password')}</MainHeaderTitle>
-          <TextButton onClick={() => {}}>
-            <Header5>{localize.text('Buy POKT', 'create-password')}</Header5>
-          </TextButton>
+          <BuyPoktButton />
         </MainHeader>
         <MainBody>
           <Header3 style={styles.header}>{localize.text('Protect your Wallet', 'create-password')}</Header3>
