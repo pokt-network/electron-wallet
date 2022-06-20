@@ -13,11 +13,13 @@ import { WalletControllerContext } from "../../hooks/wallet-hook";
 import { setActiveView, setSelectedWallet } from "../../reducers/app-reducer";
 import { activeViews } from "../../constants";
 import { useDispatch } from "react-redux";
+import { InputErrorMessage } from '../ui/input-error';
 
 export const WatchAccount = () => {
 
   const [ accountName, setAccountName ] = useState('');
   const [ address, setAddress ] = useState('');
+  const [ importError, setImportError ] = useState('');
 
   const dispatch = useDispatch();
   const localize = useContext(localizeContext);
@@ -61,6 +63,10 @@ export const WatchAccount = () => {
     submitButton: {
       marginTop: 50,
     },
+    errorMessage: {
+      marginTop: 10,
+      marginBottom: -32,
+    },
   };
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -71,19 +77,23 @@ export const WatchAccount = () => {
     if(!preppedName || !preppedAddress)
       return;
     if(walletController) {
-      walletController
-        .importWatchAccount(preppedName, preppedAddress)
-        .then(() => {
-          setTimeout(() => {
-            const wallets = walletController.getWallets();
-            const wallet = wallets.find(w => w.address === preppedAddress);
-            if(wallet) {
-              dispatch(setSelectedWallet({address: wallet.address}))
-              dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
-            }
-          }, 500);
-        })
-        .catch(console.error);
+      if(walletController.getWallets().some(w => w.address === preppedAddress)) {
+        setImportError(localize.text('Duplicate account. You cannot import the same account twice.', 'watchAccount'));
+      } else {
+        walletController
+          .importWatchAccount(preppedName, preppedAddress)
+          .then(() => {
+            setTimeout(() => {
+              const wallets = walletController.getWallets();
+              const wallet = wallets.find(w => w.address === preppedAddress);
+              if(wallet) {
+                dispatch(setSelectedWallet({address: wallet.address}))
+                dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
+              }
+            }, 500);
+          })
+          .catch(console.error);
+      }
     }
   };
 
@@ -115,6 +125,11 @@ export const WatchAccount = () => {
                 {localize.text('Address', 'watchAccount')}
               </Header4>
               <TextInput style={styles.addressInput} placeholder={localize.text('Address', 'universal')} type={'text'} wide={true} value={address} onChange={onAddressChange} required={true} />
+              {importError ?
+                <InputErrorMessage style={styles.errorMessage} message={importError}/>
+                :
+                null
+              }
               <ButtonPrimary style={styles.submitButton} type={'submit'}>{localize.text('Save Account', 'watchAccount')}</ButtonPrimary>
             </form>
           </div>

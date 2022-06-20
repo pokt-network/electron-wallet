@@ -171,17 +171,20 @@ export const ImportAccount = () => {
     const keyFileContents = await api.openFile(keyFilePath);
     const password = masterPassword?.get();
     if(walletController && password)
-      walletController.importWalletFromPPK(name, keyFileContents, keyFilePassphrase, password)
-        .then(res => {
-          if(res) {
-            setTimeout(() => {
-              const wallets = walletController.getWallets();
-              const wallet = wallets.find(w => w.address === res);
-              if(wallet) {
-                dispatch(setSelectedWallet({address: wallet.address}))
-                dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
+      walletController.getWalletDataFromPPK(name, keyFileContents, keyFilePassphrase, password)
+        .then(walletData => {
+          if(walletData) {
+            if(walletController.getWallets().some(w => w.address === walletData.address)) {
+              setKeyFileImportError(localize.text('Duplicate account. You cannot import the same account twice.', 'importAccount'));
+            } else {
+              const address = walletController.importWalletFromData(walletData)
+              if(address) {
+                setTimeout(() => {
+                  dispatch(setSelectedWallet({address}))
+                  dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
+                }, 500);
               }
-            }, 500);
+            }
           } else {
             setKeyFileImportError(localize.text('Incorrect Keyfile or Password', 'importAccount'));
           }
@@ -204,23 +207,25 @@ export const ImportAccount = () => {
       return setPrivateKeyImportError(localize.text('You must enter a private key', 'importAccount'));
     }
     if(walletController && password)
-      walletController.importWalletFromRawPrivateKey('', trimmedPrivateKey, password)
-        .then(res => {
-          if(res) {
-            setTimeout(() => {
-              const wallets = walletController.getWallets();
-              const wallet = wallets.find(w => w.address === res);
-              if(wallet) {
-                dispatch(setSelectedWallet({address: wallet.address}))
-                dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
+      walletController.getWalletDataFromRawPrivateKey('', trimmedPrivateKey, password)
+        .then(walletData => {
+          if(walletData) {
+            if(walletController.getWallets().some(w => w.address === walletData.address)) {
+              setPrivateKeyImportError(localize.text('Duplicate account. You cannot import the same account twice.', 'importAccount'));
+            } else {
+              const address = walletController.importWalletFromData(walletData)
+              if(address) {
+                setTimeout(() => {
+                  dispatch(setSelectedWallet({address}))
+                  dispatch(setActiveView({activeView: activeViews.WALLET_DETAIL}));
+                }, 500);
               }
-            }, 500);
+            }
+          } else {
+            setPrivateKeyImportError(localize.text('Invalid Private Key', 'importAccount'));
           }
         })
-        .catch(err => {
-          setPrivateKeyImportError(localize.text('Incorrect Private Key', 'importAccount'));
-          console.error(err);
-        });
+        .catch(console.error);
   };
 
   return (
