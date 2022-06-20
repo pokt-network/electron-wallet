@@ -59,40 +59,39 @@ export class WalletController {
     return walletData.address;
   }
 
-  async importWalletFromPPK(name: string, ppkJson: string, ppkPassword: string, password = makePassword()): Promise<string> {
-    const account = await this._keyUtils.importAccountFromPPK(password, ppkJson, ppkPassword);
-    if(!account)
-      return '';
-    const ppk = await this._keyUtils.getPPK(password, account.addressHex);
-    const walletData = {
-      name,
-      publicKey: account.publicKey.toString('hex'),
-      privateKeyEncrypted: account.encryptedPrivateKeyHex,
-      ppk,
-      address: account.addressHex,
-    };
+  importWalletFromData(walletData: WalletData): string {
     if(this._wallets.some(w => w.address === walletData.address))
       return '';
     this.addWallet(walletData, true);
     return walletData.address;
   }
 
-  async importWalletFromRawPrivateKey(name: string, rawPrivateKey: string, password = makePassword()): Promise<string> {
+  async getWalletDataFromPPK(name: string, ppkJson: string, ppkPassword: string, password = makePassword()): Promise<WalletData|null> {
+    const account = await this._keyUtils.importAccountFromPPK(password, ppkJson, ppkPassword);
+    if(!account)
+      return null;
+    const ppk = await this._keyUtils.getPPK(password, account.addressHex);
+    return {
+      name,
+      publicKey: account.publicKey.toString('hex'),
+      privateKeyEncrypted: account.encryptedPrivateKeyHex,
+      ppk,
+      address: account.addressHex,
+    };
+  }
+
+  async getWalletDataFromRawPrivateKey(name: string, rawPrivateKey: string, password = makePassword()): Promise<WalletData|null> {
     const account = await this._keyUtils.importAccountFromRawPrivateKey(password, rawPrivateKey);
     if(!account)
-      return '';
+      return null;
     const ppk = await this._keyUtils.getPPK(password, account.addressHex);
-    const walletData = {
+    return {
       name: name || account.addressHex.slice(0, 12),
       publicKey: account.publicKey.toString('hex'),
       privateKeyEncrypted: account.encryptedPrivateKeyHex,
       ppk,
       address: account.addressHex,
     };
-    if(this._wallets.some(w => w.address === walletData.address))
-      return '';
-    this.addWallet(walletData, true);
-    return walletData.address;
   }
 
   async importWatchAccount(name: string, address: string): Promise<string> {
