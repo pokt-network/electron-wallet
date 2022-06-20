@@ -1,10 +1,8 @@
 import { MainHeader, MainHeaderTitle } from "./main-header";
 import { TextButton } from "./button";
-import { activeViews, links } from "../../constants";
-import { Header5 } from "./header";
+import { activeViews } from "../../constants";
 import React, { useContext, useState } from "react";
 import { localizeContext } from "../../hooks/localize-hook";
-import { APIContext } from "../../hooks/api-hook";
 import { Icon } from "./icon";
 import { FlexRow } from "./flex";
 import { Card } from "./card";
@@ -13,6 +11,7 @@ import { masterPasswordContext } from "../../hooks/master-password-hook";
 import { MasterPassword } from "../../modules/master-password";
 import { useDispatch } from "react-redux";
 import { setActiveView } from '../../reducers/app-reducer';
+import { BuyPoktButton } from '../views/buy-pokt-button';
 
 interface AppHeaderProps {
   title: string
@@ -58,7 +57,6 @@ export const AppHeader = ({ title = '' }: AppHeaderProps) => {
   };
 
   const dispatch = useDispatch();
-  const api = useContext(APIContext);
   const localize = useContext(localizeContext);
   const { setMasterPassword } = useContext(masterPasswordContext);
 
@@ -78,9 +76,7 @@ export const AppHeader = ({ title = '' }: AppHeaderProps) => {
   return (
     <MainHeader>
       <MainHeaderTitle>{title}</MainHeaderTitle>
-      <TextButton onClick={() => api.openExternal(links.BUY_POCKET)}>
-        <Header5>{localize.text('Buy POKT', 'universal')}</Header5>
-      </TextButton>
+      <BuyPoktButton />
       <div style={styles.profileButtonContainer as React.CSSProperties}>
         <TextButton onClick={onProfileClick}>
           <FlexRow justifyContent={'center'} alignItems={'center'} style={styles.profileIconContainer}>
