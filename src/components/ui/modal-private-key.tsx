@@ -8,6 +8,8 @@ import { FlexRow } from './flex';
 import { useDispatch } from 'react-redux';
 import { setShowPrivateKeyModal } from '../../reducers/app-reducer';
 import { BodyText1 } from './text';
+import { InputRightButton } from './input-adornment';
+import { APIContext } from '../../hooks/api-hook';
 
 interface ModalPrivateKeyProps {
   privateKey: string
@@ -17,6 +19,7 @@ export const ModalPrivateKey = ({ privateKey }: ModalPrivateKeyProps) => {
 
   const dispatch = useDispatch();
   const localize = useContext(localizeContext);
+  const api = useContext(APIContext);
 
   const styles = {
     header: {
@@ -42,6 +45,9 @@ export const ModalPrivateKey = ({ privateKey }: ModalPrivateKeyProps) => {
       marginRight: 60,
       fontSize: 14,
     },
+    copyButton: {
+      marginTop: 0,
+    },
   };
 
   const onSubmit = (e: React.FormEvent) => {
@@ -53,6 +59,10 @@ export const ModalPrivateKey = ({ privateKey }: ModalPrivateKeyProps) => {
     dispatch(setShowPrivateKeyModal({show: false}));
   };
 
+  const onCopyPrivateKey = () => {
+    api.copyToClipboard(privateKey);
+  };
+
   return (
     <Modal onClose={onClose} shape={'circle'}>
       <div>
@@ -61,7 +71,16 @@ export const ModalPrivateKey = ({ privateKey }: ModalPrivateKeyProps) => {
           <BodyText1>{localize.text('If someone obtains your private key they can steal your POKT. Please store it securely.', 'modalPrivateKey')}</BodyText1>
         </div>
         <form style={styles.form} onSubmit={onSubmit}>
-          <TextInput style={styles.input} type={'text'} wide={true} value={privateKey} readOnly={true} />
+          <TextInput type={'text'}
+                     wide={true}
+                     value={privateKey}
+                     adornment={<InputRightButton icon={'copyBlue'} onClick={onCopyPrivateKey} style={styles.copyButton} />}
+                     adornmentPosition={'end'}
+                     adornmentSettings={{
+                       width: 52,
+                       padding: 0,
+                     }}
+                     readOnly={true} />
           <FlexRow justifyContent={'center'}>
             <ButtonPrimary type={'submit'} size={'md'} style={styles.submitButton}>{localize.text('Hide', 'universal')}</ButtonPrimary>
           </FlexRow>
