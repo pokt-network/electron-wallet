@@ -12,7 +12,8 @@ class API {
 
   keys = {
     // General listeners
-    GET_ENDPOINT: 'GET_ENDPOINT',
+    GET_POCKET_ENDPOINT: 'GET_POCKET_ENDPOINT',
+    GET_POCKET_CHAIN_ID: 'GET_POCKET_CHAIN_ID',
     GET_VERSION: 'GET_VERSION',
     OPEN_EXTERNAL: 'OPEN_EXTERNAL',
     OPEN_FILE_DIALOG: 'OPEN_FILE_DIALOG',
@@ -28,8 +29,12 @@ class API {
     this._ipcRenderer = ipcRenderer;
   }
 
-  getEndpoint(): string {
-    return this._ipcRenderer.sendSync(this.keys.GET_ENDPOINT);
+  getPocketEndpoint(): string {
+    return this._ipcRenderer.sendSync(this.keys.GET_POCKET_ENDPOINT);
+  }
+
+  getPocketChainId(): string {
+    return this._ipcRenderer.sendSync(this.keys.GET_POCKET_CHAIN_ID);
   }
 
   /**

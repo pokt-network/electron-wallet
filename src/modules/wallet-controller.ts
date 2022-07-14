@@ -5,7 +5,7 @@ import { RPCController } from './rpc-controller';
 import { makePassword } from '../util';
 import { Block, CoinDenom, Pocket, Transaction } from "@pokt-network/pocket-js";
 import { isError } from "lodash";
-import { accountTypes, DEFAULT_REQUEST_TIMEOUT, TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT } from "../constants";
+import { accountTypes, DEFAULT_REQUEST_TIMEOUT, TRANSACTION_FEE_UPOKT } from "../constants";
 
 export class WalletController {
 
@@ -18,14 +18,16 @@ export class WalletController {
   };
 
   _pocket: Pocket;
+  _chainId: string;
   _keyUtils: KeyUtils;
   _rpcController: RPCController;
   _wallets: Wallet[] = [];
 
-  constructor(keyUtils: KeyUtils, rpcController: RPCController, pocket: Pocket) {
+  constructor(keyUtils: KeyUtils, rpcController: RPCController, pocket: Pocket, chainId: string) {
     this._keyUtils = keyUtils;
     this._rpcController = rpcController;
     this._pocket = pocket;
+    this._chainId = chainId;
   }
 
   addWallet(walletData: WalletData, newWallet = false): void {
@@ -140,7 +142,7 @@ export class WalletController {
       return '';
     const rawTxResponse = await transactionSender
       .send(fromAddress, toAddress, (Number(amount) * 1000000).toString(10))
-      .submit(TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt, memo, DEFAULT_REQUEST_TIMEOUT);
+      .submit(this._chainId, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt, memo, DEFAULT_REQUEST_TIMEOUT);
     if(isError(rawTxResponse))
       return '';
     return rawTxResponse.hash;
@@ -158,11 +160,11 @@ export class WalletController {
     if(wallet.accountType === accountTypes.APP) {
       rawTxResponse = await transactionSender
         .appUnjail(address)
-        .submit(TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt);
+        .submit(this._chainId, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt);
     } else if(wallet.accountType === accountTypes.NODE) {
       rawTxResponse = await transactionSender
         .nodeUnjail(address)
-        .submit(TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt);
+        .submit(this._chainId, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt);
     } else {
       return '';
     }
@@ -183,11 +185,11 @@ export class WalletController {
     if(wallet.accountType === accountTypes.APP) {
       rawTxResponse = await transactionSender
         .appUnstake(address)
-        .submit(TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt);
+        .submit(this._chainId, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt);
     } else if(wallet.accountType === accountTypes.NODE) {
       rawTxResponse = await transactionSender
         .nodeUnstake(address)
-        .submit(TRANSACTION_CHAIN_ID, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt);
+        .submit(this._chainId, TRANSACTION_FEE_UPOKT, CoinDenom.Upokt);
     } else {
       return '';
     }
