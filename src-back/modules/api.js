@@ -11,7 +11,8 @@ class API {
 
   keys = {
     // General listeners
-    GET_ENDPOINT: 'GET_ENDPOINT',
+    GET_POCKET_ENDPOINT: 'GET_POCKET_ENDPOINT',
+    GET_POCKET_CHAIN_ID: 'GET_POCKET_CHAIN_ID',
     GET_VERSION: 'GET_VERSION',
     OPEN_EXTERNAL: 'OPEN_EXTERNAL',
     OPEN_FILE_DIALOG: 'OPEN_FILE_DIALOG',
@@ -42,7 +43,8 @@ class API {
     this._fs = fs;
     this._clipboard = clipboard;
     ipcMain
-      .on(this.keys.GET_ENDPOINT, this.getEndpoint)
+      .on(this.keys.GET_POCKET_ENDPOINT, this.getPocketEndpoint)
+      .on(this.keys.GET_POCKET_CHAIN_ID, this.getPocketChainId)
       .on(this.keys.GET_VERSION, this.getVersion.bind(this))
       .on(this.keys.OPEN_EXTERNAL, this.openExternal.bind(this))
       .on(this.keys.LOG_INFO, this.logInfo.bind(this))
@@ -71,8 +73,12 @@ class API {
     this._shell.openExternal(url);
   }
 
-  getEndpoint(e) {
-    e.returnValue = process.env.POCKET_WALLET_RPC_ENDPOINT || 'https://testnet-1.nodes.pokt.network:4201';
+  getPocketEndpoint(e) {
+    e.returnValue = process.env.POCKET_WALLET_RPC_ENDPOINT || 'https://mainnet-5.nodes.pokt.network:4201';
+  }
+
+  getPocketChainId(e) {
+    e.returnValue = process.env.POCKET_WALLET_CHAIN_ID || 'mainnet';
   }
 
   openFileDialog(e, options) {

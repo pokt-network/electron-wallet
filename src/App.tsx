@@ -70,8 +70,11 @@ const App = () => {
         const version = api.getVersion();
         api.logInfo(`Launch Pocket Wallet v${version}`);
 
-        const endpoint = api.getEndpoint();
+        const endpoint = api.getPocketEndpoint();
         api.logInfo(`RPC endpoint: ${endpoint}`);
+
+        const chainId = api.getPocketChainId();
+        api.logInfo(`RPC chain ID: ${chainId}`);
 
         if(!endpoint) {
           const message = 'ENDPOINT is not defined';
@@ -90,7 +93,7 @@ const App = () => {
         const keyUtils = new KeyUtils(pocket);
         const rpcController = new RPCController(pocket);
 
-        const walletController = new WalletController(keyUtils, rpcController, pocket);
+        const walletController = new WalletController(keyUtils, rpcController, pocket, chainId);
 
         walletController.events.error.subscribe(errStr => {
           api.logError(errStr);
