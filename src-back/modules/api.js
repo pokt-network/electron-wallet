@@ -74,7 +74,7 @@ class API {
   }
 
   getPocketEndpoint(e) {
-    e.returnValue = process.env.POCKET_WALLET_RPC_ENDPOINT || 'https://mainnet-5.nodes.pokt.network:4201';
+    e.returnValue = process.env.POCKET_WALLET_RPC_ENDPOINT;
   }
 
   getPocketChainId(e) {
