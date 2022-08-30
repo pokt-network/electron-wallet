@@ -1,4 +1,7 @@
-# dl-wallet
+# electron-wallet
+
+## Deprecated
+This project is no longer being maintained. Per our original engagement with the developer behind this project, [@rBurgett](https://github.com/rBurgett), we are open sourcing the project for the Pocket Network community under the MIT License. 
 
 ## Getting Started
 1. Install [Node.js](https://nodejs.org/en/)
